@@ -54,3 +54,13 @@
   .lookup-page, .success-page { padding-top: 1.7rem; }
   .lookup-card, .success-card { border-radius: 22px; }
 }
+
+
+@media (max-width: 991.98px) {
+  .about-hero { grid-template-columns: 1fr; }
+  .about-visual, .about-visual img { min-height: 330px; }
+}
+@media (max-width: 575.98px) {
+  .content-page { padding-top: 1.7rem; }
+  .content-card { padding: 1rem; border-radius: 20px; }
+}

@@ -260,3 +260,30 @@ button, input, select, textarea { font: inherit; }
 .success-details { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
 .success-detail-row { display: flex; justify-content: space-between; gap: 1rem; padding: .45rem 0; font-size: .86rem; }
 .success-detail-row span { color: var(--muted-foreground); }
+
+
+/* Batch 3: account and editorial content */
+.content-page { padding: 2.5rem 0 4.5rem; }
+.content-card { border: 1px solid var(--border); border-radius: 24px; background: var(--surface); padding: 1.35rem; }
+.account-nav { display: grid; gap: .65rem; }
+.account-nav a { display:flex; align-items:center; gap:.65rem; padding:.8rem .9rem; border-radius:14px; color:var(--muted-foreground); font-size:.86rem; font-weight:700; }
+.account-nav a:hover, .account-nav a.active { background:var(--surface-muted); color:var(--primary); }
+.profile-avatar { width:64px; height:64px; display:grid; place-items:center; border-radius:50%; background:var(--surface-muted); color:var(--primary); font-size:1.4rem; }
+.order-history-card { border:1px solid var(--border); border-radius:20px; background:var(--surface); padding:1rem; }
+.order-history-card + .order-history-card { margin-top:.8rem; }
+.stat-chip { display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .65rem; border-radius:999px; background:var(--surface-muted); color:var(--primary); font-size:.72rem; font-weight:700; }
+.about-hero { display:grid; grid-template-columns:1.05fr .95fr; gap:2rem; align-items:center; }
+.about-visual { min-height:430px; border-radius:30px; overflow:hidden; background:var(--surface-muted); }
+.about-visual img { width:100%; height:100%; min-height:430px; object-fit:cover; }
+.value-card { height:100%; border:1px solid var(--border); border-radius:22px; background:var(--surface); padding:1.2rem; }
+.value-card i { color:var(--primary); font-size:1.3rem; }
+.contact-info { display:grid; gap:.75rem; }
+.contact-row { display:flex; gap:.8rem; align-items:flex-start; padding:.9rem; border-radius:16px; background:var(--surface-muted); }
+.contact-row i { color:var(--primary); }
+.news-card { height:100%; overflow:hidden; border:1px solid var(--border); border-radius:22px; background:var(--surface); }
+.news-card img { width:100%; aspect-ratio:16/10; object-fit:cover; }
+.news-card-body { padding:1rem; }
+.news-card h2 { font-family:'Lora', Georgia, serif; font-size:1.18rem; line-height:1.35; }
+.news-card p { color:var(--muted-foreground); font-size:.82rem; line-height:1.7; }
+.article-meta { color:var(--muted-foreground); font-size:.75rem; }
+.empty-state { padding:2rem; border:1px dashed var(--border); border-radius:20px; text-align:center; background:var(--surface); }

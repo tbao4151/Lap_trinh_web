@@ -19,16 +19,16 @@
               '<a class="cas-nav-link' + active('home') + '" href="index.html">Trang chủ</a>' +
               '<a class="cas-nav-link' + active('catalog') + '" href="san-pham.html?type=bouquet">Bó hoa</a>' +
               '<a class="cas-nav-link" href="san-pham.html?type=basket">Giỏ hoa</a>' +
-              '<a class="cas-nav-link" href="#footer">Liên hệ</a>' +
+              '<a class="cas-nav-link" href="tin-tuc.html">Tin tức</a><a class="cas-nav-link" href="lien-he.html">Liên hệ</a>' +
             '</nav>' +
             '<div class="d-flex align-items-center gap-1">' +
               '<a class="cas-icon-btn" href="san-pham.html" aria-label="Tìm kiếm sản phẩm"><i class="bi bi-search"></i></a>' +
-              '<a class="cas-account-link d-none d-sm-inline-flex" href="dang-nhap.html">Đăng nhập</a>' +
+              '<a class="cas-account-link d-none d-sm-inline-flex" href="tai-khoan.html">Tài khoản</a>' +
               '<a class="cas-icon-btn surface position-relative" href="gio-hang.html" aria-label="Giỏ hàng"><i class="bi bi-bag"></i><span class="cas-cart-count d-none" id="headerCartCount">0</span></a>' +
               '<button class="cas-icon-btn d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#casMobileNav" aria-controls="casMobileNav" aria-expanded="false" aria-label="Mở menu"><i class="bi bi-list fs-5"></i></button>' +
             '</div>' +
           '</div>' +
-          '<div class="collapse cas-mobile-nav d-md-none" id="casMobileNav"><nav class="cas-container py-2"><a href="index.html">Trang chủ</a><a href="san-pham.html?type=bouquet">Bó hoa</a><a href="san-pham.html?type=basket">Giỏ hoa</a><a href="gio-hang.html">Giỏ hàng</a><a href="tra-cuu-don-hang.html">Tra cứu đơn</a><a href="dang-nhap.html">Đăng nhập</a><a href="#footer">Liên hệ</a></nav></div>' +
+          '<div class="collapse cas-mobile-nav d-md-none" id="casMobileNav"><nav class="cas-container py-2"><a href="index.html">Trang chủ</a><a href="san-pham.html?type=bouquet">Bó hoa</a><a href="san-pham.html?type=basket">Giỏ hoa</a><a href="gio-hang.html">Giỏ hàng</a><a href="tra-cuu-don-hang.html">Tra cứu đơn</a><a href="tai-khoan.html">Tài khoản</a><a href="tin-tuc.html">Tin tức</a><a href="lien-he.html">Liên hệ</a></nav></div>' +
         '</header>' +
       '</div>';
   }
@@ -38,8 +38,8 @@
       '<footer class="cas-footer" id="footer">' +
         '<div class="cas-container cas-footer-main"><div class="row g-4">' +
           '<div class="col-md-5"><div class="cas-brand"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span class="cas-brand-name">CÁ\'S HOA</span></div><p class="mt-3 mb-0" style="max-width:380px">Tiệm hoa tươi online. Hoa cho những điều khó nói. Luôn kèm sẵn thiệp và túi.</p></div>' +
-          '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a><br><a href="#" data-demo-link>Zalo</a><br><a href="tra-cuu-don-hang.html">Tra cứu đơn</a></p></div>' +
-          '<div class="col-6 col-md-4"><div class="cas-footer-title">Địa chỉ</div><p class="mt-3 mb-0">126/13 đường số 17<br>Linh Xuân, Thủ Đức, TP.HCM</p></div>' +
+          '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a><br><a href="lien-he.html">Liên hệ</a><br><a href="tra-cuu-don-hang.html">Tra cứu đơn</a></p></div>' +
+          '<div class="col-6 col-md-2"><div class="cas-footer-title">Thông tin</div><p class="mt-3 mb-0"><a href="gioi-thieu.html">Giới thiệu</a><br><a href="tin-tuc.html">Tin tức</a><br><a href="chinh-sach-giao-hang.html">Giao hàng</a><br><a href="chinh-sach-doi-tra.html">Đổi trả</a></p></div><div class="col-12 col-md-2"><div class="cas-footer-title">Địa chỉ</div><p class="mt-3 mb-0">126/13 đường số 17<br>Linh Xuân, Thủ Đức, TP.HCM</p></div>' +
         '</div></div>' +
         '<div class="cas-footer-bottom"><div class="cas-container d-flex flex-column flex-sm-row gap-2 justify-content-between"><span>© 2026 CÁ\'S HOA</span><span>FrontEnd môn Lập trình Web · HTML · CSS · JavaScript · Bootstrap</span></div></div>' +
       '</footer>';
@@ -120,7 +120,7 @@
 
   function currentCatalogFilters() {
     var params = new URLSearchParams(window.location.search);
-    return { type: params.get('type') || 'all', today: params.get('today') === '1' };
+    return { type: params.get('type') || 'all', today: params.get('today') === '1', tone: params.get('tone') || 'all', occasion: params.get('occasion') || '' };
   }
 
   function initCatalog() {
@@ -137,9 +137,8 @@
     var maxPriceLabel = document.getElementById('maxPriceLabel');
     var urlFilter = currentCatalogFilters();
 
-    if (urlFilter.type !== 'all') {
-      typeChecks.forEach(function (input) { input.checked = input.value === urlFilter.type; });
-    }
+    if (urlFilter.type !== 'all') typeChecks.forEach(function (input) { input.checked = input.value === urlFilter.type; });
+    if (urlFilter.tone !== 'all') toneChecks.forEach(function (input) { input.checked = input.value === urlFilter.tone; });
 
     function checkedValue(nodes, fallback) {
       var item = Array.from(nodes).find(function (node) { return node.checked; });
@@ -156,12 +155,13 @@
 
       var list = window.CAS_PRODUCTS.filter(function (product) {
         var matchesQuery = !query || [product.name, product.categories.join(' '), product.occasion].join(' ').toLowerCase().includes(query);
+        var matchesOccasion = !urlFilter.occasion || product.occasion === urlFilter.occasion;
         var matchesType = type === 'all' || product.type === type;
         var matchesCategory = category === 'all' || product.categories.includes(category);
         var matchesTone = tone === 'all' || product.tone === tone;
         var matchesPrice = product.price <= ceiling;
         var matchesToday = !urlFilter.today || product.today;
-        return matchesQuery && matchesType && matchesCategory && matchesTone && matchesPrice && matchesToday;
+        return matchesQuery && matchesType && matchesCategory && matchesTone && matchesPrice && matchesToday && matchesOccasion;
       });
 
       var sort = sortSelect.value;
@@ -188,6 +188,7 @@
         toneChecks.forEach(function (el) { el.checked = el.value === 'all'; });
         maxPrice.value = '500000';
         urlFilter.today = false;
+        urlFilter.occasion = '';
         render();
       });
     });
