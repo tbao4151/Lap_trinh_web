@@ -1,0 +1,43 @@
+@media (min-width: 768px) {
+  .cas-container { width: min(calc(100% - 64px), 1240px); }
+  .hero-section { padding: 2.6rem 0 3rem; }
+  .discovery-section, .latest-section { padding-top: 3.6rem; padding-bottom: 3.6rem; }
+}
+
+@media (max-width: 991.98px) {
+  .catalog-sidebar, .summary-card { position: static; }
+  .cart-line { grid-template-columns: 90px 1fr; }
+  .cart-line-image { width: 90px; }
+  .cart-line-actions { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; }
+}
+
+@media (max-width: 767.98px) {
+  .cas-announcement { font-size: 9px; letter-spacing: .1em; }
+  .cas-navbar { min-height: 62px; }
+  .cas-brand-tagline { display: none; }
+  .cas-brand-name { font-size: 19px; }
+  .hero-section { padding-top: 1.4rem; }
+  .hero-image-link:nth-child(1) { border-radius: 20px 20px 8px 20px; }
+  .hero-image-link:nth-child(2) { border-radius: 20px 8px 20px 20px; }
+  .hero-image-link:nth-child(3) { border-radius: 8px 20px 20px 20px; }
+  .discovery-card, .discovery-card img { min-height: 230px; }
+  .product-image-wrap { border-radius: 17px; }
+  .product-info { padding-top: .7rem; }
+  .product-name { font-size: .84rem; }
+  .product-price { font-size: .8rem; }
+  .catalog-head { padding-top: 1.8rem; }
+  .detail-panel { margin-top: .3rem; border-radius: 22px; }
+  .detail-image-main { border-radius: 22px; }
+  .cart-page, .checkout-page { padding-top: 1.8rem; }
+}
+
+@media (max-width: 575.98px) {
+  .cas-container { width: min(calc(100% - 24px), 1240px); }
+  .hero-today-btn { width: 100%; }
+  .hero-control { width: 38px; height: 38px; }
+  .latest-section { padding-bottom: 3rem; }
+  .product-quick-add { width: 38px; height: 38px; right: .6rem; bottom: .6rem; }
+  .cart-line { grid-template-columns: 76px 1fr; gap: .8rem; padding: .85rem; }
+  .cart-line-image { width: 76px; }
+  .checkout-card { padding: 1rem; border-radius: 20px; }
+}

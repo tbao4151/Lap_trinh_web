@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Giỏ hàng CÁ'S HOA.">
+  <title>Giỏ hàng | CÁ'S HOA</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body data-page="cart" class="d-flex flex-column">
+  <div id="siteHeader"></div>
+
+  <main class="cas-page cart-page">
+    <div class="cas-container">
+      <p class="cas-eyebrow">Đơn hoa của bạn</p>
+      <h1 class="cas-title">Giỏ hàng.</h1>
+      <p class="cas-subtitle">Bạn có thể thay đổi số lượng hoặc xoá sản phẩm trước khi chuyển sang bước thanh toán.</p>
+
+      <div class="row g-4 mt-2">
+        <div class="col-lg-8">
+          <div id="cartLines"></div>
+          <div id="emptyCart" class="empty-cart d-none"><i class="bi bi-bag"></i><h2 class="font-display fs-3">Giỏ hàng đang trống.</h2><p class="cas-muted">Chọn một mẫu hoa bạn thích để bắt đầu.</p><a class="btn-cas-primary mt-2" href="san-pham.html">Xem sản phẩm</a></div>
+        </div>
+
+        <div class="col-lg-4">
+          <aside id="cartSummary" class="summary-card d-none">
+            <p class="cas-eyebrow">Tóm tắt</p>
+            <h2 class="font-display fs-4 mt-2 mb-3">Đơn hàng</h2>
+            <div class="summary-row"><span>Tạm tính</span><strong data-cart-subtotal>0 ₫</strong></div>
+            <div class="summary-row"><span>Phí giao hàng</span><span>Tính ở bước sau</span></div>
+            <div class="summary-row total"><span>Tổng tạm tính</span><span data-cart-total>0 ₫</span></div>
+            <a href="thanh-toan.html" class="btn-cas-primary w-100 mt-3">Tiếp tục thanh toán <i class="bi bi-arrow-right"></i></a>
+            <a href="san-pham.html" class="btn-cas-outline w-100 mt-2">Tiếp tục chọn hoa</a>
+            <p class="demo-note mt-3 mb-0">Trong Batch 1, giỏ hàng được lưu bằng LocalStorage. Khi viết PHP, phần này sẽ được nối với session và dữ liệu đơn hàng phía server.</p>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="siteFooter"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/js/products.js" defer></script>
+  <script src="assets/js/cart.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

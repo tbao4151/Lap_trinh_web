@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Danh sách hoa tươi tại CÁ'S HOA.">
+  <title>Sản phẩm | CÁ'S HOA</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body data-page="catalog" class="d-flex flex-column">
+  <div id="siteHeader"></div>
+
+  <main class="cas-page">
+    <section class="catalog-head">
+      <div class="cas-container">
+        <p class="cas-eyebrow">Bộ sưu tập</p>
+        <h1 class="cas-title">Chọn một bó hoa.</h1>
+        <p class="cas-subtitle">Tìm theo tên, loại hoa, tone màu hoặc khoảng giá. Dữ liệu đang là dữ liệu FrontEnd để thuận tiện chuyển sang MySQL ở giai đoạn sau.</p>
+
+        <div class="catalog-toolbar mt-4">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-6">
+              <label class="visually-hidden" for="catalogSearch">Tìm sản phẩm</label>
+              <div class="position-relative"><i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 cas-muted"></i><input id="catalogSearch" class="form-control cas-form-control ps-5" type="search" placeholder="Tìm tên hoa hoặc dịp tặng..."></div>
+            </div>
+            <div class="col-7 col-md-4">
+              <label class="visually-hidden" for="catalogSort">Sắp xếp</label>
+              <select id="catalogSort" class="form-select cas-form-select">
+                <option value="featured">Nổi bật</option>
+                <option value="low">Giá thấp đến cao</option>
+                <option value="high">Giá cao đến thấp</option>
+                <option value="name">Tên A–Z</option>
+              </select>
+            </div>
+            <div class="col-5 col-md-2 d-lg-none"><button class="btn-cas-outline w-100" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanel" aria-expanded="false" aria-controls="filterPanel"><i class="bi bi-sliders"></i> Lọc</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="catalog-results">
+      <div class="cas-container">
+        <div class="row g-4">
+          <div class="col-lg-3">
+            <div class="collapse d-lg-block" id="filterPanel">
+              <aside class="catalog-sidebar" aria-label="Bộ lọc sản phẩm">
+                <div class="d-flex justify-content-between align-items-center mb-3"><strong>Bộ lọc</strong><button type="button" class="btn btn-link p-0 text-decoration-none small" style="color:var(--primary)" data-reset-filters>Đặt lại</button></div>
+
+                <div class="filter-group">
+                  <div class="filter-title">Kiểu sản phẩm</div>
+                  <label class="filter-check"><input type="radio" name="productType" value="all" checked> Tất cả</label>
+                  <label class="filter-check"><input type="radio" name="productType" value="bouquet"> Bó hoa</label>
+                  <label class="filter-check"><input type="radio" name="productType" value="basket"> Giỏ hoa</label>
+                </div>
+
+                <div class="filter-group">
+                  <div class="filter-title">Loại hoa</div>
+                  <label class="filter-check"><input type="radio" name="flowerCategory" value="all" checked> Tất cả</label>
+                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Hoa ly"> Hoa ly</label>
+                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Hoa hồng"> Hoa hồng</label>
+                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Cẩm tú cầu"> Cẩm tú cầu</label>
+                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Phi yến"> Phi yến</label>
+                </div>
+
+                <div class="filter-group">
+                  <div class="filter-title">Tone màu</div>
+                  <label class="filter-check"><input type="radio" name="tone" value="all" checked> Tất cả</label>
+                  <label class="filter-check"><input type="radio" name="tone" value="Xanh"> Xanh</label>
+                  <label class="filter-check"><input type="radio" name="tone" value="Hồng"> Hồng</label>
+                  <label class="filter-check"><input type="radio" name="tone" value="Đỏ"> Đỏ</label>
+                  <label class="filter-check"><input type="radio" name="tone" value="Tím"> Tím</label>
+                </div>
+
+                <div class="filter-group">
+                  <div class="filter-title d-flex justify-content-between"><span>Giá tối đa</span><span id="maxPriceLabel">500.000 ₫</span></div>
+                  <input id="maxPrice" class="form-range" type="range" min="290000" max="500000" step="10000" value="500000" style="accent-color:var(--primary)">
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          <div class="col-lg-9">
+            <div class="d-flex align-items-center justify-content-between mb-3"><span id="resultCount" class="cas-muted small">0 sản phẩm</span><a href="gio-hang.html" class="small fw-bold" style="color:var(--primary)">Xem giỏ hàng <i class="bi bi-arrow-right"></i></a></div>
+            <div id="catalogGrid" class="row g-3 g-lg-4"></div>
+            <div id="catalogEmpty" class="catalog-empty d-none mt-3"><i class="bi bi-flower1 fs-3" style="color:var(--primary)"></i><h2 class="font-display fs-4 mt-3">Chưa tìm thấy mẫu phù hợp.</h2><p class="cas-muted mb-3">Bạn thử thay đổi từ khoá hoặc bộ lọc.</p><button class="btn-cas-outline" type="button" data-reset-filters>Đặt lại bộ lọc</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="siteFooter"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/js/products.js" defer></script>
+  <script src="assets/js/cart.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
