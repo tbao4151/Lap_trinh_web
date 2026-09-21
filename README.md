@@ -2,27 +2,53 @@
 
 Website bán hoa tươi được xây dựng cho đồ án môn Lập trình Web.
 
-## FrontEnd hiện có 20 màn hình
+## FrontEnd hoàn chỉnh — 25 màn hình
 
-### Batch 1
-`index.html`, `san-pham.html`, `chi-tiet-san-pham.html`, `gio-hang.html`, `thanh-toan.html`
+### Batch 1 — Storefront
+1. `index.html`
+2. `san-pham.html`
+3. `chi-tiet-san-pham.html`
+4. `gio-hang.html`
+5. `thanh-toan.html`
 
-### Batch 2
-`dat-hang-thanh-cong.html`, `tra-cuu-don-hang.html`, `dang-nhap.html`, `dang-ky.html`, `quen-mat-khau.html`
+### Batch 2 — Đặt hàng và xác thực
+6. `dat-hang-thanh-cong.html`
+7. `tra-cuu-don-hang.html`
+8. `dang-nhap.html`
+9. `dang-ky.html`
+10. `quen-mat-khau.html`
 
-### Batch 3
-`tai-khoan.html`, `lich-su-don-hang.html`, `gioi-thieu.html`, `lien-he.html`, `tin-tuc.html`
+### Batch 3 — Tài khoản và nội dung
+11. `tai-khoan.html`
+12. `lich-su-don-hang.html`
+13. `gioi-thieu.html`
+14. `lien-he.html`
+15. `tin-tuc.html`
 
-### Batch 4
-`chi-tiet-tin-tuc.html`, `chinh-sach-giao-hang.html`, `chinh-sach-doi-tra.html`, `admin/dang-nhap.html`, `admin/index.html`
+### Batch 4 — Nội dung hỗ trợ và admin
+16. `chi-tiet-tin-tuc.html`
+17. `chinh-sach-giao-hang.html`
+18. `chinh-sach-doi-tra.html`
+19. `admin/dang-nhap.html`
+20. `admin/index.html`
+
+### Batch 5 — Quản lý
+21. `admin/san-pham.html`
+22. `admin/them-san-pham.html`
+23. `admin/sua-san-pham.html`
+24. `admin/don-hang.html`
+25. `admin/khach-hang.html`
+
+## Công nghệ
+HTML5, CSS3, JavaScript thuần, Bootstrap 5 và LocalStorage cho dữ liệu FrontEnd demo.
 
 ## Tài nguyên
-- `assets/css/` — giao diện cửa hàng và quản trị
-- `assets/js/` — JavaScript cho giỏ hàng, đơn hàng, tài khoản và quản trị
-- `assets/images/` — ảnh PNG lưu trực tiếp trong project
+- `assets/css/`
+- `assets/js/`
+- `assets/images/` — ảnh sản phẩm PNG lưu trực tiếp trong project
 
 ## Chạy local
 Mở `index.html` bằng VS Code Live Server.
 
 ## BackEnd dự kiến
-PHP + MySQL/MariaDB cho xác thực, session, CRUD sản phẩm, đơn hàng, khách hàng và nội dung.
+PHP + MySQL/MariaDB. Các trang HTML có thể được chuyển sang PHP template và thay LocalStorage bằng session + cơ sở dữ liệu.
