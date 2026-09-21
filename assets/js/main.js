@@ -120,7 +120,21 @@
 
   function currentCatalogFilters() {
     var params = new URLSearchParams(window.location.search);
-    return { type: params.get('type') || 'all', today: params.get('today') === '1', tone: params.get('tone') || 'all', occasion: params.get('occasion') || '' };
+    var occasionMap = {
+      'sinh-nhat': 'Sinh nhật',
+      'nguoi-thuong': 'Tặng người thương',
+      'ky-niem': 'Kỷ niệm',
+      'chuc-mung': 'Chúc mừng'
+    };
+    var toneMap = { 'xanh': 'Xanh', 'hong': 'Hồng', 'do': 'Đỏ', 'tim': 'Tím' };
+    var occasionParam = params.get('occasion') || '';
+    var toneParam = params.get('tone') || 'all';
+    return {
+      type: params.get('type') || 'all',
+      today: params.get('today') === '1',
+      tone: toneMap[toneParam] || toneParam,
+      occasion: occasionMap[occasionParam] || occasionParam
+    };
   }
 
   function initCatalog() {

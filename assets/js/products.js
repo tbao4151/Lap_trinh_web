@@ -78,7 +78,7 @@ window.CAS_PRODUCTS = [
   }
 ];
 
-window.CAS_FORMAT_VND/ = function (amount) {
+window.CAS_FORMAT_VND = function (amount) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(amount);
 };
 
