@@ -17,7 +17,7 @@
     <div class="cas-container">
       <p class="cas-eyebrow">Hoàn tất đơn hoa</p>
       <h1 class="cas-title">Thông tin nhận hoa.</h1>
-      <p class="cas-subtitle">Giao diện thanh toán kiểm tra dữ liệu bằng JavaScript và tạo đơn mô phỏng trong trình duyệt. PHP và MySQL sẽ thay thế phần lưu đơn ở giai đoạn BackEnd.</p>
+      <p class="cas-subtitle">Vui lòng kiểm tra kỹ thông tin người đặt, người nhận và thời gian giao trước khi xác nhận.</p>
 
       <div id="checkoutEmpty" class="empty-cart d-none mt-4"><i class="bi bi-bag"></i><h2 class="font-display fs-3">Chưa có sản phẩm để thanh toán.</h2><p class="cas-muted">Vui lòng thêm hoa vào giỏ hàng trước.</p><a href="san-pham.html" class="btn-cas-primary mt-2">Chọn hoa</a></div>
 
@@ -62,7 +62,7 @@
 
             <section class="checkout-card">
               <h2>Thanh toán</h2>
-              <label class="fulfillment-option"><input type="radio" name="payment" value="cod" checked><strong>Thanh toán khi xác nhận đơn</strong><span>Ở giai đoạn FrontEnd, đây là lựa chọn mô phỏng. Cổng thanh toán và xác nhận thanh toán chưa được kết nối.</span></label>
+              <label class="fulfillment-option"><input type="radio" name="payment" value="cod" checked><strong>Thanh toán khi xác nhận đơn</strong><span>Shop sẽ xác nhận hình thức thanh toán phù hợp sau khi tiếp nhận đơn.</span></label>
               <button id="checkoutSubmit" class="btn-cas-primary w-100 mt-3" type="submit"><i class="bi bi-check2-circle"></i> Xác nhận đặt hoa</button>
             </section>
           </form>
@@ -76,7 +76,7 @@
             <div class="summary-row mt-2"><span>Tạm tính</span><strong data-checkout-subtotal>0 ₫</strong></div>
             <div class="summary-row"><span>Phí giao hàng</span><span>Shop xác nhận sau</span></div>
             <div class="summary-row total"><span>Tổng tạm tính</span><span data-checkout-total>0 ₫</span></div>
-            <p class="demo-note mt-3 mb-0">Giá, tồn kho và phí giao hàng sẽ được kiểm tra lại ở phía PHP/MySQL khi triển khai BackEnd.</p>
+            <p class="demo-note mt-3 mb-0">Phí giao hàng và tình trạng hoa sẽ được shop xác nhận trước khi chuẩn bị đơn.</p>
           </aside>
         </div>
       </div>

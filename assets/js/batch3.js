@@ -32,7 +32,7 @@
       };
       write(PROFILE_KEY, next);
       document.getElementById('profileName').textContent = next.fullName || 'Khách hàng';
-      show('profileMessage','Đã lưu thông tin trên trình duyệt để phục vụ bản FrontEnd demo.','success');
+      show('profileMessage','Đã lưu thông tin cá nhân.','success');
     });
     document.getElementById('profileName').textContent = profile.fullName || 'Khách hàng';
   }
@@ -70,7 +70,7 @@
       write(CONTACT_KEY, messages.slice(0,20));
       form.reset();
       form.classList.remove('was-validated');
-      show('contactMessage','Đã ghi nhận nội dung trong bản FrontEnd demo.','success');
+      show('contactMessage','Cảm ơn bạn. Nội dung liên hệ đã được ghi nhận.','success');
     });
   }
 

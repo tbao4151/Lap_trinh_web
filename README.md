@@ -2,7 +2,29 @@
 
 Website bán hoa tươi được xây dựng cho đồ án môn Lập trình Web.
 
-## FrontEnd hoàn chỉnh — 25 màn hình
+## Mục tiêu FrontEnd
+
+Giao diện hiện có 25 màn hình và sử dụng đúng các công nghệ của giai đoạn FrontEnd:
+
+- HTML5
+- CSS3
+- JavaScript thuần
+- Bootstrap 5
+- Bootstrap Icons
+- Responsive Web Design
+- LocalStorage cho một số chức năng tương tác trước khi kết nối BackEnd
+
+## 5 trang chính có thể dùng để báo cáo giao diện
+
+1. `index.html` — Trang chủ
+2. `san-pham.html` — Danh sách sản phẩm và bộ lọc
+3. `chi-tiet-san-pham.html` — Chi tiết sản phẩm
+4. `lien-he.html` — Thông tin và biểu mẫu liên hệ
+5. `tin-tuc.html` — Danh sách tin tức
+
+Ngoài ra project còn có giỏ hàng, thanh toán, tra cứu đơn, tài khoản khách hàng, chính sách và khu vực quản trị.
+
+## Danh sách 25 màn hình
 
 ### Batch 1 — Storefront
 1. `index.html`
@@ -39,16 +61,26 @@ Website bán hoa tươi được xây dựng cho đồ án môn Lập trình Web
 24. `admin/don-hang.html`
 25. `admin/khach-hang.html`
 
-## Công nghệ
-HTML5, CSS3, JavaScript thuần, Bootstrap 5 và LocalStorage cho dữ liệu FrontEnd demo.
+## Cấu trúc thư mục
 
-## Tài nguyên
-- `assets/css/`
-- `assets/js/`
-- `assets/images/` — ảnh sản phẩm PNG lưu trực tiếp trong project
+- `assets/css/` — CSS giao diện người dùng và admin
+- `assets/js/` — JavaScript cho sản phẩm, giỏ hàng, đơn hàng, tài khoản và admin
+- `assets/images/` — ảnh PNG lưu trực tiếp trong project
+- `admin/` — các màn hình quản trị
 
-## Chạy local
+## Chạy project
+
 Mở `index.html` bằng VS Code Live Server.
 
-## BackEnd dự kiến
-PHP + MySQL/MariaDB. Các trang HTML có thể được chuyển sang PHP template và thay LocalStorage bằng session + cơ sở dữ liệu.
+## Hướng phát triển BackEnd
+
+Giai đoạn hoàn chỉnh sẽ dùng PHP + MySQL/MariaDB để xử lý:
+
+- đăng ký, đăng nhập và session
+- dữ liệu sản phẩm
+- giỏ hàng và đặt hàng
+- tra cứu trạng thái đơn
+- lưu liên hệ
+- CRUD sản phẩm
+- quản lý đơn hàng
+- quản lý khách hàng

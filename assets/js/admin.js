@@ -78,13 +78,13 @@ function productForm(){
       var added=read(ADDED_KEY,[]),idx=added.findIndex(function(p){return p.id===editing.id});
       if(idx>=0){added[idx]=Object.assign({},added[idx],data);write(ADDED_KEY,added)}
       else{var overrides=read(OVERRIDE_KEY,{});overrides[editing.id]=Object.assign({},overrides[editing.id]||{},data);write(OVERRIDE_KEY,overrides)}
-      msg.textContent='Đã lưu thay đổi sản phẩm trong dữ liệu FrontEnd demo.';
+      msg.textContent='Đã lưu thay đổi sản phẩm.';
     }else{
       var addedList=read(ADDED_KEY,[]);
       data.id='custom-'+Date.now();
       data.slug=data.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
       addedList.unshift(data);write(ADDED_KEY,addedList);
-      msg.textContent='Đã thêm sản phẩm vào dữ liệu FrontEnd demo.';
+      msg.textContent='Đã thêm sản phẩm.';
       form.reset();
     }
     msg.className='alert alert-success mt-3 mb-0';

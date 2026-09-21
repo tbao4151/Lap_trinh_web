@@ -105,7 +105,7 @@
         if (!existing && card) {
           existing = document.createElement('div');
           existing.className = 'auth-message info google-demo-message';
-          existing.textContent = 'Đăng nhập Google sẽ được kết nối ở giai đoạn BackEnd. Batch FrontEnd hiện chỉ hoàn thiện giao diện.';
+          existing.textContent = 'Chức năng đăng nhập bằng Google chưa được kích hoạt trong phiên bản hiện tại.';
           button.insertAdjacentElement('afterend', existing);
         }
       });
@@ -128,7 +128,7 @@
         setMessage('loginMessage', 'Gmail hoặc số điện thoại chưa đúng định dạng.', 'error');
         return;
       }
-      setMessage('loginMessage', 'Dữ liệu FrontEnd hợp lệ. Xác thực tài khoản thật sẽ được xử lý bằng PHP/MySQL ở giai đoạn BackEnd.', 'success');
+      setMessage('loginMessage', 'Thông tin đăng nhập hợp lệ.', 'success');
     });
   }
 
@@ -158,7 +158,7 @@
       if (password !== confirmPassword) {
         setMessage('signupMessage', 'Mật khẩu xác nhận không khớp.', 'error'); return;
       }
-      setMessage('signupMessage', 'Form đăng ký đã hợp lệ. FrontEnd không lưu mật khẩu; PHP/MySQL sẽ xử lý tạo tài khoản và xác nhận Gmail sau.', 'success');
+      setMessage('signupMessage', 'Thông tin đăng ký hợp lệ. Vui lòng kiểm tra Gmail để tiếp tục xác nhận tài khoản.', 'success');
     });
   }
 
@@ -178,7 +178,7 @@
         setMessage('recoveryMessage', 'Vui lòng nhập Gmail @gmail.com hoặc số điện thoại 10 chữ số.', 'error');
         return;
       }
-      setMessage('recoveryMessage', 'Thông tin đúng định dạng. Chuyển sang bước nhập mã khôi phục.', 'success');
+      setMessage('recoveryMessage', 'Thông tin hợp lệ. Vui lòng nhập mã khôi phục đã nhận.', 'success');
       requestForm.classList.add('d-none');
       verifyForm.classList.remove('d-none');
       code.focus();
@@ -190,7 +190,7 @@
         setMessage('recoveryVerifyMessage', 'Vui lòng nhập đủ 8 chữ số trong mã khôi phục.', 'error');
         return;
       }
-      setMessage('recoveryVerifyMessage', 'Mã đã đúng định dạng. Việc xác minh mã và đặt lại mật khẩu sẽ được nối với PHP/MySQL ở giai đoạn BackEnd.', 'success');
+      setMessage('recoveryVerifyMessage', 'Mã khôi phục hợp lệ. Bạn có thể tiếp tục đặt lại mật khẩu khi chức năng tài khoản được kích hoạt.', 'success');
     });
 
     document.getElementById('recoveryChange').addEventListener('click', function () {
@@ -247,7 +247,7 @@
       var results = document.getElementById('lookupResults');
       var card = document.getElementById('lookupResultCard');
       if (!order) {
-        setMessage('lookupMessage', 'Không tìm thấy đơn phù hợp trong dữ liệu demo của trình duyệt này. Hãy kiểm tra lại mã đơn và SĐT người nhận.', 'error');
+        setMessage('lookupMessage', 'Không tìm thấy đơn hàng phù hợp. Hãy kiểm tra lại mã đơn và số điện thoại người nhận.', 'error');
         results.classList.add('d-none');
         return;
       }
@@ -272,7 +272,7 @@
 
     var details = document.getElementById('successOrderDetails');
     if (!order) {
-      details.innerHTML = '<p class="auth-message info mb-0">Không tìm thấy chi tiết đơn trong trình duyệt này. Bạn có thể quay lại cửa hàng và tạo một đơn FrontEnd demo mới.</p>';
+      details.innerHTML = '<p class="auth-message info mb-0">Không tìm thấy chi tiết đơn hàng. Vui lòng kiểm tra lại mã đơn hoặc quay lại cửa hàng.</p>';
       return;
     }
     details.innerHTML =

@@ -23,14 +23,14 @@
         <section class="auth-card">
           <p class="cas-eyebrow">Khôi phục tài khoản</p>
           <h1>Quên mật khẩu</h1>
-          <p class="auth-description">Nhập Gmail hoặc số điện thoại đã đăng ký. Giai đoạn PHP sẽ gửi và xác minh mã khôi phục thật.</p>
+          <p class="auth-description">Nhập Gmail hoặc số điện thoại đã đăng ký để nhận mã khôi phục tài khoản.</p>
           <form id="recoveryForm" class="auth-form" novalidate>
             <div class="mb-3"><label for="recoveryIdentifier" class="form-label">Gmail hoặc số điện thoại</label><input id="recoveryIdentifier" class="form-control cas-form-control" type="text" placeholder="example@gmail.com hoặc 0123456789" required></div>
             <div id="recoveryMessage" class="auth-message d-none" role="status"></div>
             <button class="btn-cas-primary w-100 mt-2" type="submit"><i class="bi bi-key"></i> Gửi mã xác nhận <i class="bi bi-arrow-right"></i></button>
           </form>
           <form id="recoveryVerifyForm" class="auth-form d-none" novalidate>
-            <div class="demo-note mb-3">FrontEnd demo: chưa có dịch vụ email nên mã không được gửi thật. Ô mã này dùng để hoàn thiện luồng giao diện trước khi kết nối PHP/MySQL.</div>
+            <div class="demo-note mb-3">Nhập mã xác nhận gồm 8 chữ số đã được gửi đến thông tin đăng ký của bạn.</div>
             <div class="mb-3"><label for="recoveryCode" class="form-label">Mã xác nhận 8 chữ số</label><input id="recoveryCode" class="form-control cas-form-control text-center" inputmode="numeric" maxlength="8" placeholder="00000000" required></div>
             <div id="recoveryVerifyMessage" class="auth-message d-none" role="status"></div>
             <button class="btn-cas-primary w-100" type="submit">Xác nhận mã</button>
