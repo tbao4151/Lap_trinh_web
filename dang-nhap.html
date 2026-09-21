@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Đăng nhập tài khoản khách hàng CÁ'S HOA.">
+  <title>Đăng nhập | CÁ'S HOA</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body data-page="login" class="auth-page">
+  <main class="auth-main">
+    <div class="auth-shell"><div class="auth-grid">
+      <aside class="auth-story">
+  <p class="cas-eyebrow">CÁ'S HOA · FLOWERS & FEELINGS</p>
+  <h2>Những điều khó nói, gửi cùng một nhành hoa.</h2>
+  <p>Tài khoản giúp bạn lưu thông tin, theo dõi đơn và giữ lại những lựa chọn hoa dành cho người thương.</p>
+  <div class="d-flex align-items-center gap-3 mt-4 fw-semibold" style="color:var(--primary)"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span>Tiệm hoa tươi online</span></div>
+</aside>
+      <div><a href="index.html" class="auth-brand" aria-label="Về trang chủ CÁ'S HOA"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span class="cas-brand-name">CÁ'S HOA</span></a>
+        <section class="auth-card">
+          <p class="cas-eyebrow">Tài khoản khách hàng</p>
+          <h1>Chào mừng bạn trở lại.</h1>
+          <p class="auth-description">Đăng nhập bằng Gmail hoặc số điện thoại cùng mật khẩu của bạn.</p>
+          <form id="loginForm" class="auth-form" novalidate>
+            <div class="mb-3"><label for="loginIdentifier" class="form-label">Email hoặc số điện thoại</label><input id="loginIdentifier" class="form-control cas-form-control" type="text" inputmode="email" placeholder="example@gmail.com hoặc 0123456789" autocomplete="username" required></div>
+            <div class="mb-2"><label for="loginPassword" class="form-label">Mật khẩu</label><div class="auth-password-wrap"><input id="loginPassword" class="form-control cas-form-control" type="password" placeholder="Mật khẩu của bạn" autocomplete="current-password" required><button class="auth-password-toggle" type="button" data-toggle-password="loginPassword" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div></div>
+            <div class="text-end mb-3"><a href="quen-mat-khau.html" class="small fw-bold" style="color:var(--primary)">Quên mật khẩu?</a></div>
+            <div id="loginMessage" class="auth-message d-none" role="status"></div>
+            <button class="btn-cas-primary w-100 mt-3" type="submit"><i class="bi bi-lock"></i> Đăng nhập <i class="bi bi-arrow-right"></i></button>
+          </form>
+          <div class="auth-divider">hoặc</div>
+          <button class="auth-google" type="button" data-auth-demo-google><span class="me-2 fw-bold" style="color:#4285F4">G</span> Tiếp tục với Google</button>
+          <p class="auth-foot">Chưa có tài khoản? <a href="dang-ky.html">Đăng ký ngay</a></p>
+          <p class="auth-foot mt-2"><a href="index.html" style="color:var(--muted-foreground)">Tiếp tục mua hoa như khách</a></p>
+        </section>
+      </div>
+    </div></div>
+  </main>
+  <script src="assets/js/batch2.js" defer></script>
+</body>
+</html>

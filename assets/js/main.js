@@ -23,12 +23,12 @@
             '</nav>' +
             '<div class="d-flex align-items-center gap-1">' +
               '<a class="cas-icon-btn" href="san-pham.html" aria-label="Tìm kiếm sản phẩm"><i class="bi bi-search"></i></a>' +
-              '<a class="cas-account-link d-none d-sm-inline-flex" href="#" data-demo-link>Đăng nhập</a>' +
+              '<a class="cas-account-link d-none d-sm-inline-flex" href="dang-nhap.html">Đăng nhập</a>' +
               '<a class="cas-icon-btn surface position-relative" href="gio-hang.html" aria-label="Giỏ hàng"><i class="bi bi-bag"></i><span class="cas-cart-count d-none" id="headerCartCount">0</span></a>' +
               '<button class="cas-icon-btn d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#casMobileNav" aria-controls="casMobileNav" aria-expanded="false" aria-label="Mở menu"><i class="bi bi-list fs-5"></i></button>' +
             '</div>' +
           '</div>' +
-          '<div class="collapse cas-mobile-nav d-md-none" id="casMobileNav"><nav class="cas-container py-2"><a href="index.html">Trang chủ</a><a href="san-pham.html?type=bouquet">Bó hoa</a><a href="san-pham.html?type=basket">Giỏ hoa</a><a href="gio-hang.html">Giỏ hàng</a><a href="#footer">Liên hệ</a></nav></div>' +
+          '<div class="collapse cas-mobile-nav d-md-none" id="casMobileNav"><nav class="cas-container py-2"><a href="index.html">Trang chủ</a><a href="san-pham.html?type=bouquet">Bó hoa</a><a href="san-pham.html?type=basket">Giỏ hoa</a><a href="gio-hang.html">Giỏ hàng</a><a href="tra-cuu-don-hang.html">Tra cứu đơn</a><a href="dang-nhap.html">Đăng nhập</a><a href="#footer">Liên hệ</a></nav></div>' +
         '</header>' +
       '</div>';
   }
@@ -38,7 +38,7 @@
       '<footer class="cas-footer" id="footer">' +
         '<div class="cas-container cas-footer-main"><div class="row g-4">' +
           '<div class="col-md-5"><div class="cas-brand"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span class="cas-brand-name">CÁ\'S HOA</span></div><p class="mt-3 mb-0" style="max-width:380px">Tiệm hoa tươi online. Hoa cho những điều khó nói. Luôn kèm sẵn thiệp và túi.</p></div>' +
-          '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a><br><a href="#" data-demo-link>Zalo</a><br><a href="#" data-demo-link>Tra cứu đơn</a></p></div>' +
+          '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a><br><a href="#" data-demo-link>Zalo</a><br><a href="tra-cuu-don-hang.html">Tra cứu đơn</a></p></div>' +
           '<div class="col-6 col-md-4"><div class="cas-footer-title">Địa chỉ</div><p class="mt-3 mb-0">126/13 đường số 17<br>Linh Xuân, Thủ Đức, TP.HCM</p></div>' +
         '</div></div>' +
         '<div class="cas-footer-bottom"><div class="cas-container d-flex flex-column flex-sm-row gap-2 justify-content-between"><span>© 2026 CÁ\'S HOA</span><span>FrontEnd môn Lập trình Web · HTML · CSS · JavaScript · Bootstrap</span></div></div>' +
@@ -310,8 +310,13 @@
       window.setTimeout(function () {
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="bi bi-check2-circle"></i> Xác nhận đặt hoa';
-        var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('frontendDemoModal'));
-        modal.show();
+        if (!window.CASOrders) {
+          showToast('Không thể tạo đơn mô phỏng. Vui lòng tải lại trang.');
+          return;
+        }
+        var order = window.CASOrders.createFromCheckout(form, window.CASCart.detailed(), window.CASCart.subtotal());
+        window.CASCart.clear();
+        window.location.href = 'dat-hang-thanh-cong.html?code=' + encodeURIComponent(order.orderCode);
       }, 550);
     });
   }

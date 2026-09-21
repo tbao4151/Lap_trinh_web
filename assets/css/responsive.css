@@ -41,3 +41,16 @@
   .cart-line-image { width: 76px; }
   .checkout-card { padding: 1rem; border-radius: 20px; }
 }
+
+
+@media (max-width: 991.98px) {
+  .auth-grid { grid-template-columns: 1fr; }
+  .auth-story { display: none; }
+  .auth-shell { width: min(100%, 520px); }
+}
+@media (max-width: 575.98px) {
+  .auth-main { padding: 1.25rem .75rem; align-items: flex-start; }
+  .auth-card { margin-top: 1.4rem; padding: 1.25rem; border-radius: 22px; }
+  .lookup-page, .success-page { padding-top: 1.7rem; }
+  .lookup-card, .success-card { border-radius: 22px; }
+}
