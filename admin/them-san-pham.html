@@ -9,33 +9,87 @@
   <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body data-admin-page="product-form">
-  <div class="admin-layout">
+  <div class="admin-app">
     <aside class="admin-sidebar" id="adminSidebar"></aside>
-    <main class="admin-main">
-      <header class="admin-topbar" id="adminTopbar"></header>
-      <div class="admin-content">
-        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-          <div><div class="admin-kicker">Sản phẩm</div><h1 id="productFormTitle" class="admin-title">Thêm sản phẩm</h1><p class="text-secondary small mt-2 mb-0">Nhập đầy đủ thông tin để sản phẩm hiển thị rõ ràng ở cửa hàng.</p></div>
-          <a class="admin-btn-light" href="san-pham.html">Quay lại danh sách</a>
-        </div>
+    <button class="admin-overlay" id="adminOverlay" type="button" aria-label="Đóng menu"></button>
 
-        <section class="admin-card mt-4">
+    <div class="admin-workspace">
+      <header class="admin-topbar" id="adminTopbar"></header>
+
+      <main class="admin-content">
+        <section class="admin-hero">
+          <div>
+            <h1>Thêm sản phẩm</h1>
+            <p>Nhập đầy đủ thông tin bán hàng, phân loại và hình ảnh của mẫu hoa.</p>
+          </div>
+          <div class="admin-hero-icon"><i class="bi bi-pencil-square"></i></div>
+        </section>
+
+        <section class="admin-card admin-section">
           <form id="adminProductForm" class="admin-form-grid" novalidate>
-            <div><label class="form-label small fw-semibold" for="productName">Tên sản phẩm</label><input id="productName" class="form-control admin-input" placeholder="Ví dụ: Mùa xanh dịu" required></div>
-            <div><label class="form-label small fw-semibold" for="productSku">Mã SKU</label><input id="productSku" class="form-control admin-input" placeholder="BO-HOA-001" required></div>
-            <div><label class="form-label small fw-semibold" for="productPrice">Giá bán</label><input id="productPrice" type="number" min="0" step="1000" class="form-control admin-input" placeholder="350000" required></div>
-            <div><label class="form-label small fw-semibold" for="productType">Loại sản phẩm</label><select id="productType" class="form-select admin-input"><option value="bouquet">Bó hoa</option><option value="basket">Giỏ hoa</option></select></div>
-            <div><label class="form-label small fw-semibold" for="productTone">Tông màu</label><select id="productTone" class="form-select admin-input"><option>Xanh</option><option>Hồng</option><option>Đỏ</option><option>Tím</option></select></div>
-            <div><label class="form-label small fw-semibold" for="productOccasion">Dịp tặng</label><select id="productOccasion" class="form-select admin-input"><option>Sinh nhật</option><option>Chúc mừng</option><option>Kỷ niệm</option><option>Tặng người thương</option></select></div>
-            <div><label class="form-label small fw-semibold" for="productCategory">Nhóm hoa</label><input id="productCategory" class="form-control admin-input" placeholder="Ví dụ: Hoa ly"></div>
-            <div><label class="form-label small fw-semibold" for="productImage">Ảnh PNG</label><select id="productImage" class="form-select admin-input"><option value="lam-tinh.png">lam-tinh.png</option><option value="garden.png">garden.png</option><option value="hoa-ly.png">hoa-ly.png</option><option value="cam-tu-cau.png">cam-tu-cau.png</option><option value="phi-yen.png">phi-yen.png</option></select></div>
-            <div class="full"><label class="form-label small fw-semibold" for="productDescription">Mô tả sản phẩm</label><textarea id="productDescription" class="form-control admin-input" rows="5" placeholder="Mô tả kiểu dáng, cảm giác và dịp tặng phù hợp..."></textarea></div>
-            <div class="full form-check"><input id="productToday" class="form-check-input" type="checkbox"><label for="productToday" class="form-check-label">Hiển thị trong danh sách “Mẫu hôm nay”</label></div>
-            <div class="full"><button class="admin-btn" type="submit"><span id="productSubmitText">Thêm sản phẩm</span></button><div id="productFormMessage"></div></div>
+            <div>
+              <label class="admin-label" for="productName">Tên sản phẩm</label>
+              <input class="admin-input" id="productName" required placeholder="Ví dụ: Garden Morning">
+            </div>
+            <div>
+              <label class="admin-label" for="productSku">SKU</label>
+              <input class="admin-input" id="productSku" required placeholder="BH-GARDEN-001">
+            </div>
+            <div>
+              <label class="admin-label" for="productPrice">Giá bán</label>
+              <input class="admin-input" id="productPrice" type="number" min="0" step="1000" required>
+            </div>
+            <div>
+              <label class="admin-label" for="productType">Kiểu sản phẩm</label>
+              <select class="admin-select" id="productType"><option value="bouquet">Bó hoa</option><option value="basket">Giỏ hoa</option></select>
+            </div>
+            <div>
+              <label class="admin-label" for="productCategory">Loại hoa chính</label>
+              <input class="admin-input" id="productCategory" placeholder="Hoa ly">
+            </div>
+            <div>
+              <label class="admin-label" for="productTone">Tông màu</label>
+              <select class="admin-select" id="productTone"><option>Xanh</option><option>Hồng</option><option>Đỏ</option><option>Tím</option><option>Trắng</option></select>
+            </div>
+            <div>
+              <label class="admin-label" for="productOccasion">Dịp tặng</label>
+              <select class="admin-select" id="productOccasion"><option>Sinh nhật</option><option>Chúc mừng</option><option>Kỷ niệm</option><option>Tặng người thương</option><option>Cảm ơn</option></select>
+            </div>
+            <div>
+              <label class="admin-label" for="productImage">Ảnh sản phẩm PNG</label>
+              <select class="admin-select" id="productImage">
+                <option value="lam-tinh.png">lam-tinh.png</option>
+                <option value="garden.png">garden.png</option>
+                <option value="hoa-ly.png">hoa-ly.png</option>
+                <option value="ly-xanh.png">ly-xanh.png</option>
+                <option value="lily.png">lily.png</option>
+                <option value="mot-bo-hoa.png">mot-bo-hoa.png</option>
+                <option value="cam-tu-cau.png">cam-tu-cau.png</option>
+                <option value="phi-yen.png">phi-yen.png</option>
+                <option value="son-sac-thuy-chung.png">son-sac-thuy-chung.png</option>
+              </select>
+            </div>
+            <div class="full">
+              <label class="admin-label" for="productDescription">Mô tả</label>
+              <textarea class="admin-textarea" id="productDescription" rows="4"></textarea>
+            </div>
+            <div class="full">
+              <label class="admin-label" for="productComposition">Thành phần / ghi chú nguyên liệu</label>
+              <textarea class="admin-textarea" id="productComposition" rows="3"></textarea>
+            </div>
+            <div class="full admin-toolbar">
+              <label class="admin-check"><input id="productToday" type="checkbox"> Mẫu hôm nay</label>
+              <label class="admin-check"><input id="productFeatured" type="checkbox"> Sản phẩm nổi bật</label>
+            </div>
+            <div class="full admin-toolbar">
+              <button class="admin-btn" type="submit"><i class="bi bi-check2"></i> <span id="productSubmitText">Thêm sản phẩm</span></button>
+              <a class="admin-btn-light" href="san-pham.html">Huỷ</a>
+            </div>
+            <div class="full" id="productFormMessage"></div>
           </form>
         </section>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
   <script src="../assets/js/products.js" defer></script>

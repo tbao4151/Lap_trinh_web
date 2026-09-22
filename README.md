@@ -2,9 +2,9 @@
 
 Website bán hoa tươi được xây dựng cho đồ án môn Lập trình Web.
 
-## Mục tiêu FrontEnd
+## FrontEnd
 
-Giao diện hiện có 25 màn hình và sử dụng đúng các công nghệ của giai đoạn FrontEnd:
+Project sử dụng:
 
 - HTML5
 - CSS3
@@ -12,75 +12,62 @@ Giao diện hiện có 25 màn hình và sử dụng đúng các công nghệ c�
 - Bootstrap 5
 - Bootstrap Icons
 - Responsive Web Design
-- LocalStorage cho một số chức năng tương tác trước khi kết nối BackEnd
+- LocalStorage cho các tương tác FrontEnd trước khi kết nối BackEnd
 
-## 5 trang chính có thể dùng để báo cáo giao diện
+## Các trang khách hàng
 
-1. `index.html` — Trang chủ
-2. `san-pham.html` — Danh sách sản phẩm và bộ lọc
-3. `chi-tiet-san-pham.html` — Chi tiết sản phẩm
-4. `lien-he.html` — Thông tin và biểu mẫu liên hệ
-5. `tin-tuc.html` — Danh sách tin tức
+Project có đầy đủ nhóm trang chính:
 
-Ngoài ra project còn có giỏ hàng, thanh toán, tra cứu đơn, tài khoản khách hàng, chính sách và khu vực quản trị.
+- Trang chủ
+- Danh sách và chi tiết sản phẩm
+- Giỏ hàng và thanh toán
+- Đăng nhập, đăng ký, quên mật khẩu
+- Tài khoản và lịch sử đơn
+- Tra cứu đơn hàng
+- Giới thiệu, liên hệ
+- Tin tức và chi tiết bài viết
+- Chính sách giao hàng và đổi trả
 
-## Danh sách 25 màn hình
+## Khu vực quản trị
 
-### Batch 1 — Storefront
-1. `index.html`
-2. `san-pham.html`
-3. `chi-tiet-san-pham.html`
-4. `gio-hang.html`
-5. `thanh-toan.html`
+Thư mục `admin/` gồm các nhóm chức năng:
 
-### Batch 2 — Đặt hàng và xác thực
-6. `dat-hang-thanh-cong.html`
-7. `tra-cuu-don-hang.html`
-8. `dang-nhap.html`
-9. `dang-ky.html`
-10. `quen-mat-khau.html`
+### Tổng quan
+- Dashboard vận hành với 8 chỉ số chính
+- Đơn gần đây
+- Cảnh báo nguyên liệu sắp hết
 
-### Batch 3 — Tài khoản và nội dung
-11. `tai-khoan.html`
-12. `lich-su-don-hang.html`
-13. `gioi-thieu.html`
-14. `lien-he.html`
-15. `tin-tuc.html`
+### Vận hành
+- Đơn hàng
+- Hoàn tiền
+- Giao hàng
+- Khách hàng
+- Báo cáo doanh thu
 
-### Batch 4 — Nội dung hỗ trợ và admin
-16. `chi-tiet-tin-tuc.html`
-17. `chinh-sach-giao-hang.html`
-18. `chinh-sach-doi-tra.html`
-19. `admin/dang-nhap.html`
-20. `admin/index.html`
+### Sản phẩm
+- Quản lý sản phẩm
+- Thêm / sửa sản phẩm
+- Quản lý nhanh giá và trạng thái
+- Màu giấy gói
+- Phân loại & bộ lọc
+- Danh mục khám phá trang chủ
 
-### Batch 5 — Quản lý
-21. `admin/san-pham.html`
-22. `admin/them-san-pham.html`
-23. `admin/sua-san-pham.html`
-24. `admin/don-hang.html`
-25. `admin/khach-hang.html`
+### Kho
+- Kho tổng
+- Kho Hoa
+- Kho Phụ kiện
+- Lịch sử nhập / xuất kho
 
-## Cấu trúc thư mục
+### Hệ thống
+- Nhân viên & quyền
+- Cài đặt shop
+- Tài khoản quản trị
+- Khu vực chủ sở hữu
 
-- `assets/css/` — CSS giao diện người dùng và admin
-- `assets/js/` — JavaScript cho sản phẩm, giỏ hàng, đơn hàng, tài khoản và admin
-- `assets/images/` — ảnh PNG lưu trực tiếp trong project
-- `admin/` — các màn hình quản trị
+## Chạy local
 
-## Chạy project
+Có thể mở bằng VS Code Live Server hoặc đặt project trong `htdocs` của XAMPP.
 
-Mở `index.html` bằng VS Code Live Server.
+## Giai đoạn BackEnd
 
-## Hướng phát triển BackEnd
-
-Giai đoạn hoàn chỉnh sẽ dùng PHP + MySQL/MariaDB để xử lý:
-
-- đăng ký, đăng nhập và session
-- dữ liệu sản phẩm
-- giỏ hàng và đặt hàng
-- tra cứu trạng thái đơn
-- lưu liên hệ
-- CRUD sản phẩm
-- quản lý đơn hàng
-- quản lý khách hàng
+Giai đoạn hoàn chỉnh sẽ dùng PHP + MySQL/MariaDB để thay dữ liệu LocalStorage bằng dữ liệu phía server, session đăng nhập và CRUD trong cơ sở dữ liệu.

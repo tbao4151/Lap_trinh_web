@@ -11,25 +11,33 @@
 <body data-admin-page="login">
   <main class="admin-login">
     <section class="admin-login-card">
-      <a href="../index.html" class="admin-brand">
+      <a class="admin-brand" href="../index.html">
         <span class="admin-brand-mark"><i class="bi bi-flower1"></i></span>
-        <span>CÁ'S HOA</span>
+        <span><strong>CÁ'S HOA</strong><small style="color:var(--admin-muted)">flowers & feelings</small></span>
       </a>
 
-      <div class="admin-kicker mt-4">Khu vực quản trị</div>
-      <h1 class="fs-2 mt-2">Đăng nhập quản trị</h1>
-      <p class="text-secondary small lh-lg">Quản lý sản phẩm, đơn hàng và thông tin khách hàng trong một khu vực riêng.</p>
+      <h1>Trung tâm điều hành</h1>
+      <p>Đăng nhập để quản lý đơn hàng, sản phẩm, kho, khách hàng và hoạt động vận hành của cửa hàng.</p>
 
       <form id="adminLoginForm" class="mt-4" novalidate>
-        <div class="mb-3"><label class="form-label small fw-semibold" for="adminEmail">Email quản trị</label><input id="adminEmail" type="email" class="form-control admin-input" placeholder="admin@example.com" required></div>
-        <div class="mb-3"><label class="form-label small fw-semibold" for="adminPassword">Mật khẩu</label><input id="adminPassword" type="password" class="form-control admin-input" placeholder="Mật khẩu" required></div>
-        <button class="admin-btn w-100" type="submit"><i class="bi bi-shield-lock me-1"></i> Đăng nhập</button>
+        <div class="mb-3">
+          <label class="admin-label" for="adminEmail">Email quản trị</label>
+          <input id="adminEmail" class="admin-input" type="email" value="owner@cashoa.vn" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="admin-label" for="adminPassword">Mật khẩu</label>
+          <input id="adminPassword" class="admin-input" type="password" value="1234" required>
+        </div>
+
+        <button class="admin-btn w-100" type="submit"><i class="bi bi-shield-lock"></i> Đăng nhập</button>
         <div id="adminLoginMessage"></div>
       </form>
 
-      <a href="../index.html" class="d-block text-center small text-secondary mt-4">Quay lại cửa hàng</a>
+      <a class="admin-btn-light w-100 mt-2" href="../index.html"><i class="bi bi-arrow-left"></i> Về cửa hàng</a>
     </section>
   </main>
+
   <script src="../assets/js/admin.js" defer></script>
 </body>
 </html>

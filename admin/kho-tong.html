@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kho tổng | CÁ'S HOA Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-admin-page="warehouse">
+  <div class="admin-app">
+    <aside class="admin-sidebar" id="adminSidebar"></aside>
+    <button class="admin-overlay" id="adminOverlay" type="button" aria-label="Đóng menu"></button>
+
+    <div class="admin-workspace">
+      <header class="admin-topbar" id="adminTopbar"></header>
+
+      <main class="admin-content">
+        <section class="admin-hero">
+          <div>
+            <h1>Kho tổng</h1>
+            <p>Tổng hợp nguyên liệu hoa và phụ kiện phục vụ quá trình bó, gói và giao sản phẩm.</p>
+          </div>
+          <div class="admin-hero-icon"><i class="bi bi-building"></i></div>
+        </section>
+
+        <section class="admin-grid-4 admin-section">
+                    <article class="admin-stat">
+            <div class="admin-stat-icon"><i class="bi bi-flower3"></i></div>
+            <div class="admin-stat-label">Mặt hàng hoa</div>
+            <div class="admin-stat-value"><span id="warehouseFlowerItems">0</span></div>
+            <div class="admin-stat-note">Số nguyên liệu hoa đang theo dõi</div>
+          </article>
+                    <article class="admin-stat">
+            <div class="admin-stat-icon"><i class="bi bi-box-seam"></i></div>
+            <div class="admin-stat-label">Phụ kiện</div>
+            <div class="admin-stat-value"><span id="warehouseAccessoryItems">0</span></div>
+            <div class="admin-stat-note">Giấy, ruy băng, thiệp, túi...</div>
+          </article>
+                    <article class="admin-stat">
+            <div class="admin-stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="admin-stat-label">Sắp hết</div>
+            <div class="admin-stat-value"><span id="warehouseLowStock">0</span></div>
+            <div class="admin-stat-note">Cần bổ sung tồn kho</div>
+          </article>
+                    <article class="admin-stat">
+            <div class="admin-stat-icon"><i class="bi bi-cash-stack"></i></div>
+            <div class="admin-stat-label">Giá trị tồn ước tính</div>
+            <div class="admin-stat-value"><span id="warehouseValue">0</span></div>
+            <div class="admin-stat-note">Theo giá nhập hiện tại</div>
+          </article>
+        </section>
+
+        <section class="admin-card admin-section">
+          <div class="admin-toolbar between">
+            <div><h2 class="admin-card-title">Tồn kho hiện tại</h2><p class="admin-card-subtitle">Theo dõi số lượng, ngưỡng tối thiểu và chi phí nhập.</p></div>
+            <div class="admin-toolbar"><a class="admin-btn-light" href="kho-hoa.html">Kho Hoa</a><a class="admin-btn-light" href="kho-phu-kien.html">Kho Phụ kiện</a></div>
+          </div>
+          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Mặt hàng</th><th>Tồn</th><th>Tối thiểu</th><th>Giá nhập</th><th>Trạng thái</th></tr></thead><tbody id="warehouseRows"></tbody></table></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/products.js" defer></script>
+  <script src="../assets/js/admin.js" defer></script>
+</body>
+</html>

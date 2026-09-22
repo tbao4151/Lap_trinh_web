@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nhân viên & quyền | CÁ'S HOA Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-admin-page="staff">
+  <div class="admin-app">
+    <aside class="admin-sidebar" id="adminSidebar"></aside>
+    <button class="admin-overlay" id="adminOverlay" type="button" aria-label="Đóng menu"></button>
+
+    <div class="admin-workspace">
+      <header class="admin-topbar" id="adminTopbar"></header>
+
+      <main class="admin-content">
+        <section class="admin-hero">
+          <div>
+            <h1>Nhân viên & quyền</h1>
+            <p>Quản lý thành viên tham gia vận hành cửa hàng và vai trò của từng người.</p>
+          </div>
+          <div class="admin-hero-icon"><i class="bi bi-person-gear"></i></div>
+        </section>
+
+        <section class="admin-grid-2 admin-section">
+          <article class="admin-card">
+            <div class="admin-toolbar between"><h2 class="admin-card-title">Thành viên</h2><span class="admin-badge" id="staffCount">0 thành viên</span></div>
+            <div class="admin-table-wrap"><table class="admin-table" style="min-width:560px"><thead><tr><th>Nhân viên</th><th>Vai trò</th><th>Trạng thái</th></tr></thead><tbody id="staffRows"></tbody></table></div>
+          </article>
+
+          <article class="admin-card">
+            <h2 class="admin-card-title">Thêm nhân viên</h2>
+            <form id="staffForm" class="mt-3">
+              <div class="mb-3"><label class="admin-label" for="staffName">Họ tên</label><input class="admin-input" id="staffName" required></div>
+              <div class="mb-3"><label class="admin-label" for="staffEmail">Email</label><input class="admin-input" id="staffEmail" type="email" required></div>
+              <div class="mb-3"><label class="admin-label" for="staffRole">Vai trò</label><select class="admin-select" id="staffRole"><option>Bán hàng</option><option>Vận hành</option><option>Quản lý kho</option><option>Quản trị viên</option></select></div>
+              <button class="admin-btn" type="submit">Thêm nhân viên</button>
+            </form>
+          </article>
+        </section>
+
+        <section class="admin-card admin-section">
+          <h2 class="admin-card-title">Phân quyền gợi ý</h2>
+          <div class="admin-grid-3 mt-3">
+            <div class="admin-note"><strong>Bán hàng</strong><br>Xem và cập nhật đơn hàng, khách hàng.</div>
+            <div class="admin-note"><strong>Vận hành</strong><br>Đơn hàng, giao hàng, hoàn tiền và kho.</div>
+            <div class="admin-note"><strong>Quản trị viên</strong><br>Toàn bộ hệ thống trừ chuyển quyền chủ sở hữu.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/products.js" defer></script>
+  <script src="../assets/js/admin.js" defer></script>
+</body>
+</html>

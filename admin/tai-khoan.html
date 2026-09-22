@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tài khoản | CÁ'S HOA Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-admin-page="account">
+  <div class="admin-app">
+    <aside class="admin-sidebar" id="adminSidebar"></aside>
+    <button class="admin-overlay" id="adminOverlay" type="button" aria-label="Đóng menu"></button>
+
+    <div class="admin-workspace">
+      <header class="admin-topbar" id="adminTopbar"></header>
+
+      <main class="admin-content">
+        <section class="admin-hero">
+          <div>
+            <h1>Tài khoản quản trị</h1>
+            <p>Thông tin cá nhân đang sử dụng khu vực điều hành.</p>
+          </div>
+          <div class="admin-hero-icon"><i class="bi bi-person-circle"></i></div>
+        </section>
+
+        <section class="admin-grid-2 admin-section">
+          <article class="admin-card">
+            <h2 class="admin-card-title">Thông tin tài khoản</h2>
+            <form id="adminAccountForm" class="admin-form-grid mt-3">
+              <div class="full"><label class="admin-label">Họ tên</label><input class="admin-input" name="name"></div>
+              <div class="full"><label class="admin-label">Email</label><input class="admin-input" name="email" type="email"></div>
+              <div class="full"><label class="admin-label">Số điện thoại</label><input class="admin-input" name="phone"></div>
+              <div class="full"><button class="admin-btn" type="submit">Lưu thông tin</button></div>
+              <div class="full" id="accountMessage"></div>
+            </form>
+          </article>
+
+          <article class="admin-card">
+            <h2 class="admin-card-title">Bảo mật</h2>
+            <p class="admin-card-subtitle">Khi kết nối BackEnd, khu vực này dùng để đổi mật khẩu và quản lý phiên đăng nhập.</p>
+            <div class="admin-list mt-3">
+              <div class="admin-list-item"><div><strong>Mật khẩu</strong><small class="d-block mt-1">Nên thay đổi định kỳ</small></div><button class="admin-btn-light" type="button">Đổi mật khẩu</button></div>
+              <div class="admin-list-item"><div><strong>Phiên đăng nhập</strong><small class="d-block mt-1">Máy tính hiện tại</small></div><span class="admin-status success">Đang hoạt động</span></div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/products.js" defer></script>
+  <script src="../assets/js/admin.js" defer></script>
+</body>
+</html>
