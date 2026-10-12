@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
-<body data-page="login" class="auth-page">
+<body data-page="login" class="auth-page"><div class="container mt-3"><p class="alert alert-warning" role="status">Module tài khoản chưa triển khai PHP/MySQL; nhóm sẽ hoàn thành trong giai đoạn tiếp theo. Không nhập mật khẩu thật vào biểu mẫu này.</p></div>
   <main class="auth-main">
     <div class="auth-shell"><div class="auth-grid">
       <aside class="auth-story">
@@ -25,7 +25,7 @@
           <p class="cas-eyebrow">Tài khoản khách hàng</p>
           <h1>Chào mừng bạn trở lại.</h1>
           <p class="auth-description">Đăng nhập bằng Gmail hoặc số điện thoại cùng mật khẩu của bạn.</p>
-          <form id="loginForm" class="auth-form" novalidate>
+          <form onsubmit="return false" id="loginForm" class="auth-form" novalidate>
             <div class="mb-3"><label for="loginIdentifier" class="form-label">Email hoặc số điện thoại</label><input id="loginIdentifier" class="form-control cas-form-control" type="text" inputmode="email" placeholder="example@gmail.com hoặc 0123456789" autocomplete="username" required></div>
             <div class="mb-2"><label for="loginPassword" class="form-label">Mật khẩu</label><div class="auth-password-wrap"><input id="loginPassword" class="form-control cas-form-control" type="password" placeholder="Mật khẩu của bạn" autocomplete="current-password" required><button class="auth-password-toggle" type="button" data-toggle-password="loginPassword" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div></div>
             <div class="text-end mb-3"><a href="quen-mat-khau.php" class="small fw-bold" style="color:var(--primary)">Quên mật khẩu?</a></div>

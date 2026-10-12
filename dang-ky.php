@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
-<body data-page="signup" class="auth-page">
+<body data-page="signup" class="auth-page"><div class="container mt-3"><p class="alert alert-warning" role="status">Module tài khoản chưa triển khai PHP/MySQL; nhóm sẽ hoàn thành trong giai đoạn tiếp theo. Không nhập mật khẩu thật vào biểu mẫu này.</p></div>
   <main class="auth-main">
     <div class="auth-shell"><div class="auth-grid">
       <aside class="auth-story">
@@ -25,7 +25,7 @@
           <p class="cas-eyebrow">Tạo tài khoản khách hàng</p>
           <h1>Lưu lại những đơn hoa.</h1>
           <p class="auth-description">Dùng Gmail để xác nhận tài khoản và số điện thoại để CÁ'S HOA liên hệ khi cần thiết.</p>
-          <form id="signupForm" class="auth-form" novalidate>
+          <form onsubmit="return false" id="signupForm" class="auth-form" novalidate>
             <div class="mb-3"><label for="signupPhone" class="form-label">Số điện thoại <span style="color:var(--danger)">*</span></label><input id="signupPhone" class="form-control cas-form-control" inputmode="numeric" maxlength="10" placeholder="0123456789" autocomplete="tel" required></div>
             <div class="mb-3"><label for="signupEmail" class="form-label">Gmail <span style="color:var(--danger)">*</span></label><input id="signupEmail" class="form-control cas-form-control" type="email" placeholder="example@gmail.com" autocomplete="email" required></div>
             <div class="mb-3"><label for="signupPassword" class="form-label">Mật khẩu <span style="color:var(--danger)">*</span></label><div class="auth-password-wrap"><input id="signupPassword" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupPassword" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div><div class="password-policy">Ít nhất 10 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</div></div>

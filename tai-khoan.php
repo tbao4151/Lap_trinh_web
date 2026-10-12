@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
-<body data-page="account" class="d-flex flex-column">
+<body data-page="account" class="d-flex flex-column"><div class="container mt-3"><p class="alert alert-warning" role="status">Module tài khoản chưa triển khai PHP/MySQL; nhóm sẽ hoàn thành trong giai đoạn tiếp theo. Không nhập mật khẩu thật vào biểu mẫu này.</p></div>
   <div id="siteHeader"></div><div class="container mt-3"><p class="alert alert-warning">Chức năng tài khoản chưa kết nối PHP/MySQL.</p></div>
 
   <main class="cas-page content-page">
@@ -44,7 +44,7 @@
               Lưu các thông tin thường dùng để thao tác đặt hoa nhanh hơn trong những lần tiếp theo.
             </p>
 
-            <form id="profileForm" class="row g-3 mt-2" novalidate>
+            <form onsubmit="return false" id="profileForm" class="row g-3 mt-2" novalidate>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold" for="fullName">Họ và tên</label>
                 <input id="fullName" class="form-control cas-form-control" autocomplete="name" placeholder="Nguyễn Văn A">

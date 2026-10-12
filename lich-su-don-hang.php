@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
-<body data-page="orders" class="d-flex flex-column">
+<body data-page="orders" class="d-flex flex-column"><div class="container mt-3"><p class="alert alert-warning" role="status">Module tài khoản chưa triển khai PHP/MySQL; nhóm sẽ hoàn thành trong giai đoạn tiếp theo. Không nhập mật khẩu thật vào biểu mẫu này.</p></div>
   <div id="siteHeader"></div><div class="container mt-3"><p class="alert alert-warning">Chức năng tài khoản chưa kết nối PHP/MySQL.</p></div>
 
   <main class="cas-page content-page">
@@ -26,7 +26,7 @@
       </div>
 
       <div class="row g-4">
-        <div class="col-lg-9"><div id="orderHistory"></div></div>
+        <div class="col-lg-9"><div id="orderHistory"><p class="cas-muted">Lịch sử đơn hàng sẽ hiển thị khi module đăng nhập PHP được tích hợp.</p></div></div>
         <div class="col-lg-3">
           <aside class="content-card">
             <h2 class="font-display fs-5">Cần hỗ trợ đơn hàng?</h2>

@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
-<body data-page="forgot" class="auth-page">
+<body data-page="forgot" class="auth-page"><div class="container mt-3"><p class="alert alert-warning" role="status">Module tài khoản chưa triển khai PHP/MySQL; nhóm sẽ hoàn thành trong giai đoạn tiếp theo. Không nhập mật khẩu thật vào biểu mẫu này.</p></div>
   <main class="auth-main">
     <div class="auth-shell"><div class="auth-grid">
       <aside class="auth-story">
@@ -25,12 +25,12 @@
           <p class="cas-eyebrow">Khôi phục tài khoản</p>
           <h1>Quên mật khẩu</h1>
           <p class="auth-description">Nhập Gmail hoặc số điện thoại đã đăng ký để nhận mã khôi phục tài khoản.</p>
-          <form id="recoveryForm" class="auth-form" novalidate>
+          <form onsubmit="return false" id="recoveryForm" class="auth-form" novalidate>
             <div class="mb-3"><label for="recoveryIdentifier" class="form-label">Gmail hoặc số điện thoại</label><input id="recoveryIdentifier" class="form-control cas-form-control" type="text" placeholder="example@gmail.com hoặc 0123456789" required></div>
             <div id="recoveryMessage" class="auth-message d-none" role="status"></div>
             <button class="btn-cas-primary w-100 mt-2" type="submit"><i class="bi bi-key"></i> Gửi mã xác nhận <i class="bi bi-arrow-right"></i></button>
           </form>
-          <form id="recoveryVerifyForm" class="auth-form d-none" novalidate>
+          <form onsubmit="return false" id="recoveryVerifyForm" class="auth-form d-none" novalidate>
             <div class="demo-note mb-3">Nhập mã xác nhận gồm 8 chữ số đã được gửi đến thông tin đăng ký của bạn.</div>
             <div class="mb-3"><label for="recoveryCode" class="form-label">Mã xác nhận 8 chữ số</label><input id="recoveryCode" class="form-control cas-form-control text-center" inputmode="numeric" maxlength="8" placeholder="00000000" required></div>
             <div id="recoveryVerifyMessage" class="auth-message d-none" role="status"></div>
