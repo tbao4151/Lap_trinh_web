@@ -1,4 +1,56 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php
+declare(strict_types=1);
+require_once __DIR__.'/includes/auth.php';
+$error='';$success='';
+$uid=filter_var($_GET['uid']??null,FILTER_VALIDATE_INT);
+$token=(string)($_GET['token']??'');
+$resetMode=$uid!==false&&$uid>0&&preg_match('/^[a-f0-9]{64}$/',$token);
+if(cas_post()){
+  try{
+    cas_assert_csrf();
+    $attempts=$_SESSION['cas_reset_attempts']??[];
+    $attempts=array_values(array_filter($attempts,static fn($v)=>$v>time()-3600));
+    if(count($attempts)>=5)throw new RuntimeException('Quá nhiều yêu cầu, vui lòng thử sau một giờ.');
+    $attempts[]=time();$_SESSION['cas_reset_attempts']=$attempts;
+    if(($_POST['action']??'')==='request'){
+      $email=strtolower(trim((string)($_POST['email']??'')));
+      if(!filter_var($email,FILTER_VALIDATE_EMAIL))throw new RuntimeException('Vui lòng nhập email hợp lệ.');
+      $q=cas_db()->prepare("SELECT user_id FROM users WHERE email=? AND status='active' LIMIT 1");
+      $q->execute([$email]);$found=$q->fetchColumn();
+      if($found){
+        $secret=bin2hex(random_bytes(32));$digest=hash('sha256',$secret);
+        $db=cas_db();
+        $q=$db->prepare("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES(?,?,DATE_ADD(NOW(),INTERVAL 30 MINUTE))");
+        $q->execute([(int)$found,$digest]);
+        $base=rtrim((string)(getenv('CAS_APP_URL')?:'http://localhost/Lap_trinh_web'),'/');
+        $link=$base.'/quen-mat-khau.php?uid='.(int)$found.'&token='.$secret;
+        $sent=@mail($email,'Khoi phuc mat khau CAS HOA',"Mo lien ket trong 30 phut: ".$link."\n","From: no-reply@localhost\r\n");
+        if(!$sent){
+          $db->prepare("DELETE FROM password_resets WHERE token_hash=?")->execute([$digest]);
+          error_log('CAS password reset email transport is not configured.');
+        }
+      }
+      $success='Nếu email tồn tại và máy chủ được cấu hình gửi thư, liên kết đặt lại mật khẩu sẽ được gửi đến hộp thư.';
+    }elseif(($_POST['action']??'')==='reset' && $resetMode){
+      $password=(string)($_POST['password']??'');
+      if(!cas_valid_password($password)||$password!==(string)($_POST['confirm']??''))
+        throw new RuntimeException('Mật khẩu cần >=10 ký tự, chữ hoa/thường, số, ký tự đặc biệt và xác nhận khớp.');
+      $db=cas_db();$db->beginTransaction();
+      try{
+        $q=$db->prepare('SELECT reset_id FROM password_resets WHERE user_id=? AND token_hash=? AND consumed_at IS NULL AND expires_at>NOW() FOR UPDATE');
+        $q->execute([$uid,hash('sha256',$token)]);$rid=$q->fetchColumn();
+        if(!$rid)throw new RuntimeException('Liên kết không hợp lệ hoặc đã hết hạn.');
+        $q=$db->prepare('UPDATE users SET password_hash=? WHERE user_id=?');
+        $q->execute([password_hash($password,PASSWORD_DEFAULT),$uid]);
+        $q=$db->prepare('UPDATE password_resets SET consumed_at=NOW() WHERE user_id=? AND consumed_at IS NULL');
+        $q->execute([$uid]);$db->commit();
+        $success='Mật khẩu đã được thay đổi. Bạn có thể đăng nhập.';
+        $resetMode=false;
+      }catch(Throwable $e){$db->rollBack();throw $e;}
+    }else throw new RuntimeException('Thao tác không hợp lệ.');
+  }catch(Throwable $e){$error=$e->getMessage();}
+}
+?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -11,7 +63,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
-<body data-page="forgot" class="auth-page"><div class="container mt-3"><p class="alert alert-warning" role="status">Module tài khoản chưa triển khai PHP/MySQL; nhóm sẽ hoàn thành trong giai đoạn tiếp theo. Không nhập mật khẩu thật vào biểu mẫu này.</p></div>
+<body data-page="forgot" class="auth-page">
   <main class="auth-main">
     <div class="auth-shell"><div class="auth-grid">
       <aside class="auth-story">
@@ -24,19 +76,24 @@
         <section class="auth-card">
           <p class="cas-eyebrow">Khôi phục tài khoản</p>
           <h1>Quên mật khẩu</h1>
-          <p class="auth-description">Nhập Gmail hoặc số điện thoại đã đăng ký để nhận mã khôi phục tài khoản.</p>
-          <form onsubmit="return false" id="recoveryForm" class="auth-form" novalidate>
-            <div class="mb-3"><label for="recoveryIdentifier" class="form-label">Gmail hoặc số điện thoại</label><input id="recoveryIdentifier" class="form-control cas-form-control" type="text" placeholder="example@gmail.com hoặc 0123456789" required></div>
-            <div id="recoveryMessage" class="auth-message d-none" role="status"></div>
-            <button class="btn-cas-primary w-100 mt-2" type="submit"><i class="bi bi-key"></i> Gửi mã xác nhận <i class="bi bi-arrow-right"></i></button>
+          <p class="auth-description">Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu có thời hạn 30 phút.</p>
+          <?php if($success!==''): ?><div class="auth-message success mb-3" role="status"><?= cas_e($success) ?></div><?php endif; ?>
+          <?php if($error!==''): ?><div class="auth-message error mb-3" role="alert"><?= cas_e($error) ?></div><?php endif; ?>
+          <?php if($resetMode): ?>
+          <p class="auth-description">Nhập mật khẩu mới cho tài khoản. Liên kết chỉ dùng được một lần.</p>
+          <form id="recoveryVerifyForm" class="auth-form" method="post" action="<?= cas_e('quen-mat-khau.php?uid='.$uid.'&token='.$token) ?>">
+            <?= cas_csrf_form() ?><input type="hidden" name="action" value="reset">
+            <div class="mb-3"><label for="newPassword" class="form-label">Mật khẩu mới</label><input type="password" id="newPassword" name="password" class="form-control cas-form-control" required></div>
+            <div class="mb-3"><label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label><input type="password" id="confirmPassword" name="confirm" class="form-control cas-form-control" required></div>
+            <button class="btn-cas-primary w-100" type="submit">Đổi mật khẩu</button>
           </form>
-          <form onsubmit="return false" id="recoveryVerifyForm" class="auth-form d-none" novalidate>
-            <div class="demo-note mb-3">Nhập mã xác nhận gồm 8 chữ số đã được gửi đến thông tin đăng ký của bạn.</div>
-            <div class="mb-3"><label for="recoveryCode" class="form-label">Mã xác nhận 8 chữ số</label><input id="recoveryCode" class="form-control cas-form-control text-center" inputmode="numeric" maxlength="8" placeholder="00000000" required></div>
-            <div id="recoveryVerifyMessage" class="auth-message d-none" role="status"></div>
-            <button class="btn-cas-primary w-100" type="submit">Xác nhận mã</button>
-            <button class="btn-cas-outline w-100 mt-2" type="button" id="recoveryChange">Đổi thông tin</button>
+          <?php else: ?>
+          <form id="recoveryForm" class="auth-form" method="post" action="quen-mat-khau.php">
+            <?= cas_csrf_form() ?><input type="hidden" name="action" value="request">
+            <div class="mb-3"><label for="recoveryIdentifier" class="form-label">Email tài khoản</label><input id="recoveryIdentifier" name="email" class="form-control cas-form-control" type="email" placeholder="example@gmail.com" autocomplete="email" required></div>
+            <button class="btn-cas-primary w-100" type="submit">Gửi liên kết khôi phục</button>
           </form>
+          <?php endif; ?>
           <p class="auth-foot">Nhớ mật khẩu rồi? <a href="dang-nhap.php">Đăng nhập</a></p>
         </section>
       </div>
