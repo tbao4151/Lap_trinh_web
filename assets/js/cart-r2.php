@@ -3,7 +3,8 @@ declare(strict_types=1);
 require_once __DIR__.'/../../includes/bootstrap.php';
 header('Content-Type: application/javascript; charset=utf-8');
 header('Cache-Control: no-store');
-echo 'window.CAS_CSRF=',json_encode(cas_csrf()),";\n";
+// CSRF is injected only by first-party HTML pages (never by cross-origin JS).
+
 echo 'window.CAS_CART_INITIAL=',json_encode(array_values($_SESSION['cas_cart']??[]),JSON_UNESCAPED_UNICODE),";\n";
 ?>
 (function(){
