@@ -43,6 +43,7 @@ curl -fsS -b /tmp/r2-customer-cookie "$BASE/tai-khoan.php" > /tmp/r2-customer-pr
 grep -q 'Khach TDTU' /tmp/r2-customer-profile
 curl -fsS -b /tmp/r2-customer-cookie "$BASE/thanh-toan.php" > /tmp/r2-auth-checkout
 TOKEN=$(python3 -c 'import re;s=open("/tmp/r2-auth-checkout").read();m=re.search(r"window.CAS_CSRF\s*=\s*\"([a-f0-9]+)\"",s);assert m;print(m.group(1))')
+curl -fsS -b /tmp/r2-customer-cookie -X POST --data-urlencode "csrf=$TOKEN" --data-urlencode 'cart=[{"productId":"p001","quantity":1}]' "$BASE/actions/cart.php" > /tmp/r2-auth-session-cart
 RESP=$(curl -sS -b /tmp/r2-customer-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode 'cart=[{"productId":"p001","quantity":1}]' --data-urlencode 'customerName=Khach TDTU' --data-urlencode 'customerPhone=0922222222' --data-urlencode 'recipientName=Nguoi nhan test' --data-urlencode 'recipientPhone=0933333333' --data-urlencode 'fulfillment=pickup' --data-urlencode 'receiveDate=2030-01-01' --data-urlencode 'receiveTime=08:00 - 10:00' "$BASE/actions/checkout.php")
 CODE=$(printf '%s' "$RESP" | python3 -c 'import json,sys;x=json.load(sys.stdin);assert x["ok"],x;print(x["orderCode"])')
 curl -fsS -b /tmp/r2-customer-cookie "$BASE/lich-su-don-hang.php" > /tmp/r2-account-history

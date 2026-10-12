@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__.'/../includes/auth.php';
 cas_require_post();
 if(!cas_csrf_valid($_POST['csrf']??null)) cas_json(403,['ok'=>false,'message'=>'Phiên làm việc hết hạn, hãy tải lại trang.']);
-$cart=json_decode((string)($_POST['cart']??''),true);
+$cart=$_SESSION['cas_cart']??[];
 if(!is_array($cart)||count($cart)<1||count($cart)>40) cas_json(422,['ok'=>false,'message'=>'Giỏ hàng không hợp lệ.']);
 $name=cas_str('customerName',120);$phone=cas_phone(cas_str('customerPhone',20));
 $recipient=cas_str('recipientName',120);$recipientPhone=cas_phone(cas_str('recipientPhone',20));
@@ -60,6 +60,7 @@ try {
     $delivery->execute([$orderId,$date.' '.substr($time,0,5).':00']);
   }
   $db->commit();
+  unset($_SESSION['cas_cart']);
   $_SESSION['cas_last_order_id']=$orderId;
   $_SESSION['cas_last_order_code']=$code;
   cas_json(201,['ok'=>true,'orderCode'=>$code]);

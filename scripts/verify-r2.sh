@@ -21,6 +21,7 @@ curl -fsS -c /tmp/cas-r2-cookies http://127.0.0.1:8033/thanh-toan.php > /tmp/cas
 TOKEN="$(python3 -c 'import re; s=open("/tmp/cas-r2-checkout.html").read(); m=re.search(r"window.CAS_CSRF\s*=\s*\"([a-f0-9]+)\"",s); assert m,"Missing CSRF"; print(m.group(1))')"
 curl -fsS -b /tmp/cas-r2-cookies http://127.0.0.1:8033/assets/js/products.php > /tmp/cas-r2-products.js
 grep -q 'p001' /tmp/cas-r2-products.js
+curl -fsS -b /tmp/cas-r2-cookies -X POST -F "csrf=$TOKEN" -F 'cart=[{"productId":"p001","quantity":2}]' http://127.0.0.1:8033/actions/cart.php > /tmp/cas-r2-session-cart.json
 RESP="$(curl -sS -b /tmp/cas-r2-cookies -c /tmp/cas-r2-cookies -X POST \
   -F "csrf=$TOKEN" \
   -F 'cart=[{"productId":"p001","quantity":2}]' \

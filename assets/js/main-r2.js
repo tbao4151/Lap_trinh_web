@@ -325,6 +325,7 @@
       try {
         var data = new FormData(form); data.set('csrf',window.CAS_CSRF||'');
         data.set('cart',JSON.stringify(window.CASCart.read()));
+        await window.CASCart.sync();
         var response = await fetch('actions/checkout.php',{method:'POST',body:data,credentials:'same-origin'});
         var result=await response.json();
         if(!response.ok||!result.ok) throw new Error(result.message||'Không thể tạo đơn');

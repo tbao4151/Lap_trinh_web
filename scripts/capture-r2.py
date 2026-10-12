@@ -64,7 +64,7 @@ try:
     capture(driver,2,"Danh sách sản phẩm - tìm kiếm và bộ lọc","san-pham.php")
     capture(driver,3,"Chi tiết sản phẩm theo slug","chi-tiet-san-pham.php?slug=lam-tinh")
     driver.get(BASE+"san-pham.php")
-    driver.execute_script("localStorage.setItem('cas-hoa-static-cart',JSON.stringify([{productId:'p001',quantity:2}]))")
+    driver.execute_async_script("var done=arguments[0]; window.CASCart.add('p001',2).then(function(){done(true)}).catch(function(e){done(e.message)})")
     capture(driver,4,"Giỏ hàng - hai sản phẩm đã chọn","gio-hang.php")
     capture(driver,5,"Thanh toán - biểu mẫu PHP","thanh-toan.php")
     # Lập đơn thật qua giao diện của trình duyệt, để minh chứng trang thành công.
