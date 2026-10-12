@@ -63,6 +63,15 @@ jobs:
           DB_PASSWORD: localtestpass
         run: bash scripts/verify-r2.sh
 
+      - name: MySQL authenticated customer and Admin end-to-end checks
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_NAME: cas_hoa
+          DB_USER: root
+          DB_PASSWORD: localtestpass
+        run: bash scripts/verify-r2-auth-admin.sh
+
       - name: Prepare Chrome screenshot environment
         run: |
           command -v google-chrome || command -v chromium
