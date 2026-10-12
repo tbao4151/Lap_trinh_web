@@ -34,7 +34,7 @@ def capture(driver,number,title,page):
     driver.get(url)
     WebDriverWait(driver,12).until(lambda d:d.execute_script("return document.readyState")=="complete")
     time.sleep(1.5)
-    name=f"{number:02d}_{page.split('?')[0].replace('.php','').replace('-','_')}.png"
+    name=f"{number:02d}_{page.split('?')[0].replace('.php','').replace('-','_').replace('/','_')}.png"
     shot=OUT/name
     subprocess.run(["scrot","-z",str(shot)],check=True)
     with Image.open(shot) as img:
@@ -107,6 +107,40 @@ try:
     capture(driver,11,"Giới thiệu","gioi-thieu.php")
     capture(driver,12,"Chính sách giao hàng","chinh-sach-giao-hang.php")
     capture(driver,13,"Chính sách đổi trả","chinh-sach-doi-tra.php")
+    # 5 màn hình tài khoản: ba trang truy cập công khai, hai trang đăng nhập thật.
+    capture(driver,14,"Đăng ký khách hàng bằng PHP/MySQL","dang-ky.php")
+    capture(driver,15,"Đăng nhập khách hàng bằng PHP Session","dang-nhap.php")
+    capture(driver,16,"Khôi phục mật khẩu bằng liên kết một lần","quen-mat-khau.php")
+    driver.get(BASE+"dang-nhap.php")
+    driver.find_element(By.ID,"loginIdentifier").send_keys("tdtu-test@example.test")
+    driver.find_element(By.ID,"loginPassword").send_keys("Customer_2026!")
+    driver.execute_script("document.querySelector('#loginForm button[type=submit]').click()")
+    WebDriverWait(driver,15).until(lambda d:"tai-khoan.php" in d.current_url)
+    capture(driver,17,"Hồ sơ khách hàng từ MySQL","tai-khoan.php")
+    capture(driver,18,"Lịch sử đơn hàng theo tài khoản","lich-su-don-hang.php")
+    # Đăng nhập Admin thật bằng tài khoản do CLI cấp trong bước integration.
+    capture(driver,19,"Đăng nhập quản trị có phân quyền","admin/dang-nhap.php")
+    driver.get(BASE+"admin/dang-nhap.php")
+    driver.find_element(By.ID,"adminEmail").send_keys("admin-coursework@example.test")
+    driver.find_element(By.ID,"adminPassword").send_keys("AdminTest_2026!")
+    driver.execute_script("document.querySelector('form button[type=submit]').click()")
+    WebDriverWait(driver,15).until(lambda d:"admin/index.php" in d.current_url)
+    admin_pages=[
+      (20,"Dashboard quản trị - dữ liệu MySQL","admin/index.php"),
+      (21,"Quản lý đơn hàng","admin/don-hang.php"),
+      (22,"Quản lý giao hàng","admin/giao-hang.php"),
+      (23,"Quản lý khách hàng","admin/khach-hang.php"),
+      (24,"Quản lý sản phẩm","admin/san-pham.php"),
+      (25,"Thêm sản phẩm","admin/them-san-pham.php"),
+      (26,"Sửa sản phẩm","admin/sua-san-pham.php?id=1"),
+      (27,"Quản lý nhanh giá và trạng thái","admin/quan-ly-nhanh.php"),
+      (28,"Phân loại và bộ lọc","admin/phan-loai-bo-loc.php"),
+      (29,"Kho tổng MySQL","admin/kho-tong.php"),
+      (30,"Báo cáo doanh thu","admin/bao-cao.php")
+    ]
+    for num,title,page in admin_pages:
+        capture(driver,num,title,page)
+
 finally:
     if driver:
         driver.quit()
@@ -114,8 +148,8 @@ finally:
     try: php.wait(timeout=5)
     except subprocess.TimeoutExpired:php.kill()
 
-if len(entries)!=13:
-    raise RuntimeError(f"Expected 13 genuine screenshots, found {len(entries)}")
+if len(entries)!=30:
+    raise RuntimeError(f"Expected 30 genuine screenshots, found {len(entries)}")
 (OUT/"manifest.json").write_text(json.dumps(entries,ensure_ascii=False,indent=2),encoding="utf-8")
 pdf=Path("evidence/CAS_HOA_Yeu_Cau_2.pdf")
 pdf.parent.mkdir(parents=True,exist_ok=True)
@@ -128,8 +162,8 @@ text(50,h-108,"BÁO CÁO YÊU CẦU 2 - LẬP TRÌNH WEB VÀ ỨNG DỤNG",15)
 text(50,h-148,"XÂY DỰNG WEBSITE BÁN HOA TƯƠI VÀ QUẢN LÝ CỬA HÀNG",14)
 text(50,h-188,"Nhóm 5: Nguyễn Văn Thiên Bảo, Trần Gia Hưng, Phạm Hiệp Phú",11)
 text(50,h-220,"Giao diện HTML/CSS/JavaScript, xử lý PHP 8.2 và cơ sở dữ liệu MySQL 8",11)
-text(50,h-260,"Bản minh chứng giai đoạn nộp gấp: 13/18 trang khách hàng.",11)
-text(50,h-290,"Các chức năng tài khoản và đăng nhập sẽ hoàn thiện ở giai đoạn sau.",10)
+text(50,h-260,"Minh chứng 30 màn hình: 18 trang khách hàng + 12 trang quản trị.",11)
+text(50,h-290,"Phạm vi nhóm 30/40 màn hình (75% theo số trang); dựa trên chức năng thực tế.",10)
 text(50,h-335,"Ảnh chụp được ghi trực tiếp từ trình duyệt Chrome chạy trên môi trường kiểm thử.",10)
 text(50,h-355,"Mỗi ảnh thể hiện cả thanh địa chỉ thực của trình duyệt.",10)
 c.showPage()
