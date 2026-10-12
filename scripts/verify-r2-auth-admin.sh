@@ -48,4 +48,19 @@ RESP=$(curl -sS -b /tmp/r2-customer-cookie --data-urlencode "csrf=$TOKEN" --data
 CODE=$(printf '%s' "$RESP" | python3 -c 'import json,sys;x=json.load(sys.stdin);assert x["ok"],x;print(x["orderCode"])')
 curl -fsS -b /tmp/r2-customer-cookie "$BASE/lich-su-don-hang.php" > /tmp/r2-account-history
 grep -q "$CODE" /tmp/r2-account-history
+
+# Verify edit-product, taxonomy, delivery, and inventory operations.
+TOKEN=$(curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/sua-san-pham.php?id=$ID" | get_token)
+STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode "action=product_save" --data-urlencode "id=$ID" --data-urlencode "name=San pham da sua" --data-urlencode "sku=TEST-NEW-123" --data-urlencode "slug=san-pham-test-123" --data-urlencode "price=145000" --data-urlencode "product_type=bouquet" --data-urlencode "category_id=1" --data-urlencode "tone_id=1" --data-urlencode "occasion_id=2" --data-urlencode "image=lam-tinh.png" --data-urlencode "status=active" "$BASE/admin/sua-san-pham.php?id=$ID")
+[ "$STATUS" = "303" ] || { echo "Edit product failure: $STATUS";exit 1; }
+[ "$(db "SELECT COUNT(*) FROM products WHERE product_id=$ID AND name='San pham da sua' AND price=145000")" = "1" ] || exit 1
+TOKEN=$(curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/phan-loai-bo-loc.php" | get_token)
+STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode "action=taxonomy_save" --data-urlencode "table=categories" --data-urlencode "name=Hoa moi kiem thu" "$BASE/admin/phan-loai-bo-loc.php")
+[ "$STATUS" = "303" ] || exit 1
+[ "$(db "SELECT COUNT(*) FROM categories WHERE name='Hoa moi kiem thu'")" = "1" ] || exit 1
+TOKEN=$(curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/giao-hang.php" | get_token)
+STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode "action=delivery_update" --data-urlencode "id=1" --data-urlencode "status=out_for_delivery" "$BASE/admin/giao-hang.php")
+[ "$STATUS" = "303" ] || exit 1
+[ "$(db "SELECT COUNT(*) FROM deliveries WHERE delivery_id=1 AND delivery_status='out_for_delivery'")" = "1" ] || exit 1
+[ "$(db "SELECT COUNT(*) FROM inventory_items")" -ge 10 ] || exit 1
 echo "PASS: Admin login/RBAC, 11 pages, product SQL CRUD, order update, customer registration/profile/history."
