@@ -1,4 +1,36 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php
+require_once __DIR__.'/includes/auth.php';
+if(cas_user())cas_redirect('tai-khoan.php');
+$error='';
+if(cas_post()){
+ try{
+    cas_assert_csrf();
+    $name=trim((string)($_POST['full_name']??''));
+    $phone=cas_phone((string)($_POST['phone']??''));
+    $email=strtolower(trim((string)($_POST['email']??'')));
+    $password=(string)($_POST['password']??'');
+    if(mb_strlen($name)<2||mb_strlen($name)>120)throw new RuntimeException('Họ tên phải từ 2 đến 120 ký tự.');
+    if(!preg_match('/^0[0-9]{9}$/',$phone))throw new RuntimeException('Số điện thoại chưa hợp lệ.');
+    if(!filter_var($email,FILTER_VALIDATE_EMAIL)||strlen($email)>150)throw new RuntimeException('Email chưa hợp lệ.');
+    if(!cas_valid_password($password))throw new RuntimeException('Mật khẩu tối thiểu 10 ký tự, gồm hoa/thường/số/ký tự đặc biệt.');
+    if($password!==(string)($_POST['confirm_password']??''))throw new RuntimeException('Mật khẩu xác nhận không khớp.');
+    $db=cas_db();$db->beginTransaction();
+    try{
+       $role=$db->query("SELECT role_id FROM roles WHERE name='customer'")->fetchColumn();
+       if(!$role)throw new RuntimeException('Chưa import dữ liệu phân quyền.');
+       $q=$db->prepare("SELECT COUNT(*) FROM users WHERE email=? OR phone=?");$q->execute([$email,$phone]);
+       if((int)$q->fetchColumn()>0)throw new RuntimeException('Email hoặc số điện thoại đã được đăng ký.');
+       $q=$db->prepare("INSERT INTO users(role_id,full_name,email,password_hash,phone) VALUES(?,?,?,?,?)");
+       $q->execute([$role,$name,$email,password_hash($password,PASSWORD_DEFAULT),$phone]);
+       $uid=(int)$db->lastInsertId();
+       $q=$db->prepare("INSERT INTO customers(user_id,full_name,phone,email) VALUES(?,?,?,?)");
+       $q->execute([$uid,$name,$phone,$email]);$db->commit();
+    }catch(Throwable $e){$db->rollBack();throw $e;}
+    session_regenerate_id(true);$_SESSION['cas_uid']=$uid;
+    unset($_SESSION['cas_csrf']);cas_redirect('tai-khoan.php');
+ }catch(Throwable $e){$error=($e instanceof PDOException)?'Dữ liệu tài khoản đã tồn tại hoặc MySQL chưa sẵn sàng.':$e->getMessage();}
+}
+?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -11,7 +43,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
-<body data-page="signup" class="auth-page"><div class="container mt-3"><p class="alert alert-warning" role="status">Module tài khoản chưa triển khai PHP/MySQL; nhóm sẽ hoàn thành trong giai đoạn tiếp theo. Không nhập mật khẩu thật vào biểu mẫu này.</p></div>
+<body data-page="signup" class="auth-page">
   <main class="auth-main">
     <div class="auth-shell"><div class="auth-grid">
       <aside class="auth-story">
@@ -25,16 +57,18 @@
           <p class="cas-eyebrow">Tạo tài khoản khách hàng</p>
           <h1>Lưu lại những đơn hoa.</h1>
           <p class="auth-description">Dùng Gmail để xác nhận tài khoản và số điện thoại để CÁ'S HOA liên hệ khi cần thiết.</p>
-          <form onsubmit="return false" id="signupForm" class="auth-form" novalidate>
-            <div class="mb-3"><label for="signupPhone" class="form-label">Số điện thoại <span style="color:var(--danger)">*</span></label><input id="signupPhone" class="form-control cas-form-control" inputmode="numeric" maxlength="10" placeholder="0123456789" autocomplete="tel" required></div>
-            <div class="mb-3"><label for="signupEmail" class="form-label">Gmail <span style="color:var(--danger)">*</span></label><input id="signupEmail" class="form-control cas-form-control" type="email" placeholder="example@gmail.com" autocomplete="email" required></div>
-            <div class="mb-3"><label for="signupPassword" class="form-label">Mật khẩu <span style="color:var(--danger)">*</span></label><div class="auth-password-wrap"><input id="signupPassword" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupPassword" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div><div class="password-policy">Ít nhất 10 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</div></div>
-            <div class="mb-3"><label for="signupConfirm" class="form-label">Xác nhận mật khẩu <span style="color:var(--danger)">*</span></label><div class="auth-password-wrap"><input id="signupConfirm" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupConfirm" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div></div>
-            <div id="signupMessage" class="auth-message d-none" role="status"></div>
+          <form id="signupForm" method="post" action="dang-ky.php" class="auth-form" novalidate>
+            <div class="mb-3"><label class="form-label" for="signupFullName">Họ và tên</label><input id="signupFullName" name="full_name" class="form-control cas-form-control" autocomplete="name" maxlength="120" required></div>
+            <div class="mb-3"><label for="signupPhone" class="form-label">Số điện thoại <span style="color:var(--danger)">*</span></label><input id="signupPhone" name="phone" class="form-control cas-form-control" inputmode="numeric" maxlength="10" placeholder="0123456789" autocomplete="tel" required></div>
+            <div class="mb-3"><label for="signupEmail" class="form-label">Gmail <span style="color:var(--danger)">*</span></label><input id="signupEmail" name="email" class="form-control cas-form-control" type="email" placeholder="example@gmail.com" autocomplete="email" required></div>
+            <div class="mb-3"><label for="signupPassword" class="form-label">Mật khẩu <span style="color:var(--danger)">*</span></label><div class="auth-password-wrap"><input id="signupPassword" name="password" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupPassword" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div><div class="password-policy">Ít nhất 10 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</div></div>
+            <div class="mb-3"><label for="signupConfirm" class="form-label">Xác nhận mật khẩu <span style="color:var(--danger)">*</span></label><div class="auth-password-wrap"><input id="signupConfirm" name="confirm_password" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupConfirm" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div></div>
+            <?= cas_csrf_form() ?>
+<?php if($error!==''): ?><div class="auth-message error" role="alert"><?= cas_e($error) ?></div><?php endif; ?>
             <button class="btn-cas-primary w-100 mt-2" type="submit"><i class="bi bi-person-plus"></i> Tạo tài khoản <i class="bi bi-arrow-right"></i></button>
           </form>
-          <div class="auth-divider">hoặc</div>
-          <button class="auth-google" type="button" data-auth-demo-google><span class="me-2 fw-bold" style="color:#4285F4">G</span> Tiếp tục với Google</button>
+          
+          
           <p class="auth-foot">Đã có tài khoản? <a href="dang-nhap.php">Đăng nhập</a></p>
         </section>
       </div>
