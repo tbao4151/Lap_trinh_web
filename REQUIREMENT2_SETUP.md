@@ -1,3 +1,5 @@
+> **CẢNH BÁO PHẠM VI (2026-10-12):** Tài liệu này mô tả **bản demo/nộp tạm 13 trang khách hàng** và không đại diện cho mức hoàn thành 70% toàn bộ đồ án. Đề tài gốc có **18 trang khách hàng + 22 trang Admin = 40 trang**. Với phạm vi nhóm thống nhất, 13 ảnh trong PDF cũ chỉ tương đương 32,5% số màn hình, chưa kể các chức năng chưa hoàn chỉnh. **Không sử dụng PDF này làm bản nghiệm thu 70% toàn hệ thống.** Kế hoạch và tiêu chí nghiệm thu chính thức cho lần phát triển tiếp theo: [docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md](docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md).
+
 # CÁ'S HOA - Hướng dẫn chạy và nộp Yêu cầu 2
 
 **Repo học thuật:** https://github.com/tbao4151/Lap_trinh_web  
