@@ -1,4 +1,12 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php
+require_once __DIR__.'/includes/bootstrap.php';
+$slug=(string)($_GET['slug']??'');$article=null;
+if(preg_match('/^[a-z0-9-]{1,220}$/',$slug)){
+ $stmt=cas_db()->prepare("SELECT title,thumbnail,content,published_at FROM news WHERE slug=? AND status='published' LIMIT 1");
+ $stmt->execute([$slug]);$article=$stmt->fetch() ?: null;
+}
+if(!$article) http_response_code(404);
+?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -16,7 +24,17 @@
 
   <main class="cas-page content-page">
     <div class="cas-container">
-      <article id="articleHost" class="mx-auto" style="max-width: 900px"></article>
+      <article id="articleHost" class="mx-auto" style="max-width: 900px">
+<?php if($article): ?>
+  <div class="article-meta"><?= cas_e(date('d.m.Y',strtotime($article['published_at']))) ?> · Tin tức</div>
+  <h1 class="cas-title mt-3"><?= cas_e($article['title']) ?></h1>
+  <img class="img-fluid rounded mt-4" src="<?= cas_e($article['thumbnail']) ?>" alt="<?= cas_e($article['title']) ?>">
+  <div class="content-card mt-4"><p style="white-space:pre-line"><?= cas_e($article['content']) ?></p></div>
+<?php else: ?>
+  <h1 class="cas-title">Không tìm thấy bài viết.</h1>
+  <a href="tin-tuc.php">Trở lại tin tức</a>
+<?php endif; ?>
+</article>
     </div>
   </main>
 
@@ -27,7 +45,7 @@
   <script src="assets/js/cart.js" defer></script>
   <script src="assets/js/batch2.js" defer></script>
   <script src="assets/js/batch3.js" defer></script>
-  <script src="assets/js/batch4.js" defer></script>
+  
   <script src="assets/js/main-r2.js" defer></script>
 </body>
 </html>
