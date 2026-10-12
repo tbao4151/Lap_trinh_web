@@ -62,3 +62,33 @@ jobs:
           DB_USER: root
           DB_PASSWORD: localtestpass
         run: bash scripts/verify-r2.sh
+
+      - name: Prepare Chrome screenshot environment
+        run: |
+          command -v google-chrome || command -v chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb scrot
+          python3 -m venv /tmp/cas-r2-env
+          /tmp/cas-r2-env/bin/pip install --quiet selenium reportlab pillow
+      - name: Capture PHP pages with real browser address bar and build PDF
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_NAME: cas_hoa
+          DB_USER: root
+          DB_PASSWORD: localtestpass
+          DISPLAY: ':99'
+        run: |
+          Xvfb :99 -screen 0 1440x960x24 >/tmp/cas-xvfb.log 2>&1 &
+          sleep 2
+          /tmp/cas-r2-env/bin/python scripts/capture-r2.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CAS_HOA_PHP_MySQL_BaoCaoYeuCau2
+          path: |
+            evidence/CAS_HOA_Yeu_Cau_2.pdf
+            evidence/r2/*.png
+            evidence/r2/manifest.json
+          if-no-files-found: warn
+          retention-days: 7
