@@ -1,57 +1,60 @@
-> **CẢNH BÁO PHẠM VI (2026-10-12):** Tài liệu này mô tả **bản demo/nộp tạm 13 trang khách hàng** và không đại diện cho mức hoàn thành 70% toàn bộ đồ án. Đề tài gốc có **18 trang khách hàng + 22 trang Admin = 40 trang**. Với phạm vi nhóm thống nhất, 13 ảnh trong PDF cũ chỉ tương đương 32,5% số màn hình, chưa kể các chức năng chưa hoàn chỉnh. **Không sử dụng PDF này làm bản nghiệm thu 70% toàn hệ thống.** Kế hoạch và tiêu chí nghiệm thu chính thức cho lần phát triển tiếp theo: [docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md](docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md).
+# CÁ'S HOA — Yêu cầu 2 (PHP + MySQL) — Hướng dẫn triển khai
 
-# CÁ'S HOA - Hướng dẫn chạy và nộp Yêu cầu 2
+## Phạm vi đã thống nhất
 
-**Repo học thuật:** https://github.com/tbao4151/Lap_trinh_web  
-**Branch giai đoạn 2:** `feature/requirement-2-php-mysql`  
-**Không sửa `main` (bản đã nộp yêu cầu 1).** Website kinh doanh `Web_Flower_Manus` không thuộc phạm vi code này.
+Đồ án học thuật sử dụng **HTML5, CSS3, JavaScript, PHP và MySQL**, tách khỏi website kinh doanh `Web_Flower_Manus`.
 
-## 1. Khởi chạy trên XAMPP
+Bản Web tĩnh yêu cầu 1 có 18 màn hình khách hàng và 22 màn hình quản trị. Phạm vi mục tiêu yêu cầu 2 là **18 trang khách hàng + 12 trang Admin = 30/40 trang (75% tính theo số trang)**. Con số này là chỉ tiêu tiến độ của nhóm, không thay thế cách giảng viên chấm 70% FrontEnd.
 
-1. Tải branch này từ GitHub dưới dạng ZIP hoặc `git checkout feature/requirement-2-php-mysql`.
-2. Chép toàn bộ thư mục thành `C:\\xampp\\htdocs\\Lap_trinh_web`.
-3. Mở XAMPP Control Panel, khởi chạy **Apache** và **MySQL**.
-4. Vào `http://localhost/phpmyadmin`, import `database/schema.sql`, sau đó import `database/seed.sql`.
-5. Mặc định kết nối `127.0.0.1:3306`, database `cas_hoa`, user `root`, password rỗng. Nếu khác, cấu hình qua các biến môi trường `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`.
-6. Mở `http://localhost/Lap_trinh_web/index.php`. Không chạy `file://` hoặc VS Code Live Server, vì PHP và MySQL cần webserver.
+Các route mới trên branch `feature/requirement-2-php-mysql` là tệp `.php`. Bản `main` yêu cầu 1 được giữ nguyên.
 
-## 2. Phạm vi nộp gấp: 13/18 trang khách hàng
+## Cài đặt XAMPP (Windows)
 
-**Đã chuyển PHP và có chức năng phù hợp:**
+1. Cài XAMPP với PHP 8.2+ và MySQL 8.0+ (hoặc MariaDB tương thích); bật Apache và MySQL.
+2. Chép project vào `C:\xampp\htdocs\Lap_trinh_web` hoặc clone branch trên vào đúng thư mục.
+3. Mở `http://localhost/phpmyadmin`, lần lượt import:
+   - `database/schema.sql` — cấu trúc 17 bảng.
+   - `database/seed.sql` — 11 sản phẩm, 6 bài viết và các bảng danh mục.
+   - `database/migrations/001_auth.php.sql` — bảng token đặt lại mật khẩu và vai trò owner.
+   - `database/migrations/002_inventory_seed.sql` — dữ liệu kho mẫu từ yêu cầu 1.
+4. Kết nối PDO mặc định: host `127.0.0.1`, cổng `3306`, database `cas_hoa`, user `root`, password trống theo XAMPP thông dụng. Nếu cấu hình khác, đặt `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` trong môi trường máy chủ.
+5. Truy cập `http://localhost/Lap_trinh_web/index.php`. **Không mở bằng file:// hay Live Server**.
 
-- `index.php`, `san-pham.php`, `chi-tiet-san-pham.php`: dữ liệu sản phẩm từ MySQL, lọc/tìm kiếm phía JS.
-- `gio-hang.php`: giỏ hàng LocalStorage, giữ tương tác HTML/JS của yêu cầu 1.
-- `thanh-toan.php`, `dat-hang-thanh-cong.php`: PHP xử lý POST, tính lại giá từ MySQL, lưu `customers`, `orders`, `order_items` và lịch giao bằng transaction; hiển thị xác nhận bằng session.
-- `tra-cuu-don-hang.php`: PHP/MySQL tra cứu theo mã đơn + số điện thoại người nhận.
-- `tin-tuc.php`, `chi-tiet-tin-tuc.php`: bài viết từ bảng `news`.
-- `lien-he.php`: lưu `contacts` với validate/CSRF.
-- `gioi-thieu.php`, `chinh-sach-giao-hang.php`, `chinh-sach-doi-tra.php`: giao diện nội dung tĩnh chạy qua PHP.
+## Cấp tài khoản quản trị an toàn
 
-**Chưa tính là hoàn thành:** `dang-nhap.php`, `dang-ky.php`, `quen-mat-khau.php`, `tai-khoan.php`, `lich-su-don-hang.php` (chưa triển khai xác thực PHP/MySQL). Các form demo đã vô hiệu hóa và có cảnh báo.
+Không sử dụng tài khoản `owner@cashoa.vn / 1234` của giao diện mẫu và **không hardcode** mật khẩu vào mã nguồn.
 
-**Cách tính 13/18 = 72,2%** chỉ là tỷ lệ theo số trang, không thay thế tiêu chí chấm điểm do giảng viên công bố. Phần giỏ hàng vẫn dùng JS/LocalStorage và sẽ được mở rộng sau.
+Trong Command Prompt của Windows (thay thông tin theo người phụ trách):
 
-## 3. Cách kiểm tra
+```bat
+cd C:\xampp\htdocs\Lap_trinh_web
+set CAS_ADMIN_EMAIL=admin-nhom@example.com
+set CAS_ADMIN_PASSWORD=MotMatKhauManh_2026!
+C:\xampp\php\php.exe scripts\create-admin.php
+```
 
-- Trang chủ phải hiển thị sản phẩm; chọn sản phẩm -> thêm giỏ -> thanh toán -> nhập đủ dữ liệu -> nhận mã đơn.
-- Tra cứu đơn bằng mã vừa tạo và SĐT người nhận đã nhập.
-- Mở phpMyAdmin: kiểm tra các bảng `orders`, `order_items`, `customers`, `contacts`.
-- Tin tức và chi tiết phải hiển thị các bài đã seed.
-- Test trên GitHub Actions: **PHP coursework validation** (syntax + MySQL 8 integration).
-- Tham khảo script kiểm thử: `scripts/verify-r2.sh`.
+Script chỉ chạy CLI, tạo mật khẩu bằng `password_hash()`, từ chối tài khoản/email trùng. Sau đó truy cập `http://localhost/Lap_trinh_web/admin/dang-nhap.php`.
 
-## 4. Minh chứng PDF bắt buộc
+## Chức năng đã lập trình
 
-Yêu cầu giảng viên: **PDF gồm ảnh các trang PHP có thanh địa chỉ Web**.
+- Khách hàng: trang chủ/catalog/chi tiết sản phẩm đọc MySQL; giỏ hàng lưu PHP Session, JavaScript đồng bộ qua CSRF; checkout transaction, tra cứu đơn, xác nhận đơn; danh sách và chi tiết bài viết; liên hệ; đăng ký, đăng nhập, đăng xuất, hồ sơ, lịch sử đơn liên kết tài khoản; quên mật khẩu bằng token có hạn sử dụng và dùng một lần; giới thiệu và chính sách.
+- Admin: đăng nhập Session với role staff/admin/owner; Dashboard; đơn hàng; giao hàng; khách hàng; sản phẩm; thêm/sửa sản phẩm; đổi giá/trạng thái nhanh; phân loại; kho tổng; báo cáo doanh thu.
+- Giữ nguyên giao diện HTML/CSS/Bootstrap của yêu cầu 1 ở phía khách hàng và phong cách trang quản trị.
 
-GitHub Actions chạy Chrome thật trên PHP/MySQL tại `http://127.0.0.1:8033`, chụp cả cửa sổ trình duyệt, rồi tạo `evidence/CAS_HOA_Yeu_Cau_2.pdf`. Khi workflow thành công, vào tab **Actions > PHP coursework validation > lần chạy mới nhất > Artifacts**, tải `CAS_HOA_PHP_MySQL_BaoCaoYeuCau2`; trong ZIP có PDF và ảnh gốc.
+**Phụ thuộc phải cấu hình riêng:** PHP `mail()` cần máy chủ gửi email hoặc SMTP/sendmail hoạt động. Trang quên mật khẩu không tự giả lập OTP hay hiển thị token trên website công khai. Cần xác minh gửi/nhận email trước khi nghiệm thu toàn bộ tính năng trên máy XAMPP.
 
-Trước khi nộp: mở PDF kiểm tra giao diện và thanh địa chỉ. Nếu có lỗi hiển thị trong ảnh, phải chụp lại trên XAMPP bằng Chrome và thay ảnh đúng; **không dựng ảnh địa chỉ giả**.
+## Kiểm thử và PDF
 
-## 5. Phân chia phần còn lại sau hạn
+GitHub Actions: [PHP coursework validation](https://github.com/tbao4151/Lap_trinh_web/actions). Pipeline chạy PHP lint, JavaScript lint, MySQL 8 integration và Chrome full-window screenshots. Các bài kiểm thử có trong:
 
-Trần Gia Hưng: đăng ký, đăng nhập, quên mật khẩu, PHP session.  
-Phạm Hiệp Phú: tài khoản, lịch sử đơn, bổ sung giao diện hoặc tính năng tương ứng.  
-Nguyễn Văn Thiên Bảo: tích hợp, kiểm thử và xử lý xung đột.
+- `scripts/verify-r2.sh`
+- `scripts/verify-r2-auth-admin.sh`
+- `scripts/capture-r2.py`
 
-Tiến độ hoàn thành trong tài liệu này căn cứ vào CI và mã nguồn; không tuyên bố đã thử trên XAMPP cá nhân nếu chưa thực hiện.
+Khi lần chạy CI mới nhất hoàn tất thành công, vào **Actions → workflow mới nhất → Artifacts → CAS_HOA_PHP_MySQL_BaoCaoYeuCau2**. ZIP chứa PDF 31 trang (bìa + 30 màn hình) và ảnh PNG thực có thanh địa chỉ `127.0.0.1:8033/...php`. Xem lại PDF trước khi nộp; không dùng ảnh HTML hoặc dựng thanh địa chỉ giả.
+
+## Công việc tiếp theo
+
+- Kiểm thử hồi quy và bảo mật bổ sung, đặc biệt luồng reset mật khẩu với dịch vụ mail thực, truy cập sai quyền, input sai và dữ liệu SQL.
+- Rà soát UI responsive trên nhiều viewport và dữ liệu biên.
+- Sau mốc 30 trang, tiếp tục 10 màn hình Admin chưa nằm trong yêu cầu 2 của nhóm.
