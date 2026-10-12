@@ -109,6 +109,6 @@ function cas_admin_select(string $field,array $options,string $selected): string
   }
   return $s.'</select>';
 }
-const statuses=['pending_confirmation'=>'Chờ xác nhận','confirmed'=>'Đã xác nhận','preparing'=>'Đang chuẩn bị','ready'=>'Sẵn sàng','delivering'=>'Đang giao','completed'=>'Hoàn tất','cancelled'=>'Đã hủy'];
-const payments=['unpaid'=>'Chưa thu','partial'=>'Đã cọc','paid'=>'Đã thu','refunded'=>'Đã hoàn'];
-const deliveries=['not_delivered'=>'Chưa giao','out_for_delivery'=>'Đang giao','delivered'=>'Đã giao','pickup_ready'=>'Chờ lấy'];
+$statuses=['pending_confirmation'=>'Chờ xác nhận','confirmed'=>'Đã xác nhận','preparing'=>'Đang chuẩn bị','ready'=>'Sẵn sàng','delivering'=>'Đang giao','completed'=>'Hoàn tất','cancelled'=>'Đã hủy'];
+$payments=['unpaid'=>'Chưa thu','partial'=>'Đã cọc','paid'=>'Đã thu','refunded'=>'Đã hoàn'];
+$deliveries=['not_delivered'=>'Chưa giao','out_for_delivery'=>'Đang giao','delivered'=>'Đã giao','pickup_ready'=>'Chờ lấy'];
