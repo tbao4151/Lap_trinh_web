@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__.'/../includes/bootstrap.php';
+require_once __DIR__.'/../includes/auth.php';
 cas_require_post();
 if(!cas_csrf_valid($_POST['csrf']??null)) cas_json(403,['ok'=>false,'message'=>'Phiên làm việc hết hạn, hãy tải lại trang.']);
 $cart=json_decode((string)($_POST['cart']??''),true);
@@ -42,8 +42,12 @@ try {
     $subtotal+=$sum;$ordered[]=[$id,$qty,$price,$sum];
   }
   if($subtotal<=0||$subtotal>99999999999) throw new DomainException('Tổng tiền không hợp lệ.');
-  $insertCustomer=$db->prepare("INSERT INTO customers(user_id,full_name,phone) VALUES(NULL,?,?)");
-  $insertCustomer->execute([$name,$phone]);$customerId=(int)$db->lastInsertId();
+  $user=cas_user();
+  $customerId=$user&&$user['role']==='customer'?cas_customer_id((int)$user['user_id']):null;
+  if(!$customerId){
+    $insertCustomer=$db->prepare("INSERT INTO customers(user_id,full_name,phone) VALUES(NULL,?,?)");
+    $insertCustomer->execute([$name,$phone]);$customerId=(int)$db->lastInsertId();
+  }
   $code='CSH-'.date('Y').'-'.strtoupper(bin2hex(random_bytes(4)));
   $orderSql="INSERT INTO orders(customer_id,order_code,recipient_name,recipient_phone,delivery_method,delivery_address,receive_date,receive_time,payment_method,payment_status,order_status,card_message,order_note,subtotal,shipping_fee,total_amount) VALUES(?,?,?,?,?,?,?,?,?,'unpaid','pending_confirmation',?,?,?,0,?)";
   $stmt=$db->prepare($orderSql);

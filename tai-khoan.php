@@ -1,4 +1,28 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php
+require_once __DIR__.'/includes/auth.php';
+$user=cas_require_user();$error='';
+if(cas_post()){
+  try {
+    cas_assert_csrf();
+    $name=trim((string)($_POST['full_name']??''));
+    $phone=cas_phone((string)($_POST['phone']??''));
+    $email=strtolower(trim((string)($_POST['email']??'')));
+    $address=trim((string)($_POST['address']??''));
+    if(mb_strlen($name)<2||mb_strlen($name)>120||mb_strlen($address)>255||!preg_match('/^0[0-9]{9}$/',$phone)||!filter_var($email,FILTER_VALIDATE_EMAIL)) throw new RuntimeException('Họ tên, email hoặc điện thoại chưa hợp lệ.');
+    $db=cas_db();$db->beginTransaction();
+    try{
+      $q=$db->prepare("UPDATE users SET full_name=?,email=?,phone=? WHERE user_id=?");
+      $q->execute([$name,$email,$phone,$user['user_id']]);
+      $q=$db->prepare("UPDATE customers SET full_name=?,phone=?,email=?,address=? WHERE user_id=?");
+      $q->execute([$name,$phone,$email,$address,$user['user_id']]);
+      $db->commit();
+    }catch(Throwable $e){$db->rollBack();throw $e;}
+    cas_redirect('tai-khoan.php?saved=1');
+  }catch(Throwable $e){$error=$e instanceof PDOException?'Email đã tồn tại hoặc MySQL xảy ra lỗi.':$e->getMessage();}
+}
+$q=cas_db()->prepare("SELECT u.full_name,u.email,u.phone,c.address FROM users u LEFT JOIN customers c ON c.user_id=u.user_id WHERE u.user_id=?");
+$q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
+?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -11,8 +35,8 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
-<body data-page="account" class="d-flex flex-column"><div class="container mt-3"><p class="alert alert-warning" role="status">Module tài khoản chưa triển khai PHP/MySQL; nhóm sẽ hoàn thành trong giai đoạn tiếp theo. Không nhập mật khẩu thật vào biểu mẫu này.</p></div>
-  <div id="siteHeader"></div><div class="container mt-3"><p class="alert alert-warning">Chức năng tài khoản chưa kết nối PHP/MySQL.</p></div>
+<body data-page="account" class="d-flex flex-column">
+  <div id="siteHeader"></div>
 
   <main class="cas-page content-page">
     <div class="cas-container">
@@ -23,7 +47,7 @@
         <div class="profile-avatar"><i class="bi bi-person"></i></div>
         <div>
           <p class="cas-muted small mb-1">Tài khoản khách hàng</p>
-          <strong id="profileName">Khách hàng</strong>
+          <strong id="profileName"><?= cas_e($profile['full_name']??'Khách hàng') ?></strong>
         </div>
       </div>
 
@@ -31,7 +55,7 @@
         <a class="active" href="tai-khoan.php"><i class="bi bi-person-lines-fill"></i> Thông tin cá nhân</a>
         <a href="lich-su-don-hang.php"><i class="bi bi-receipt"></i> Lịch sử đơn hàng</a>
         <a href="tra-cuu-don-hang.php"><i class="bi bi-search"></i> Tra cứu đơn</a>
-        <a href="dang-nhap.php"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</a>
+        <form action="dang-xuat.php" method="post"><?= cas_csrf_form() ?><button class="btn-cas-outline mt-2" type="submit">Đăng xuất</button></form>
       </nav>
     </aside>
         </div>
@@ -44,25 +68,26 @@
               Lưu các thông tin thường dùng để thao tác đặt hoa nhanh hơn trong những lần tiếp theo.
             </p>
 
-            <form onsubmit="return false" id="profileForm" class="row g-3 mt-2" novalidate>
+            <form id="profileForm" method="post" action="tai-khoan.php" class="row g-3 mt-2" novalidate>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold" for="fullName">Họ và tên</label>
-                <input id="fullName" class="form-control cas-form-control" autocomplete="name" placeholder="Nguyễn Văn A">
+                <input id="fullName" name="full_name" value="<?= cas_e($profile['full_name']??'') ?>" class="form-control cas-form-control" autocomplete="name" placeholder="Nguyễn Văn A">
               </div>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold" for="phone">Số điện thoại</label>
-                <input id="phone" class="form-control cas-form-control" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="0123456789">
+                <input id="phone" name="phone" value="<?= cas_e($profile['phone']??'') ?>" class="form-control cas-form-control" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="0123456789">
               </div>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold" for="email">Email</label>
-                <input id="email" type="email" class="form-control cas-form-control" autocomplete="email" placeholder="example@gmail.com">
+                <input id="email" name="email" value="<?= cas_e($profile['email']??'') ?>" type="email" class="form-control cas-form-control" autocomplete="email" placeholder="example@gmail.com">
               </div>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold" for="address">Địa chỉ thường dùng</label>
-                <input id="address" class="form-control cas-form-control" autocomplete="street-address" placeholder="Số nhà, đường, phường/xã">
+                <input id="address" name="address" value="<?= cas_e($profile['address']??'') ?>" class="form-control cas-form-control" autocomplete="street-address" placeholder="Số nhà, đường, phường/xã">
               </div>
               <div class="col-12">
-                <div id="profileMessage" class="auth-message d-none" role="status"></div>
+                <?= cas_csrf_form() ?>
+<?php if($error!==''): ?><div class="auth-message error"><?= cas_e($error) ?></div><?php elseif(isset($_GET['saved'])): ?><div class="auth-message success">Đã lưu thông tin cá nhân.</div><?php endif; ?>
                 <button class="btn-cas-primary mt-2" type="submit"><i class="bi bi-check2"></i> Lưu thông tin</button>
               </div>
             </form>
