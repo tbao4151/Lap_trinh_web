@@ -1,4 +1,7 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php
+require_once __DIR__.'/includes/bootstrap.php';
+$articles=cas_db()->query("SELECT slug,title,summary,thumbnail,published_at FROM news WHERE status='published' ORDER BY published_at DESC")->fetchAll();
+?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -21,75 +24,22 @@
       <p class="cas-subtitle">Gợi ý chọn hoa, viết thiệp, chăm hoa và chuẩn bị món quà phù hợp với từng dịp.</p>
 
       <div class="row g-4 mt-2">
-        <div class="col-md-6 col-lg-4">
-          <article class="news-card">
-            <img src="assets/images/lam-tinh.png" alt="Chọn hoa theo màu sắc và cảm xúc">
-            <div class="news-card-body">
-              <div class="article-meta">18.09.2026 · Gợi ý chọn hoa</div>
-              <h2 class="mt-2">Chọn hoa theo màu sắc và cảm xúc</h2>
-              <p>Tông xanh, hồng, đỏ hay tím tạo nên những sắc thái khác nhau cho món quà.</p>
-              <a class="fw-bold small" style="color:var(--primary)" href="chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau">Đọc bài viết</a>
-            </div>
-          </article>
-        </div>
-        <div class="col-md-6 col-lg-4">
-          <article class="news-card">
-            <img src="assets/images/garden.png" alt="Viết gì trên một tấm thiệp ngắn?">
-            <div class="news-card-body">
-              <div class="article-meta">12.09.2026 · Thiệp hoa</div>
-              <h2 class="mt-2">Viết gì trên một tấm thiệp ngắn?</h2>
-              <p>Một lời nhắn không cần dài. Điều quan trọng là đúng người, đúng dịp và đúng cảm xúc.</p>
-              <a class="fw-bold small" style="color:var(--primary)" href="chi-tiet-tin-tuc.php?slug=viet-thiep-ngan">Đọc bài viết</a>
-            </div>
-          </article>
-        </div>
-        <div class="col-md-6 col-lg-4">
-          <article class="news-card">
-            <img src="assets/images/cam-tu-cau.png" alt="Giữ hoa tươi lâu hơn sau khi nhận">
-            <div class="news-card-body">
-              <div class="article-meta">05.09.2026 · Chăm hoa</div>
-              <h2 class="mt-2">Giữ hoa tươi lâu hơn sau khi nhận</h2>
-              <p>Một vài thao tác nhỏ khi cắm và thay nước giúp hoa giữ được trạng thái đẹp lâu hơn.</p>
-              <a class="fw-bold small" style="color:var(--primary)" href="chi-tiet-tin-tuc.php?slug=giu-hoa-tuoi-lau">Đọc bài viết</a>
-            </div>
-          </article>
-        </div>
-        <div class="col-md-6 col-lg-4">
-          <article class="news-card">
-            <img src="assets/images/hoa-ly.png" alt="Gợi ý chọn hoa sinh nhật theo tính cách">
-            <div class="news-card-body">
-              <div class="article-meta">30.08.2026 · Sinh nhật</div>
-              <h2 class="mt-2">Gợi ý chọn hoa sinh nhật theo tính cách</h2>
-              <p>Từ người thích tối giản đến người thích nổi bật, mỗi tính cách có thể phù hợp với một kiểu hoa khác nhau.</p>
-              <a class="fw-bold small" style="color:var(--primary)" href="chi-tiet-tin-tuc.php?slug=hoa-sinh-nhat">Đọc bài viết</a>
-            </div>
-          </article>
-        </div>
-        <div class="col-md-6 col-lg-4">
-          <article class="news-card">
-            <img src="assets/images/mot-bo-hoa.png" alt="Hoa chúc mừng nên chọn bó hay giỏ?">
-            <div class="news-card-body">
-              <div class="article-meta">24.08.2026 · Chúc mừng</div>
-              <h2 class="mt-2">Hoa chúc mừng nên chọn bó hay giỏ?</h2>
-              <p>Bó hoa linh hoạt còn giỏ hoa tiện trưng bày. Hãy chọn theo bối cảnh người nhận.</p>
-              <a class="fw-bold small" style="color:var(--primary)" href="chi-tiet-tin-tuc.php?slug=hoa-chuc-mung">Đọc bài viết</a>
-            </div>
-          </article>
-        </div>
-        <div class="col-md-6 col-lg-4">
-          <article class="news-card">
-            <img src="assets/images/phi-yen.png" alt="Một bó hoa cho ngày kỷ niệm">
-            <div class="news-card-body">
-              <div class="article-meta">16.08.2026 · Kỷ niệm</div>
-              <h2 class="mt-2">Một bó hoa cho ngày kỷ niệm</h2>
-              <p>Không cần quá lớn, một bó hoa có chi tiết gắn với câu chuyện riêng vẫn đủ đặc biệt.</p>
-              <a class="fw-bold small" style="color:var(--primary)" href="chi-tiet-tin-tuc.php?slug=chon-hoa-ky-niem">Đọc bài viết</a>
-            </div>
-          </article>
-        </div>
+  <?php foreach($articles as $article): ?>
+  <div class="col-md-6 col-lg-4">
+    <article class="news-card">
+      <img src="<?= cas_e($article['thumbnail']) ?>" alt="<?= cas_e($article['title']) ?>">
+      <div class="news-card-body">
+        <div class="article-meta"><?= cas_e(date('d.m.Y',strtotime($article['published_at']))) ?> · Tin tức</div>
+        <h2 class="mt-2"><?= cas_e($article['title']) ?></h2>
+        <p><?= cas_e($article['summary']) ?></p>
+        <a class="fw-bold small" style="color:var(--primary)"
+          href="chi-tiet-tin-tuc.php?slug=<?= urlencode($article['slug']) ?>">Đọc bài viết</a>
       </div>
-
-      <section class="content-card mt-5">
+    </article>
+  </div>
+  <?php endforeach; ?>
+</div>
+<section class="content-card mt-5">
         <div class="row align-items-center g-3">
           <div class="col-lg-8">
             <p class="cas-eyebrow">Cần một gợi ý riêng?</p>
