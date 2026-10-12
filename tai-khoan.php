@@ -110,7 +110,7 @@ $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
   <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart.js" defer></script>
+  <script src="assets/js/cart-r2.php" defer></script>
   
   
   <script src="assets/js/main-r2.js" defer></script>
