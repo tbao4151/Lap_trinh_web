@@ -19,7 +19,8 @@ trap 'kill "$PID" 2>/dev/null || true' EXIT
 sleep 2
 curl -fsS -c /tmp/cas-r2-cookies http://127.0.0.1:8033/thanh-toan.php > /tmp/cas-r2-checkout.html
 TOKEN="$(python3 -c 'import re; s=open("/tmp/cas-r2-checkout.html").read(); m=re.search(r"window.CAS_CSRF\s*=\s*\"([a-f0-9]+)\"",s); assert m,"Missing CSRF"; print(m.group(1))')"
-curl -fsS -b /tmp/cas-r2-cookies http://127.0.0.1:8033/assets/js/products.php | grep -q 'p001'
+curl -fsS -b /tmp/cas-r2-cookies http://127.0.0.1:8033/assets/js/products.php > /tmp/cas-r2-products.js
+grep -q 'p001' /tmp/cas-r2-products.js
 RESP="$(curl -sS -b /tmp/cas-r2-cookies -c /tmp/cas-r2-cookies -X POST \
   -F "csrf=$TOKEN" \
   -F 'cart=[{"productId":"p001","quantity":2}]' \
@@ -33,8 +34,10 @@ LOOKUP="$(curl -sS -b /tmp/cas-r2-cookies -X POST -F "csrf=$TOKEN" -F "code=$COD
 printf '%s' "$LOOKUP" | python3 -c 'import json,sys; x=json.load(sys.stdin); assert x["ok"] and x["order"]["total"]==800000,x'
 CONTACT="$(curl -sS -b /tmp/cas-r2-cookies -X POST -F "csrf=$TOKEN" -F 'name=Khach hang' -F 'phone=0900000000' -F 'subject=Tu van mau hoa' -F 'message=Toi can tu van mau hoa cho ngay ky niem' http://127.0.0.1:8033/actions/contact.php)"
 printf '%s' "$CONTACT" | python3 -c 'import json,sys; x=json.load(sys.stdin); assert x["ok"],x'
-curl -fsS http://127.0.0.1:8033/tin-tuc.php | grep -q 'Chọn hoa'
-curl -fsS 'http://127.0.0.1:8033/chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau' | grep -q 'Chọn hoa'
+curl -fsS http://127.0.0.1:8033/tin-tuc.php > /tmp/cas-r2-news.html
+grep -q 'Chọn hoa' /tmp/cas-r2-news.html
+curl -fsS 'http://127.0.0.1:8033/chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau' > /tmp/cas-r2-article.html
+grep -q 'Chọn hoa' /tmp/cas-r2-article.html
 COUNT="$($MYSQL --batch --skip-column-names cas_hoa -e 'SELECT COUNT(*) FROM orders')"
 [ "$COUNT" -ge 1 ]
 echo "PASS: 17 SQL tables, 11 products, checkout $CODE, lookup, contact, news."
