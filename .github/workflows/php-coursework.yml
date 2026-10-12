@@ -1,0 +1,32 @@
+name: PHP coursework validation
+on:
+  push:
+    branches:
+      - feature/requirement-2-php-mysql
+  pull_request:
+    branches:
+      - feature/requirement-2-php-mysql
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP syntax
+        run: |
+          php --version
+          find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+      - name: JavaScript syntax
+        run: |
+          node --check assets/js/main-r2.js
+          node --check assets/js/r2-contact.js
+          node --check assets/js/r2-lookup.js
+      - name: Validate SQL and static page routes
+        run: |
+          test -s database/schema.sql
+          test -s database/seed.sql
+          test -f index.php
+          test -f san-pham.php
+          test -f thanh-toan.php
+          test -f actions/checkout.php
+          test -f actions/lookup.php
+          test -f actions/contact.php
