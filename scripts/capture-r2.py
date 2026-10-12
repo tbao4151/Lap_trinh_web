@@ -53,6 +53,7 @@ try:
     opts.add_argument("--disable-gpu")
     opts.add_argument("--no-first-run")
     opts.add_experimental_option("excludeSwitches", ["enable-automation"])
+    opts.add_experimental_option("prefs", {"credentials_enable_service":False,"profile.password_manager_enabled":False,"profile.password_manager_leak_detection":False,"autofill.profile_enabled":False})
     opts.add_argument("--no-default-browser-check")
     opts.add_argument("--disable-search-engine-choice-screen")
     opts.add_argument("--window-size=1440,960")
