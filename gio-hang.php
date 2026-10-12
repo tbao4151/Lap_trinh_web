@@ -48,5 +48,6 @@
   <script src="assets/js/products.php" defer></script>
   <script src="assets/js/cart-r2.php" defer></script>
   <script src="assets/js/main-r2.js" defer></script>
+<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
 </body>
 </html>

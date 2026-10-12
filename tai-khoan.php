@@ -114,5 +114,6 @@ $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
   
   
   <script src="assets/js/main-r2.js" defer></script>
+<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
 </body>
 </html>
