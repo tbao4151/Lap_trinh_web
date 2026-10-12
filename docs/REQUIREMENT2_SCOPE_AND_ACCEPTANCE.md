@@ -1,5 +1,40 @@
 # CÁ'S HOA – Chuẩn hóa phạm vi Yêu cầu 2 (đồ án TDTU)
 
+## Mốc triển khai chính thức đã thống nhất: 30/40 trang
+
+Ngày chốt: 2026-10-12.
+
+**Mục tiêu bản yêu cầu 2:** Hoàn thiện về nghiệp vụ **18/18 trang khách hàng và 12/22 trang Admin**, tổng 30/40 trang (75% *theo số trang của nhóm*). Đây là chỉ tiêu quản trị nội bộ, không khẳng định công thức tính 70% FrontEnd của giảng viên. Tất cả 30 trang phải qua kiểm thử nghiệp vụ với PHP/MySQL; không tính các trang chỉ đổi phần mở rộng .html thành .php, còn dùng LocalStorage để giả lập nghiệp vụ, hoặc chỉ chụp ảnh.
+
+### 12 trang Admin nằm trong phạm vi
+
+| # | Đường dẫn | Kết quả bắt buộc |
+|---|---|---|
+| 1 | admin/dang-nhap.php | Auth PHP Session, RBAC |
+| 2 | admin/index.php | Dashboard với dữ liệu MySQL |
+| 3 | admin/don-hang.php | Xem, lọc và cập nhật trạng thái đơn |
+| 4 | admin/giao-hang.php | Theo dõi và cập nhật trạng thái giao |
+| 5 | admin/khach-hang.php | Danh sách, tìm kiếm khách hàng |
+| 6 | admin/san-pham.php | Danh sách và tìm kiếm sản phẩm |
+| 7 | admin/them-san-pham.php | Tạo sản phẩm với validation và lưu DB |
+| 8 | admin/sua-san-pham.php | Sửa sản phẩm hợp lệ, xử lý ID lỗi |
+| 9 | admin/quan-ly-nhanh.php | Thay đổi giá/trạng thái an toàn |
+| 10 | admin/phan-loai-bo-loc.php | Quản lý danh mục/tông màu/dịp |
+| 11 | admin/kho-tong.php | Tổng quan tồn kho từ MySQL |
+| 12 | admin/bao-cao.php | Báo cáo SQL từ đơn hàng thực tế |
+
+**Chưa thuộc mốc 30 trang:** admin/hoan-tien, admin/giay-goi, admin/kham-pha, admin/kho-hoa, admin/kho-phu-kien, admin/lich-su-kho, admin/nhan-vien, admin/cai-dat, admin/tai-khoan, admin/chu-so-huu (10 trang). Giữ giao diện nguồn; triển khai backend ở mốc tiếp theo. Không được mở route không bảo vệ quyền admin chỉ để cho đủ số màn hình.
+
+### Nghiệm thu
+
+- Đủ 18 FrontEnd hoạt động thực sự, bao gồm đăng ký, đăng nhập, khôi phục mật khẩu an toàn, tài khoản và lịch sử đơn.
+- Đủ 12 Admin hoạt động thực sự, dữ liệu nhất quán với bảng của khách hàng và có kiểm tra quyền.
+- Kiểm thử cú pháp, MySQL, CRUD, xác thực/phân quyền, các trường hợp lỗi và luồng khách mua -> Admin xác nhận -> theo dõi đơn.
+- PDF gồm ảnh chụp 30 trang PHP thực tế có thanh địa chỉ trình duyệt. Không ghi bản cũ 13 trang là 75%.
+- Tiếp tục đầy đủ, bài bản theo các bước kiến trúc -> lập trình -> kiểm thử -> nghiệm thu; không bỏ kiểm thử vì gần hạn.
+
+
+
 ## 1. Cơ sở đánh giá
 
 - Yêu cầu giảng viên: sau khi đã có giao diện tĩnh và database, viết PHP hoàn thành **tối thiểu 70% FrontEnd**; sản phẩm nộp là PDF ảnh chụp màn hình các trang PHP **có thanh địa chỉ Web**.
