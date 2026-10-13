@@ -17,6 +17,7 @@ Các route mới trên branch `feature/requirement-2-php-mysql` là tệp `.php`
    - `database/seed.sql` — 11 sản phẩm, 6 bài viết và các bảng danh mục.
    - `database/migrations/001_auth.php.sql` — bảng token đặt lại mật khẩu và vai trò owner.
    - `database/migrations/002_inventory_seed.sql` — dữ liệu kho mẫu từ yêu cầu 1.
+   - `database/migrations/003_admin_ops.sql` — Admin Operations: ảnh sản phẩm, lịch sử kho trước/sau, giấy gói có phụ thu, danh mục khám phá, lịch sử giao hàng/hoàn tiền, cài đặt shop, nhật ký quản trị. Chỉ thêm bảng/cột, chạy lại nhiều lần không lỗi và không xoá dữ liệu.
 4. Kết nối PDO mặc định: host `127.0.0.1`, cổng `3306`, database `cas_hoa`, user `root`, password trống theo XAMPP thông dụng. Nếu cấu hình khác, đặt `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` trong môi trường máy chủ.
 5. Truy cập `http://localhost/Lap_trinh_web/index.php`. **Không mở bằng file:// hay Live Server**.
 
@@ -35,6 +36,10 @@ C:\xampp\php\php.exe scripts\create-admin.php
 
 Script chỉ chạy CLI, tạo mật khẩu bằng `password_hash()`, từ chối tài khoản/email trùng. Sau đó truy cập `http://localhost/Lap_trinh_web/admin/dang-nhap.php`.
 
+Tạo tài khoản theo vai trò (mặc định `admin`): thêm `set CAS_ADMIN_ROLE=owner` hoặc `staff`, tuỳ chọn `set CAS_ADMIN_NAME=Họ tên`. Chỉ nhận `staff`, `admin`, `owner`. Sau khi đã có chủ sở hữu, các tài khoản nội bộ khác nên tạo trong `admin/nhan-vien.php` (admin tạo nhân viên; chủ sở hữu tạo cả quản trị viên) và nâng/hạ chủ sở hữu ở `admin/chu-so-huu.php` (luôn giữ ít nhất một chủ sở hữu hoạt động).
+
+Thư mục `assets/uploads/` lưu ảnh Admin tải lên; cần quyền ghi cho Apache. File `.htaccess` trong thư mục chặn chạy script; ảnh tải lên không được commit (`.gitignore`).
+
 ## Chức năng đã lập trình
 
 - Khách hàng: trang chủ/catalog/chi tiết sản phẩm đọc MySQL; giỏ hàng lưu PHP Session, JavaScript đồng bộ qua CSRF; checkout transaction, tra cứu đơn, xác nhận đơn; danh sách và chi tiết bài viết; liên hệ; đăng ký, đăng nhập, đăng xuất, hồ sơ, lịch sử đơn liên kết tài khoản; quên mật khẩu bằng token có hạn sử dụng và dùng một lần; giới thiệu và chính sách.
@@ -50,6 +55,22 @@ GitHub Actions: [PHP coursework validation](https://github.com/tbao4151/Lap_trin
 - `scripts/verify-r2.sh`
 - `scripts/verify-r2-auth-admin.sh`
 - `scripts/capture-r2.py`
+- `scripts/verify-admin-ops.sh` + `tests/admin/test_admin_ops.py` — Admin Operations: migration 003 chạy 2 lần, tài khoản owner/admin/staff tạo bằng CLI với mật khẩu ngẫu nhiên, ma trận 22 route × 5 vai trò và CRUD/permission bằng HTTP + MySQL. Kết quả và ảnh: `docs/admin-ops-test-report.md`.
+
+### Reset database kiểm thử
+
+Các script kiểm thử ghi dữ liệu thật vào `cas_hoa`. **Chỉ dùng trên database kiểm thử**, không chạy trên dữ liệu thật:
+
+```bash
+mysql -uroot -e "DROP DATABASE IF EXISTS cas_hoa"
+mysql -uroot < database/schema.sql
+mysql -uroot < database/seed.sql
+mysql -uroot < database/migrations/001_auth.php.sql
+mysql -uroot < database/migrations/002_inventory_seed.sql
+mysql -uroot < database/migrations/003_admin_ops.sql
+```
+
+Chạy lại toàn bộ như CI (cần PHP 8.2+, MySQL client, Python 3): `bash scripts/verify-r2.sh && bash scripts/verify-r2-auth-admin.sh && bash scripts/verify-admin-ops.sh`.
 
 Khi lần chạy CI mới nhất hoàn tất thành công, vào **Actions → workflow mới nhất → Artifacts → CAS_HOA_PHP_MySQL_BaoCaoYeuCau2**. ZIP chứa PDF 31 trang (bìa + 30 màn hình) và ảnh PNG thực có thanh địa chỉ `127.0.0.1:8033/...php`. Xem lại PDF trước khi nộp; không dùng ảnh HTML hoặc dựng thanh địa chỉ giả.
 
@@ -57,4 +78,4 @@ Khi lần chạy CI mới nhất hoàn tất thành công, vào **Actions → wo
 
 - Kiểm thử hồi quy và bảo mật bổ sung, đặc biệt luồng reset mật khẩu với dịch vụ mail thực, truy cập sai quyền, input sai và dữ liệu SQL.
 - Rà soát UI responsive trên nhiều viewport và dữ liệu biên.
-- Sau mốc 30 trang, tiếp tục 10 màn hình Admin chưa nằm trong yêu cầu 2 của nhóm.
+- 10 màn hình Admin còn lại (hoàn tiền, giấy gói, khám phá, kho hoa, kho phụ kiện, lịch sử kho, nhân viên, cài đặt, tài khoản, chủ sở hữu) đã có route PHP trên branch `feature/admin-operations-completion`; các điểm cần trưởng nhóm duyệt ghi ở `docs/admin-ops-contracts.md`.
