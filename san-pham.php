@@ -1,4 +1,4 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php require_once __DIR__.'/includes/storefront.php'; $filters = cas_catalog_filters(); $maxPrice = $filters['max_price'] ?? 500000; ?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -60,24 +60,22 @@
                 <div class="filter-group">
                   <div class="filter-title">Loại hoa</div>
                   <label class="filter-check"><input type="radio" name="flowerCategory" value="all" checked> Tất cả</label>
-                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Hoa ly"> Hoa ly</label>
-                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Hoa hồng"> Hoa hồng</label>
-                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Cẩm tú cầu"> Cẩm tú cầu</label>
-                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Phi yến"> Phi yến</label>
+<?php foreach ($filters['categories'] ?? ['Hoa ly', 'Hoa hồng', 'Cẩm tú cầu', 'Phi yến'] as $name): ?>
+                  <label class="filter-check"><input type="radio" name="flowerCategory" value="<?= cas_e($name) ?>"> <?= cas_e($name) ?></label>
+<?php endforeach; ?>
                 </div>
 
                 <div class="filter-group">
                   <div class="filter-title">Tone màu</div>
                   <label class="filter-check"><input type="radio" name="tone" value="all" checked> Tất cả</label>
-                  <label class="filter-check"><input type="radio" name="tone" value="Xanh"> Xanh</label>
-                  <label class="filter-check"><input type="radio" name="tone" value="Hồng"> Hồng</label>
-                  <label class="filter-check"><input type="radio" name="tone" value="Đỏ"> Đỏ</label>
-                  <label class="filter-check"><input type="radio" name="tone" value="Tím"> Tím</label>
+<?php foreach ($filters['tones'] ?? [['name' => 'Xanh'], ['name' => 'Hồng'], ['name' => 'Đỏ'], ['name' => 'Tím']] as $tone): ?>
+                  <label class="filter-check"><input type="radio" name="tone" value="<?= cas_e($tone['name']) ?>"> <?= cas_e($tone['name']) ?></label>
+<?php endforeach; ?>
                 </div>
 
                 <div class="filter-group">
-                  <div class="filter-title d-flex justify-content-between"><span>Giá tối đa</span><span id="maxPriceLabel">500.000 ₫</span></div>
-                  <input id="maxPrice" class="form-range" type="range" min="290000" max="500000" step="10000" value="500000" style="accent-color:var(--primary)">
+                  <div class="filter-title d-flex justify-content-between"><span>Giá tối đa</span><span id="maxPriceLabel"><?= number_format($maxPrice, 0, ',', '.') ?> ₫</span></div>
+                  <input id="maxPrice" class="form-range" type="range" min="100000" max="<?= $maxPrice ?>" step="10000" value="<?= $maxPrice ?>" style="accent-color:var(--primary)">
                 </div>
               </aside>
             </div>
