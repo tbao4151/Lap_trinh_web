@@ -2,13 +2,21 @@
   'use strict';
 
   function pageUrl(page) { return page; }
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+  }
+  // Thông tin cửa hàng do Admin cấu hình (admin/cai-dat.php), nạp qua assets/js/products.php.
+  function shop(key, fallback) {
+    var settings = window.CAS_SETTINGS || {};
+    return typeof settings[key] === 'string' ? settings[key] : fallback;
+  }
 
   function headerMarkup() {
     var page = document.body.dataset.page || '';
     function active(name) { return page === name ? ' active' : ''; }
     return '' +
       '<div class="cas-site-shell">' +
-        '<div class="cas-announcement">Có sẵn thiệp và túi · Shop xác nhận đơn sau khi nhận thông tin</div>' +
+        (shop('announcement', 'Có sẵn thiệp và túi · Shop xác nhận đơn sau khi nhận thông tin') ? '<div class="cas-announcement">' + esc(shop('announcement', '')) + '</div>' : '') +
         '<header>' +
           '<div class="cas-container cas-navbar d-flex align-items-center justify-content-between gap-3">' +
             '<a href="index.php" class="cas-brand" aria-label="Về trang chủ CÁ\'S HOA">' +
@@ -38,8 +46,8 @@
       '<footer class="cas-footer" id="footer">' +
         '<div class="cas-container cas-footer-main"><div class="row g-4">' +
           '<div class="col-md-5"><div class="cas-brand"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span class="cas-brand-name">CÁ\'S HOA</span></div><p class="mt-3 mb-0" style="max-width:380px">Tiệm hoa tươi online. Hoa cho những điều khó nói. Luôn kèm sẵn thiệp và túi.</p></div>' +
-          '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a><br><a href="lien-he.php">Liên hệ</a><br><a href="tra-cuu-don-hang.php">Tra cứu đơn</a></p></div>' +
-          '<div class="col-6 col-md-2"><div class="cas-footer-title">Thông tin</div><p class="mt-3 mb-0"><a href="gioi-thieu.php">Giới thiệu</a><br><a href="tin-tuc.php">Tin tức</a><br><a href="chinh-sach-giao-hang.php">Giao hàng</a><br><a href="chinh-sach-doi-tra.php">Đổi trả</a></p></div><div class="col-12 col-md-2"><div class="cas-footer-title">Địa chỉ</div><p class="mt-3 mb-0">126/13 đường số 17<br>Linh Xuân, Thủ Đức, TP.HCM</p></div>' +
+          '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="' + esc(shop('instagram', 'https://www.instagram.com')) + '" target="_blank" rel="noreferrer">Instagram</a><br><a href="tel:' + esc(shop('hotline', '0707309255')) + '">' + esc(shop('hotline', '0707309255')) + '</a><br><a href="lien-he.php">Liên hệ</a><br><a href="tra-cuu-don-hang.php">Tra cứu đơn</a></p></div>' +
+          '<div class="col-6 col-md-2"><div class="cas-footer-title">Thông tin</div><p class="mt-3 mb-0"><a href="gioi-thieu.php">Giới thiệu</a><br><a href="tin-tuc.php">Tin tức</a><br><a href="chinh-sach-giao-hang.php">Giao hàng</a><br><a href="chinh-sach-doi-tra.php">Đổi trả</a></p></div><div class="col-12 col-md-2"><div class="cas-footer-title">Địa chỉ</div><p class="mt-3 mb-0">' + esc(shop('address', '126/13 đường số 17, Linh Xuân, Thủ Đức, TP.HCM')) + '</p></div>' +
         '</div></div>' +
         '<div class="cas-footer-bottom"><div class="cas-container d-flex flex-column flex-sm-row gap-2 justify-content-between"><span>© 2026 CÁ\'S HOA</span><span>FrontEnd môn Lập trình Web · HTML · CSS · JavaScript · Bootstrap</span></div></div>' +
       '</footer>';
@@ -133,6 +141,7 @@
       type: params.get('type') || 'all',
       today: params.get('today') === '1',
       tone: toneMap[toneParam] || toneParam,
+      category: params.get('category') || '',
       occasion: occasionMap[occasionParam] || occasionParam
     };
   }
@@ -153,6 +162,10 @@
 
     if (urlFilter.type !== 'all') typeChecks.forEach(function (input) { input.checked = input.value === urlFilter.type; });
     if (urlFilter.tone !== 'all') toneChecks.forEach(function (input) { input.checked = input.value === urlFilter.tone; });
+    if (urlFilter.category && Array.from(categoryChecks).some(function (input) { return input.value === urlFilter.category; })) {
+      categoryChecks.forEach(function (input) { input.checked = input.value === urlFilter.category; });
+      urlFilter.category = '';
+    }
 
     function checkedValue(nodes, fallback) {
       var item = Array.from(nodes).find(function (node) { return node.checked; });
@@ -164,7 +177,7 @@
       var type = checkedValue(typeChecks, 'all');
       var category = checkedValue(categoryChecks, 'all');
       var tone = checkedValue(toneChecks, 'all');
-      var ceiling = Number(maxPrice.value || 500000);
+      var ceiling = Number(maxPrice.value || maxPrice.max || 500000);
       if (maxPriceLabel) maxPriceLabel.textContent = window.CAS_FORMAT_VND(ceiling);
 
       var list = window.CAS_PRODUCTS.filter(function (product) {
@@ -175,7 +188,8 @@
         var matchesTone = tone === 'all' || product.tone === tone;
         var matchesPrice = product.price <= ceiling;
         var matchesToday = !urlFilter.today || product.today;
-        return matchesQuery && matchesType && matchesCategory && matchesTone && matchesPrice && matchesToday && matchesOccasion;
+        var matchesUrlCategory = !urlFilter.category || product.category === urlFilter.category;
+        return matchesQuery && matchesType && matchesCategory && matchesTone && matchesPrice && matchesToday && matchesOccasion && matchesUrlCategory;
       });
 
       var sort = sortSelect.value;
@@ -200,13 +214,32 @@
         typeChecks.forEach(function (el) { el.checked = el.value === 'all'; });
         categoryChecks.forEach(function (el) { el.checked = el.value === 'all'; });
         toneChecks.forEach(function (el) { el.checked = el.value === 'all'; });
-        maxPrice.value = '500000';
+        maxPrice.value = maxPrice.max || '500000';
         urlFilter.today = false;
         urlFilter.occasion = '';
+        urlFilter.category = '';
         render();
       });
     });
     render();
+  }
+
+  // Ảnh phụ do Admin tải lên (bảng product_images); chỉ hiện khi có từ 2 ảnh.
+  function galleryMarkup(product) {
+    var images = Array.isArray(product.gallery) ? product.gallery : [];
+    if (images.length < 2) return '';
+    return '<div class="d-flex flex-wrap gap-2 mt-3" aria-label="Ảnh sản phẩm">' + images.map(function (src, index) {
+      return '<button type="button" class="p-0 border rounded-3 overflow-hidden bg-white' + (index === 0 ? ' border-dark' : '') + '" style="width:72px;height:72px" data-gallery-src="' + esc(src) + '" aria-label="Xem ảnh ' + (index + 1) + '"><img src="' + esc(src) + '" alt="" style="width:100%;height:100%;object-fit:cover"></button>';
+    }).join('') + '</div>';
+  }
+
+  // Màu giấy gói đang dùng cho sản phẩm (admin/giay-goi.php); giấy "ngừng dùng" không được gửi xuống trang khách.
+  function wrappingMarkup(product) {
+    var options = Array.isArray(product.wrapping) ? product.wrapping : [];
+    if (!options.length) return '';
+    return '<div class="detail-feature"><i class="bi bi-palette"></i><div><strong>Màu giấy gói có sẵn</strong><div class="d-flex flex-wrap gap-2 mt-2">' + options.map(function (option) {
+      return '<span class="d-inline-flex align-items-center gap-2 border rounded-pill px-2 py-1 small"><span style="width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.15);background:' + esc(option.hex) + '"></span>' + esc(option.name) + (option.surcharge > 0 ? ' · +' + window.CAS_FORMAT_VND(option.surcharge) : '') + '</span>';
+    }).join('') + '</div><div class="cas-muted small mt-1">Ghi màu mong muốn ở phần ghi chú khi đặt hàng; phụ thu (nếu có) được shop xác nhận cùng đơn.</div></div></div>';
   }
 
   function initDetail() {
@@ -216,11 +249,18 @@
     var product = window.CAS_FIND_PRODUCT(params.get('slug')); if (!product) { host.textContent='Không tìm thấy sản phẩm.'; return; }
     document.title = product.name + ' | CÁ\'S HOA';
     host.innerHTML = '<div class="breadcrumb-cas"><a href="index.php">Trang chủ</a> / <a href="san-pham.php">Sản phẩm</a> / <span>' + product.name + '</span></div>' +
-      '<div class="row g-4 g-lg-5 align-items-start"><div class="col-lg-6"><div class="detail-image-main"><img src="' + product.image + '" alt="' + product.name + '"></div></div>' +
+      '<div class="row g-4 g-lg-5 align-items-start"><div class="col-lg-6"><div class="detail-image-main"><img id="detailMainImage" src="' + product.image + '" alt="' + product.name + '"></div>' + galleryMarkup(product) + '</div>' +
       '<div class="col-lg-6"><section class="detail-panel"><p class="cas-eyebrow">' + (product.today ? 'Mẫu hôm nay' : 'Đặt trước') + '</p><h1 class="cas-title" style="font-size:clamp(2rem,4vw,3.2rem)">' + product.name + '</h1><div class="detail-price">' + window.CAS_FORMAT_VND(product.price) + '</div><p class="detail-description">' + product.description + '</p>' +
-      '<div class="detail-divider"></div><div class="detail-feature"><i class="bi bi-envelope-paper-heart"></i><div><strong>Kèm thiệp và túi</strong><div class="cas-muted small mt-1">Mỗi đơn hoa đều có sẵn thiệp và túi phù hợp.</div></div></div><div class="detail-feature"><i class="bi bi-flower2"></i><div><strong>Hoa tươi theo mùa</strong><div class="cas-muted small mt-1">' + product.composition + '</div></div></div><div class="detail-divider"></div>' +
+      '<div class="detail-divider"></div><div class="detail-feature"><i class="bi bi-envelope-paper-heart"></i><div><strong>Kèm thiệp và túi</strong><div class="cas-muted small mt-1">Mỗi đơn hoa đều có sẵn thiệp và túi phù hợp.</div></div></div><div class="detail-feature"><i class="bi bi-flower2"></i><div><strong>Hoa tươi theo mùa</strong><div class="cas-muted small mt-1">' + product.composition + '</div></div></div>' + wrappingMarkup(product) + '<div class="detail-divider"></div>' +
       '<div class="d-flex flex-wrap align-items-center gap-3"><div class="quantity-picker"><button type="button" id="qtyMinus" aria-label="Giảm số lượng"><i class="bi bi-dash"></i></button><input id="detailQty" value="1" inputmode="numeric" aria-label="Số lượng"><button type="button" id="qtyPlus" aria-label="Tăng số lượng"><i class="bi bi-plus"></i></button></div><button class="btn-cas-primary flex-grow-1" id="detailAdd"><i class="bi bi-bag-plus"></i> Thêm vào giỏ hàng</button></div>' +
       '<a class="btn-cas-outline w-100 mt-3" href="gio-hang.php">Xem giỏ hàng</a></section></div></div>';
+
+    host.querySelectorAll('[data-gallery-src]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        document.getElementById('detailMainImage').src = button.dataset.gallerySrc;
+        host.querySelectorAll('[data-gallery-src]').forEach(function (b) { b.classList.toggle('border-dark', b === button); });
+      });
+    });
 
     var qtyInput = document.getElementById('detailQty');
     function normalizeQty() { qtyInput.value = String(Math.max(1, Math.min(20, Number(qtyInput.value) || 1))); }

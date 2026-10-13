@@ -1,4 +1,4 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php require_once __DIR__.'/includes/storefront.php'; $discovery = cas_discovery_groups(); ?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -35,6 +35,7 @@
       </div>
     </section>
 
+<?php if ($discovery !== []): ?>
     <section class="discovery-section" aria-labelledby="discovery-title">
       <div class="cas-container">
         <div class="row align-items-end g-3 mb-4">
@@ -46,14 +47,22 @@
           <div class="col-lg-4 text-lg-end"><a href="san-pham.php" class="btn-cas-ghost">Xem tất cả <i class="bi bi-arrow-right"></i></a></div>
         </div>
 
+<?php if ($discovery === null): ?>
         <div class="row g-3">
           <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="san-pham.php?occasion=sinh-nhat"><img src="assets/images/garden.png" alt="Hoa sinh nhật"><span class="discovery-copy"><small>Theo dịp</small><strong>Sinh nhật</strong></span></a></div>
           <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="san-pham.php?occasion=nguoi-thuong"><img src="assets/images/mot-bo-hoa.png" alt="Hoa tặng người thương"><span class="discovery-copy"><small>Theo cảm xúc</small><strong>Người thương</strong></span></a></div>
           <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="san-pham.php?tone=xanh"><img src="assets/images/ly-xanh.png" alt="Hoa tone xanh"><span class="discovery-copy"><small>Theo tone màu</small><strong>Xanh dịu</strong></span></a></div>
           <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="san-pham.php?occasion=ky-niem"><img src="assets/images/phi-yen.png" alt="Hoa kỷ niệm"><span class="discovery-copy"><small>Theo dịp</small><strong>Kỷ niệm</strong></span></a></div>
+<?php else: ?>
+        <div class="row g-3">
+<?php foreach ($discovery as $group): ?>
+          <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="<?= cas_e($group['href']) ?>"><img src="<?= cas_e($group['image']) ?>" alt="<?= cas_e($group['title']) ?>"><span class="discovery-copy"><small><?= cas_e($group['subtitle']) ?></small><strong><?= cas_e($group['title']) ?></strong></span></a></div>
+<?php endforeach; ?>
+<?php endif; ?>
         </div>
       </div>
     </section>
+<?php endif; ?>
 
     <section class="latest-section" aria-labelledby="latest-title">
       <div class="cas-container">
