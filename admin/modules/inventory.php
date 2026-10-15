@@ -172,7 +172,7 @@ function cas_inventory_page(string $scope): void
         $where[] = 'i.quantity<=i.min_quantity';
     }
     $items = cas_rows('SELECT i.* FROM inventory_items i' . ($where ? ' WHERE ' . implode(' AND ', $where) : '') . ' ORDER BY i.item_type, i.category, i.name', $args);
-    $kpi = cas_rows("SELECT COUNT(*) items, SUM(i.quantity<=i.min_quantity) low, SUM(i.quantity=0) empty, COALESCE(SUM(i.quantity*i.unit_cost),0) value
+    $kpi = cas_rows("SELECT COUNT(*) items, SUM(i.quantity<=i.min_quantity) low, SUM(i.quantity=0) empty_stock, COALESCE(SUM(i.quantity*i.unit_cost),0) value
                      FROM inventory_items i" . ($scopeWhere ? $scopeWhere . " AND i.status='active'" : " WHERE i.status='active'"), $scopeArgs)[0];
     $flow = cas_rows("SELECT COALESCE(SUM(CASE WHEN t.quantity>0 THEN t.quantity END),0) qin, COALESCE(SUM(CASE WHEN t.quantity<0 THEN -t.quantity END),0) qout,
                         SUM(DATE(t.created_at)=CURDATE()) today
@@ -193,7 +193,7 @@ function cas_inventory_page(string $scope): void
     ?>
 <section class="admin-grid-4 admin-section">
   <article class="admin-stat"><div class="admin-stat-icon"><i class="bi bi-boxes"></i></div><div class="admin-stat-label">Mặt hàng đang dùng</div><div class="admin-stat-value"><?= (int)$kpi['items'] ?></div><div class="admin-stat-note">Theo dõi trong MySQL</div></article>
-  <article class="admin-stat"><div class="admin-stat-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="admin-stat-label">Sắp hết / hết hàng</div><div class="admin-stat-value"><?= (int)$kpi['low'] ?> / <?= (int)$kpi['empty'] ?></div><div class="admin-stat-note">Tồn ≤ mức tối thiểu</div></article>
+  <article class="admin-stat"><div class="admin-stat-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="admin-stat-label">Sắp hết / hết hàng</div><div class="admin-stat-value"><?= (int)$kpi['low'] ?> / <?= (int)$kpi['empty_stock'] ?></div><div class="admin-stat-note">Tồn ≤ mức tối thiểu</div></article>
   <article class="admin-stat"><div class="admin-stat-icon"><i class="bi bi-cash-stack"></i></div><div class="admin-stat-label">Giá trị tồn ước tính</div><div class="admin-stat-value"><?= cas_money($kpi['value']) ?></div><div class="admin-stat-note">Số lượng × giá nhập</div></article>
   <article class="admin-stat"><div class="admin-stat-icon"><i class="bi bi-arrow-left-right"></i></div><div class="admin-stat-label">Nhập / xuất 7 ngày</div><div class="admin-stat-value">+<?= cas_qty($flow['qin']) ?> / −<?= cas_qty($flow['qout']) ?></div><div class="admin-stat-note"><?= (int)$flow['today'] ?> phiếu hôm nay</div></article>
 </section>
