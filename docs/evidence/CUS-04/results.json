@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-15T00:02:43.829Z",
+  "base": "http://127.0.0.1:8033",
+  "task": "CUS-04",
+  "results": [
+    {
+      "name": "Đăng ký từ chối dữ liệu sai ở server",
+      "expected": "Email/phone/password/xác nhận sai không tạo user",
+      "actual": "4 trường hợp sai bị từ chối; số user không đổi",
+      "status": "PASS"
+    },
+    {
+      "name": "Sai mật khẩu không tạo Session đăng nhập",
+      "expected": "Thông báo lỗi rõ và trang tài khoản vẫn chuyển về login",
+      "actual": "Lỗi hiện tại form; tài khoản HTTP 303 về đăng nhập",
+      "status": "PASS"
+    },
+    {
+      "name": "Khôi phục bằng link email trong trình duyệt",
+      "expected": "Nhận SMTP local, URL fragment bị xóa; reset thành công; lần dùng lại bị từ chối",
+      "actual": "Thư nhận qua SMTP, token không hiện trên màn hình/URL sau tải; reset và từ chối dùng lại đạt; SQL consumed_at đã có",
+      "status": "PASS"
+    }
+  ],
+  "queries": [
+    {
+      "sql": "SELECT COUNT(*) n FROM users",
+      "rows": 1
+    },
+    {
+      "sql": "SELECT COUNT(*) n FROM users",
+      "rows": 1
+    },
+    {
+      "sql": "SELECT COUNT(*) n FROM password_resets r JOIN users u ON u.user_id=r.user_id WHERE u.email=? AND r.consumed_at IS NOT NULL",
+      "rows": 1
+    }
+  ]
+}

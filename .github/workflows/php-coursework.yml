@@ -20,6 +20,8 @@ jobs:
           node --check assets/js/main-r2.js
           node --check assets/js/r2-contact.js
           node --check assets/js/r2-lookup.js
+          python3 -m py_compile tests/admin/test_admin_ops.py
+          bash -n scripts/verify-admin-ops.sh
       - name: Validate SQL and static page routes
         run: |
           test -s database/schema.sql
@@ -71,6 +73,15 @@ jobs:
           DB_USER: root
           DB_PASSWORD: localtestpass
         run: bash scripts/verify-r2-auth-admin.sh
+
+      - name: Admin operations (ADM-01..07) MySQL/HTTP permission and CRUD checks
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_NAME: cas_hoa
+          DB_USER: root
+          DB_PASSWORD: localtestpass
+        run: bash scripts/verify-admin-ops.sh
 
       - name: Prepare Chrome screenshot environment
         run: |

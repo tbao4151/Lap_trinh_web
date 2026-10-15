@@ -32,7 +32,7 @@ RESP="$(curl -sS -b /tmp/cas-r2-cookies -c /tmp/cas-r2-cookies -X POST \
   http://127.0.0.1:8033/actions/checkout.php)"
 CODE="$(printf '%s' "$RESP" | python3 -c 'import json,sys; x=json.load(sys.stdin); assert x["ok"],x; print(x["orderCode"])')"
 LOOKUP="$(curl -sS -b /tmp/cas-r2-cookies -X POST -F "csrf=$TOKEN" -F "code=$CODE" -F 'phone=0911111111' http://127.0.0.1:8033/actions/lookup.php)"
-printf '%s' "$LOOKUP" | python3 -c 'import json,sys; x=json.load(sys.stdin); assert x["ok"] and x["order"]["total"]==800000,x'
+printf '%s' "$LOOKUP" | python3 -c 'import json,sys; x=json.load(sys.stdin); assert x["ok"] and x["order"]["total"]==830000,x'
 CONTACT="$(curl -sS -b /tmp/cas-r2-cookies -X POST -F "csrf=$TOKEN" -F 'name=Khach hang' -F 'phone=0900000000' -F 'subject=Tu van mau hoa' -F 'message=Toi can tu van mau hoa cho ngay ky niem' http://127.0.0.1:8033/actions/contact.php)"
 printf '%s' "$CONTACT" | python3 -c 'import json,sys; x=json.load(sys.stdin); assert x["ok"],x'
 curl -fsS http://127.0.0.1:8033/tin-tuc.php > /tmp/cas-r2-news.html

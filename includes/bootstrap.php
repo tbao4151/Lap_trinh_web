@@ -19,7 +19,7 @@ function cas_csrf(): string
     }
     return $_SESSION['cas_csrf'];
 }
-function cas_csrf_valid(?string $value): bool
+function cas_csrf_valid(mixed $value): bool
 {
     return is_string($value) && hash_equals(cas_csrf(), $value);
 }
@@ -39,6 +39,9 @@ function cas_require_post(): void
 }
 function cas_str(string $field, int $max = 255): string
 {
+    if (isset($_POST[$field]) && !is_string($_POST[$field])) {
+        cas_json(422, ['ok'=>false,'message'=>'Thông tin không hợp lệ: '.$field]);
+    }
     $value = trim((string)($_POST[$field] ?? ''));
     if (mb_strlen($value, 'UTF-8') > $max) {
         cas_json(422, ['ok'=>false,'message'=>'Nội dung quá dài: '.$field]);
@@ -47,5 +50,8 @@ function cas_str(string $field, int $max = 255): string
 }
 function cas_phone(string $value): string
 {
-    return preg_replace('/\D+/', '', $value) ?? '';
+    $value = preg_replace('/[\s().-]+/', '', trim($value)) ?? '';
+    if (str_starts_with($value, '+84')) $value = '0'.substr($value, 3);
+    elseif (preg_match('/^84[0-9]{9}$/D', $value)) $value = '0'.substr($value, 2);
+    return $value;
 }

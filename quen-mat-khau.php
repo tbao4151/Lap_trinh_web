@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__.'/includes/auth.php';
+require_once __DIR__.'/includes/customer.php';
 $error='';$success='';
-$uid=filter_var($_GET['uid']??null,FILTER_VALIDATE_INT);
-$token=(string)($_GET['token']??'');
+$uid=filter_var($_POST['uid']??$_GET['uid']??null,FILTER_VALIDATE_INT);
+$token=is_string($_POST['token']??$_GET['token']??null)?($_POST['token']??$_GET['token']):'';
 $resetMode=$uid!==false&&$uid>0&&preg_match('/^[a-f0-9]{64}$/',$token);
 if(cas_post()){
   try{
@@ -13,7 +13,7 @@ if(cas_post()){
     if(count($attempts)>=5)throw new RuntimeException('Quá nhiều yêu cầu, vui lòng thử sau một giờ.');
     $attempts[]=time();$_SESSION['cas_reset_attempts']=$attempts;
     if(($_POST['action']??'')==='request'){
-      $email=strtolower(trim((string)($_POST['email']??'')));
+      $email=strtolower(trim(cas_customer_text($_POST,'email',150)));
       if(!filter_var($email,FILTER_VALIDATE_EMAIL))throw new RuntimeException('Vui lòng nhập email hợp lệ.');
       $q=cas_db()->prepare("SELECT user_id FROM users WHERE email=? AND status='active' LIMIT 1");
       $q->execute([$email]);$found=$q->fetchColumn();
@@ -23,7 +23,8 @@ if(cas_post()){
         $q=$db->prepare("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES(?,?,DATE_ADD(NOW(),INTERVAL 30 MINUTE))");
         $q->execute([(int)$found,$digest]);
         $base=rtrim((string)(getenv('CAS_APP_URL')?:'http://localhost/Lap_trinh_web'),'/');
-        $link=$base.'/quen-mat-khau.php?uid='.(int)$found.'&token='.$secret;
+        // URL fragment never reaches HTTP access logs or the Referer header.
+        $link=$base.'/quen-mat-khau.php#uid='.(int)$found.'&token='.$secret;
         $sent=@mail($email,'Khoi phuc mat khau CAS HOA',"Mo lien ket trong 30 phut: ".$link."\n","From: no-reply@localhost\r\n");
         if(!$sent){
           $db->prepare("DELETE FROM password_resets WHERE token_hash=?")->execute([$digest]);
@@ -48,7 +49,7 @@ if(cas_post()){
         $resetMode=false;
       }catch(Throwable $e){$db->rollBack();throw $e;}
     }else throw new RuntimeException('Thao tác không hợp lệ.');
-  }catch(Throwable $e){$error=$e->getMessage();}
+  }catch(Throwable $e){$error=cas_customer_error($e);}
 }
 ?>
 <!doctype html>
@@ -58,10 +59,11 @@ if(cas_post()){
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Khôi phục mật khẩu tài khoản CÁ'S HOA.">
   <title>Quên mật khẩu | CÁ'S HOA</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
 </head>
 <body data-page="forgot" class="auth-page">
   <main class="auth-main">
@@ -81,7 +83,8 @@ if(cas_post()){
           <?php if($error!==''): ?><div class="auth-message error mb-3" role="alert"><?= cas_e($error) ?></div><?php endif; ?>
           <?php if($resetMode): ?>
           <p class="auth-description">Nhập mật khẩu mới cho tài khoản. Liên kết chỉ dùng được một lần.</p>
-          <form id="recoveryVerifyForm" class="auth-form" method="post" action="<?= cas_e('quen-mat-khau.php?uid='.$uid.'&token='.$token) ?>">
+          <form id="recoveryVerifyForm" class="auth-form" method="post" action="quen-mat-khau.php">
+            <input type="hidden" name="uid" value="<?= (int)$uid ?>"><input type="hidden" name="token" value="<?= cas_e($token) ?>">
             <?= cas_csrf_form() ?><input type="hidden" name="action" value="reset">
             <div class="mb-3"><label for="newPassword" class="form-label">Mật khẩu mới</label><input type="password" id="newPassword" name="password" class="form-control cas-form-control" required></div>
             <div class="mb-3"><label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label><input type="password" id="confirmPassword" name="confirm" class="form-control cas-form-control" required></div>
@@ -100,5 +103,6 @@ if(cas_post()){
     </div></div>
   </main>
   
+  <script src="assets/js/customer-forms.js" defer></script>
 </body>
 </html>

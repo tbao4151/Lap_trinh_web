@@ -1,73 +1,68 @@
-# CÁ'S HOA — Đồ án Lập trình Web
+# CÁ'S HOA — Website thương mại điện tử bán hoa và quản lý cửa hàng
 
-Website bán hoa tươi được xây dựng cho đồ án môn Lập trình Web.
+Đồ án môn **Lập trình Web và Ứng dụng** — nhóm 3 thành viên. Mã nguồn học phần này dùng **HTML5, CSS3, Bootstrap 5, JavaScript thuần, PHP 8.2+, MySQL 8/MariaDB tương thích**; không sử dụng Next.js hoặc Supabase.
 
-## FrontEnd
+## Chọn đúng phiên bản
+- `main`: giao diện tĩnh của yêu cầu 1, được bảo toàn.
+- `feature/requirement-2-php-mysql`: bản PHP/MySQL để phát triển và nghiệm thu yêu cầu 2.
+- `integration/cas-hoa-final-20261015`: nhánh tích hợp code của hai thành viên (Customer và Admin Operations), đang chờ nghiệm thu/merge qua PR #1.
 
-Project sử dụng:
+Khách hàng: **18 route PHP**. Quản trị: **22 route PHP**. Mốc **18+12=30/40** đã thống nhất cho yêu cầu 2 là chỉ tiêu quản lý theo màn hình, không thay thế cách chấm của giảng viên. Các trang chỉ được đánh dấu đạt khi có kiểm thử chức năng; số lượng file PHP không tự chứng minh hoàn thành.
 
-- HTML5
-- CSS3
-- JavaScript thuần
-- Bootstrap 5
-- Bootstrap Icons
-- Responsive Web Design
-- LocalStorage cho các tương tác FrontEnd trước khi kết nối BackEnd
+## Chạy XAMPP từ GitHub
 
-## Các trang khách hàng
+Yêu cầu PHP **8.2+** với `pdo_mysql`, `mbstring`, MySQL 8 hoặc MariaDB tương thích, Apache và Git.
 
-Project có đầy đủ nhóm trang chính:
+```powershell
+cd C:\xampp\htdocs
+git clone https://github.com/tbao4151/Lap_trinh_web.git
+cd Lap_trinh_web
+git switch integration/cas-hoa-final-20261015
+```
 
-- Trang chủ
-- Danh sách và chi tiết sản phẩm
-- Giỏ hàng và thanh toán
-- Đăng nhập, đăng ký, quên mật khẩu
-- Tài khoản và lịch sử đơn
-- Tra cứu đơn hàng
-- Giới thiệu, liên hệ
-- Tin tức và chi tiết bài viết
-- Chính sách giao hàng và đổi trả
+Trong XAMPP bật **Apache** và **MySQL**, vào `http://localhost/phpmyadmin`. Import SQL theo thứ tự:
 
-## Khu vực quản trị
+1. `database/schema.sql`
+2. `database/seed.sql`
+3. `database/migrations/001_auth.php.sql`
+4. `database/migrations/002_inventory_seed.sql`
+5. `database/migrations/003_admin_ops.sql`
 
-Thư mục `admin/` gồm các nhóm chức năng:
+Mặc định PDO kết nối `127.0.0.1:3306`, database `cas_hoa`, user `root`, mật khẩu rỗng (thiết lập XAMPP phổ biến). Nếu khác, đặt biến môi trường `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. **Không đưa mật khẩu hoặc file .env lên GitHub.**
 
-### Tổng quan
-- Dashboard vận hành với 8 chỉ số chính
-- Đơn gần đây
-- Cảnh báo nguyên liệu sắp hết
+Tạo quản trị viên bằng PHP CLI, không sử dụng tài khoản demo tĩnh:
 
-### Vận hành
-- Đơn hàng
-- Hoàn tiền
-- Giao hàng
-- Khách hàng
-- Báo cáo doanh thu
+```bat
+cd C:\xampp\htdocs\Lap_trinh_web
+set CAS_ADMIN_EMAIL=admin-nhom@example.com
+set CAS_ADMIN_PASSWORD=ThayBangMatKhauManh!
+C:\xampp\php\php.exe scripts\create-admin.php
+```
 
-### Sản phẩm
-- Quản lý sản phẩm
-- Thêm / sửa sản phẩm
-- Quản lý nhanh giá và trạng thái
-- Màu giấy gói
-- Phân loại & bộ lọc
-- Danh mục khám phá trang chủ
+Mở `http://localhost/Lap_trinh_web/index.php` và `http://localhost/Lap_trinh_web/admin/dang-nhap.php`. Không dùng Live Server hoặc mở `file://` để thử nghiệp vụ PHP.
 
-### Kho
-- Kho tổng
-- Kho Hoa
-- Kho Phụ kiện
-- Lịch sử nhập / xuất kho
+## Chức năng chính
+- Catalog MySQL, tìm kiếm, lọc loại hoa/tone/dịp/giá; gợi ý và nhóm khám phá.
+- Nhiều ảnh sản phẩm, giấy gói, giỏ hàng PHP Session, checkout giao/nhận tại cửa hàng, tạo mã đơn/tra cứu.
+- Xác thực khách hàng qua Session và mật khẩu hash; hồ sơ/lịch sử đơn; quên mật khẩu bằng token qua mail transport được cấu hình.
+- Admin: Dashboard, sản phẩm/ảnh/taxonomy, giá nhanh, giấy gói, kho hoa/phụ kiện, nhập/xuất, lịch sử, giao hàng, hoàn tiền, nhân viên, chủ sở hữu, cài đặt.
+- PHP server kiểm phân quyền và CSRF, PDO prepared statements, transaction cho cập nhật tiền/kho, log thao tác.
+- Checkout tính lại giá, phụ thu giấy gói, phí giao hàng bằng dữ liệu server; ghi snapshot tổng tiền vào MySQL.
 
-### Hệ thống
-- Nhân viên & quyền
-- Cài đặt shop
-- Tài khoản quản trị
-- Khu vực chủ sở hữu
+## Kiểm thử
 
-## Chạy local
+GitHub Actions workflow: **PHP coursework validation**, áp dụng cho Pull Request vào `feature/requirement-2-php-mysql`. Có PHP/JS lint, MySQL 8 HTTP/integration tests, Admin Operations tests (216 trường hợp), và script chụp 30 màn hình bằng Chrome thật.
 
-Có thể mở bằng VS Code Live Server hoặc đặt project trong `htdocs` của XAMPP.
+```bash
+bash scripts/verify-r2.sh
+bash scripts/verify-r2-auth-admin.sh
+bash scripts/verify-admin-ops.sh
+```
 
-## Giai đoạn BackEnd
+Các script này cần PHP CLI, MySQL, `curl`, Python và môi trường Linux/Git Bash được cấu hình thích hợp; một số test khởi tạo hoặc thêm dữ liệu vào database `cas_hoa`, **chỉ chạy trên database kiểm thử**. Để kiểm thử trình duyệt trên Windows xem hướng dẫn `docs/customer-preview.md`.
 
-Giai đoạn hoàn chỉnh sẽ dùng PHP + MySQL/MariaDB để thay dữ liệu LocalStorage bằng dữ liệu phía server, session đăng nhập và CRUD trong cơ sở dữ liệu.
+## Nghiệm thu và những giới hạn
+
+Tài liệu đầy đủ: `REQUIREMENT2_SETUP.md`, `docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md`, `docs/INTEGRATION_REVIEW_2026-10-15.md`.
+
+Phải tự kiểm tra lại trên XAMPP của nhóm, gồm upload ảnh, phân quyền, checkout, tra cứu và mobile. Cần cấu hình mail/SMTP thật nếu demo quên mật khẩu qua email Internet. Các mở rộng nâng cao như tự trừ nguyên liệu theo định mức và đối soát hoàn tiền với trạng thái thanh toán chưa được xem là hoàn tất; xem danh sách ở tài liệu kiểm kê tích hợp.

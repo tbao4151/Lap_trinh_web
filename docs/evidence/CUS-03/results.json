@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-15T00:02:32.759Z",
+  "base": "http://127.0.0.1:8033",
+  "task": "CUS-03",
+  "results": [
+    {
+      "name": "Giỏ xóa và refresh giữ đúng Session",
+      "expected": "Thêm hai sản phẩm, sửa số lượng, xóa một rồi refresh vẫn đúng",
+      "actual": "1 dòng, số lượng 3 sau refresh",
+      "status": "PASS"
+    },
+    {
+      "name": "Pickup và lỗi lưu đơn hiển thị tại form",
+      "expected": "Pickup bỏ yêu cầu địa chỉ; ngày không hợp lệ tắt giờ; HTTP 503 không chuyển trang và cho thử lại",
+      "actual": "Giờ disabled/enabled đúng; lỗi 503 inline, nút được bật lại; thử lại thành công và mã đơn tồn tại trong SQL",
+      "status": "PASS"
+    }
+  ],
+  "queries": [
+    {
+      "sql": "SELECT COUNT(*) n FROM orders WHERE order_code=?",
+      "rows": 1
+    }
+  ]
+}

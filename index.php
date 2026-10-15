@@ -1,4 +1,4 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php require_once __DIR__.'/includes/storefront.php'; $discovery = cas_discovery_groups(); ?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -6,10 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="CÁ'S HOA - Hoa tươi cho những ngày đáng nhớ và cả những ngày bình thường.">
   <title>CÁ'S HOA — Hoa cho những điều khó nói</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
 </head>
 <body data-page="home" class="d-flex flex-column">
   <div id="siteHeader"></div>
@@ -35,6 +36,7 @@
       </div>
     </section>
 
+<?php if ($discovery !== []): ?>
     <section class="discovery-section" aria-labelledby="discovery-title">
       <div class="cas-container">
         <div class="row align-items-end g-3 mb-4">
@@ -46,14 +48,22 @@
           <div class="col-lg-4 text-lg-end"><a href="san-pham.php" class="btn-cas-ghost">Xem tất cả <i class="bi bi-arrow-right"></i></a></div>
         </div>
 
+<?php if ($discovery === null): ?>
         <div class="row g-3">
           <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="san-pham.php?occasion=sinh-nhat"><img src="assets/images/garden.png" alt="Hoa sinh nhật"><span class="discovery-copy"><small>Theo dịp</small><strong>Sinh nhật</strong></span></a></div>
           <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="san-pham.php?occasion=nguoi-thuong"><img src="assets/images/mot-bo-hoa.png" alt="Hoa tặng người thương"><span class="discovery-copy"><small>Theo cảm xúc</small><strong>Người thương</strong></span></a></div>
           <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="san-pham.php?tone=xanh"><img src="assets/images/ly-xanh.png" alt="Hoa tone xanh"><span class="discovery-copy"><small>Theo tone màu</small><strong>Xanh dịu</strong></span></a></div>
           <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="san-pham.php?occasion=ky-niem"><img src="assets/images/phi-yen.png" alt="Hoa kỷ niệm"><span class="discovery-copy"><small>Theo dịp</small><strong>Kỷ niệm</strong></span></a></div>
+<?php else: ?>
+        <div class="row g-3">
+<?php foreach ($discovery as $group): ?>
+          <div class="col-6 col-lg-3"><a class="discovery-card d-block" href="<?= cas_e($group['href']) ?>"><img src="<?= cas_e($group['image']) ?>" alt="<?= cas_e($group['title']) ?>"><span class="discovery-copy"><small><?= cas_e($group['subtitle']) ?></small><strong><?= cas_e($group['title']) ?></strong></span></a></div>
+<?php endforeach; ?>
+<?php endif; ?>
         </div>
       </div>
     </section>
+<?php endif; ?>
 
     <section class="latest-section" aria-labelledby="latest-title">
       <div class="cas-container">
@@ -70,12 +80,14 @@
     </section>
   </main>
 
+  <div class="cas-container"><?php require __DIR__.'/includes/customer-recommendations.php'; ?></div>
   <div id="siteFooter"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
   <script src="assets/js/products.php" defer></script>
   <script src="assets/js/cart-r2.php" defer></script>
   <script src="assets/js/main-r2.js" defer></script>
 <script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
+  <script src="assets/js/customer-forms.js" defer></script>
 </body>
 </html>

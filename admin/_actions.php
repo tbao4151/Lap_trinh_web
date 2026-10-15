@@ -43,6 +43,24 @@ function cas_admin_product_input(PDO $db): array {
     isset($_POST['featured'])?1:0,isset($_POST['today'])?1:0,$status
   ]);
 }
+function cas_order_transitions(): array {
+  return [
+    'pending_confirmation'=>['confirmed','cancelled'],
+    'confirmed'=>['preparing','cancelled'],
+    'preparing'=>['ready','cancelled'],
+    'ready'=>['delivering','completed'],
+    'delivering'=>['completed','ready'],
+    'completed'=>[],
+    'cancelled'=>[]
+  ];
+}
+function cas_order_choices(string $current): array {
+  global $statuses;
+  $choices=[$current=>$statuses[$current]??$current];
+  foreach(cas_order_transitions()[$current]??[] as $next) $choices[$next]=$statuses[$next]??$next;
+  return $choices;
+}
+
 if(cas_post()){
   try{
     cas_assert_csrf();
@@ -51,11 +69,49 @@ if(cas_post()){
       $id=cas_admin_number('id');
       $status=(string)($_POST['status']??'');
       $payment=(string)($_POST['payment_status']??'');
-      if(!in_array($status,['pending_confirmation','confirmed','preparing','ready','delivering','completed','cancelled'],true) ||
-         !in_array($payment,['unpaid','partial','paid','refunded'],true))
-         throw new RuntimeException('Trạng thái không hợp lệ.');
-      $q=$db->prepare('UPDATE orders SET order_status=?,payment_status=? WHERE order_id=?');
-      $q->execute([$status,$payment,$id]);
+      $reason=trim((string)($_POST['reason']??''));
+      $allowedStatuses=cas_order_transitions();
+      if(!array_key_exists($status,$allowedStatuses) || !in_array($payment,['unpaid','partial','paid','refunded'],true))
+        throw new DomainException('Trạng thái không hợp lệ.');
+      if(mb_strlen($reason)>255)throw new DomainException('Lý do tối đa 255 ký tự.');
+      $db->beginTransaction();
+      try{
+        $q=$db->prepare('SELECT order_status,payment_status,delivery_method FROM orders WHERE order_id=? FOR UPDATE');
+        $q->execute([$id]);$previous=$q->fetch();
+        if(!$previous)throw new DomainException('Không tìm thấy đơn hàng.');
+        $from=$previous['order_status'];$oldPayment=$previous['payment_status'];
+        if($status!==$from && !in_array($status,$allowedStatuses[$from]??[],true))
+          throw new DomainException('Không được chuyển trạng thái đơn hàng từ '.$from.' sang '.$status.'.');
+        if($status==='delivering'&&$previous['delivery_method']!=='delivery')
+          throw new DomainException('Đơn nhận tại cửa hàng không có trạng thái đang giao.');
+        if($status==='completed'&&$previous['delivery_method']==='delivery'){
+          $q=$db->prepare('SELECT delivery_status FROM deliveries WHERE order_id=? LIMIT 1');
+          $q->execute([$id]);
+          if($q->fetchColumn()!=='delivered')throw new DomainException('Đơn giao hàng cần được xác nhận đã giao trước khi hoàn tất.');
+        }
+        if($status!==$from && in_array($status,['cancelled','ready'],true) && $from==='delivering' && mb_strlen($reason)<3)
+          throw new DomainException('Quay lại trạng thái trước cần ghi lý do tối thiểu 3 ký tự.');
+        if($status==='cancelled'&&$from==='preparing'&&mb_strlen($reason)<3)
+          throw new DomainException('Hủy đơn đang chuẩn bị cần ghi lý do tối thiểu 3 ký tự.');
+        if($payment!==$oldPayment){
+          if(!in_array($user['role'],['admin','owner'],true))
+            throw new DomainException('Chỉ quản trị viên được cập nhật thanh toán.');
+          $paymentFlow=['unpaid'=>['partial','paid'],'partial'=>['paid'],'paid'=>[],'refunded'=>[]];
+          if(!in_array($payment,$paymentFlow[$oldPayment]??[],true))
+            throw new DomainException('Trạng thái thanh toán không hợp lệ; hoàn tiền phải xử lý qua chức năng Hoàn tiền.');
+        }
+        $q=$db->prepare('UPDATE orders SET order_status=?,payment_status=? WHERE order_id=?');
+        $q->execute([$status,$payment,$id]);
+        $db->commit();
+        if($status!==$from||$payment!==$oldPayment){
+          try{
+            $audit=$db->prepare('INSERT INTO admin_audit_log(user_id,action,entity_type,entity_id,outcome,detail,ip) VALUES(?,?,?,?,?,?,?)');
+            $audit->execute([$user['user_id'],'order_update','order',(string)$id,'ok',
+              json_encode(['from'=>$from,'to'=>$status,'payment_from'=>$oldPayment,'payment_to'=>$payment,'reason'=>$reason],JSON_UNESCAPED_UNICODE),
+              substr((string)($_SERVER['REMOTE_ADDR']??''),0,45)]);
+          }catch(Throwable $logError){error_log('CAS order audit: '.$logError->getMessage());}
+        }
+      }catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}
     }elseif($act==='delivery_update' && $cas_page==='delivery'){
       $id=cas_admin_number('id');$status=(string)($_POST['status']??'');
       if(!in_array($status,['not_delivered','out_for_delivery','delivered','pickup_ready'],true))
@@ -95,6 +151,7 @@ if(cas_post()){
     }
     cas_redirect(basename($_SERVER['SCRIPT_NAME']).'?saved=1');
   }catch(Throwable $e){
+    if($e instanceof DomainException)http_response_code(422);
     $error=$e instanceof PDOException?'Dữ liệu trùng, đang được sử dụng hoặc lỗi kết nối MySQL.':$e->getMessage();
   }
 }

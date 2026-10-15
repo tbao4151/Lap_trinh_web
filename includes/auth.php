@@ -45,7 +45,7 @@ function cas_assert_csrf(): void {
 function cas_post(): bool {return ($_SERVER['REQUEST_METHOD']??'GET')==='POST';}
 function cas_redirect(string $url): never {header('Location: '.$url,true,303);exit;}
 function cas_valid_password(string $password): bool {
-    return strlen($password)>=10 && preg_match('/[A-Z]/',$password) && preg_match('/[a-z]/',$password) && preg_match('/[0-9]/',$password) && preg_match('/[^A-Za-z0-9]/',$password);
+    return strlen($password)>=10 && strlen($password)<=72 && !str_contains($password,"\0") && preg_match('/[A-Z]/',$password) && preg_match('/[a-z]/',$password) && preg_match('/[0-9]/',$password) && preg_match('/[^A-Za-z0-9]/',$password);
 }
 function cas_customer_id(int $userId): ?int {
     $q=cas_db()->prepare("SELECT customer_id FROM customers WHERE user_id=? LIMIT 1");$q->execute([$userId]);
