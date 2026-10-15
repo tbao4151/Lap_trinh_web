@@ -1,0 +1,420 @@
+{
+  "date": "2026-10-14T16:49:45.786Z",
+  "base": "http://127.0.0.1:8033",
+  "browser": "155.0.8059.40",
+  "results": [
+    {
+      "name": "Mobile menu and keyboard focus",
+      "status": "PASS"
+    },
+    {
+      "name": "Recommendation uses real filters and shareable URL",
+      "status": "PASS"
+    },
+    {
+      "name": "Combined taxonomy, price, accent-insensitive search and sorting",
+      "status": "PASS"
+    },
+    {
+      "name": "Cart save failure preserves state and offers retry without false success",
+      "status": "PASS"
+    },
+    {
+      "name": "Queued plus then minus preserves correct quantity and refresh",
+      "status": "PASS"
+    },
+    {
+      "name": "Remove multiple unavailable items in one confirmed update",
+      "status": "PASS"
+    },
+    {
+      "name": "Product feed transport failure displays retry and keeps cart",
+      "status": "PASS"
+    },
+    {
+      "name": "Wrapping choice appears in cart and checkout",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile checkout delivery validates inputs, blocks duplicate click and saves real order",
+      "status": "PASS"
+    },
+    {
+      "name": "Guest lookup rejects wrong phone and displays safe real result",
+      "status": "PASS"
+    },
+    {
+      "name": "Registration, profile editing, logout and login through browser",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px index.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px san-pham.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px chi-tiet-san-pham.php?slug=lam-tinh",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px gio-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px thanh-toan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px dat-hang-thanh-cong.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px dang-nhap.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px dang-ky.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px quen-mat-khau.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px tai-khoan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px lich-su-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px tra-cuu-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px tin-tuc.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px lien-he.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px gioi-thieu.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px chinh-sach-giao-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 375px chinh-sach-doi-tra.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px index.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px san-pham.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px chi-tiet-san-pham.php?slug=lam-tinh",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px gio-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px thanh-toan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px dat-hang-thanh-cong.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px dang-nhap.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px dang-ky.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px quen-mat-khau.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px tai-khoan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px lich-su-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px tra-cuu-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px tin-tuc.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px lien-he.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px gioi-thieu.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px chinh-sach-giao-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 390px chinh-sach-doi-tra.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px index.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px san-pham.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px chi-tiet-san-pham.php?slug=lam-tinh",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px gio-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px thanh-toan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px dat-hang-thanh-cong.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px dang-nhap.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px dang-ky.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px quen-mat-khau.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px tai-khoan.php",
+      "status": "FAIL",
+      "message": "page.goto: Timeout 7000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:8033/tai-khoan.php\", waiting until \"networkidle\"\u001b[22m\n"
+    },
+    {
+      "name": "Responsive 768px lich-su-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px tra-cuu-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px tin-tuc.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px lien-he.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px gioi-thieu.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px chinh-sach-giao-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 768px chinh-sach-doi-tra.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px index.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px san-pham.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px chi-tiet-san-pham.php?slug=lam-tinh",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px gio-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px thanh-toan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px dat-hang-thanh-cong.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px dang-nhap.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px dang-ky.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px quen-mat-khau.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px tai-khoan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px lich-su-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px tra-cuu-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px tin-tuc.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px lien-he.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px gioi-thieu.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px chinh-sach-giao-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1024px chinh-sach-doi-tra.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px index.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px san-pham.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px chi-tiet-san-pham.php?slug=lam-tinh",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px gio-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px thanh-toan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px dat-hang-thanh-cong.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px dang-nhap.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px dang-ky.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px quen-mat-khau.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px tai-khoan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px lich-su-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px tra-cuu-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px tin-tuc.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px lien-he.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px gioi-thieu.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px chinh-sach-giao-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Responsive 1440px chinh-sach-doi-tra.php",
+      "status": "PASS"
+    },
+    {
+      "name": "Long product text stays within mobile layout and does not execute HTML",
+      "status": "PASS"
+    },
+    {
+      "name": "No uncaught JavaScript exceptions during customer browser flows",
+      "status": "PASS"
+    }
+  ]
+}

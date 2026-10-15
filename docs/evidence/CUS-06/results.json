@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-15T00:03:04.298Z",
+  "base": "http://127.0.0.1:8033",
+  "task": "CUS-06",
+  "results": [
+    {
+      "name": "Ngân sách gợi ý hợp lệ và chia sẻ URL không lộ hidden",
+      "expected": "Khoảng giá đảo bị chặn; tổ hợp không có sản phẩm có cách nới điều kiện; sản phẩm hidden không xuất hiện",
+      "actual": "Chặn khoảng giá đảo; empty state/URL giữ đúng; hidden không xuất hiện",
+      "status": "PASS"
+    }
+  ],
+  "queries": [
+    {
+      "sql": "SELECT status FROM products WHERE product_id=2",
+      "rows": 1
+    },
+    {
+      "sql": "UPDATE products SET status='hidden' WHERE product_id=2",
+      "rows": null,
+      "affected": 1
+    },
+    {
+      "sql": "UPDATE products SET status=? WHERE product_id=2",
+      "rows": null,
+      "affected": 1
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-15",
+  "status": "PASS",
+  "pagesReviewed": 15,
+  "tables": 13,
+  "embeddedImages": 7,
+  "renderer": "Microsoft Word read-only COM export and Poppler PNG",
+  "fallbackReason": "Bundled render_docx.py unavailable: bundled LibreOffice absent on Windows",
+  "checks": [
+    "Viewed every final page",
+    "No blank page, clipped text, overlapping tables or images",
+    "Comparison matrix fits one landscape page",
+    "Screenshots are readable actual browser captures"
+  ],
+  "sha256": "EA9676FF49588B90FEB9475E66CB00C9D579030FB08183F395A7919A3AB434DF",
+  "branch": "feature/customer-completion",
+  "head": "9c35a949484c654aa8a7cf9522bcefe09f7ce92c",
+  "gitDiffCheck": "PASS",
+  "protectedFiles": "3/3 unchanged",
+  "limitations": [
+    "CUS-02 gallery and inventory schema contract awaits lead",
+    "CUS-07 commit, push, PR and CI not authorized",
+    "Apache deployment and Internet SMTP not verified"
+  ]
+}
