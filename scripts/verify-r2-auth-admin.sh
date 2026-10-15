@@ -37,6 +37,11 @@ TOKEN=$(curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/don-hang.php" | get_token
 STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode "action=order_update" --data-urlencode "id=1" --data-urlencode "status=confirmed" --data-urlencode "payment_status=paid" "$BASE/admin/don-hang.php")
 [ "$STATUS" = "303" ] || exit 1
 [ "$(db "SELECT COUNT(*) FROM orders WHERE order_id=1 AND order_status='confirmed' AND payment_status='paid'")" = "1" ] || exit 1
+# Regression: no skipping from confirmed directly to completed, payment stays unchanged.
+STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode "action=order_update" --data-urlencode "id=1" --data-urlencode "status=completed" --data-urlencode "payment_status=paid" "$BASE/admin/don-hang.php")
+[ "$STATUS" = "422" ] || { echo "Illegal order status jump was not blocked: $STATUS"; exit 1; }
+[ "$(db "SELECT COUNT(*) FROM orders WHERE order_id=1 AND order_status='confirmed' AND payment_status='paid'")" = "1" ] || exit 1
+
 TOKEN=$(curl -fsS -c /tmp/r2-customer-cookie "$BASE/dang-ky.php" | get_token)
 STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-customer-cookie -c /tmp/r2-customer-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode "full_name=Khach TDTU" --data-urlencode "phone=0922222222" --data-urlencode "email=tdtu-test@example.test" --data-urlencode "password=Customer_2026!" --data-urlencode "confirm_password=Customer_2026!" "$BASE/dang-ky.php")
 [ "$STATUS" = "303" ] || { echo "Customer signup failed: $STATUS";exit 1; }
