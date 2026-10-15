@@ -53,4 +53,4 @@ sleep 2
 export CAS_BASE_URL="http://127.0.0.1:$PORT_HTTP/"
 export CAS_TEST_REPORT="${CAS_TEST_REPORT:-/tmp/cas-admin-ops-report.json}"
 python3 tests/admin/test_admin_ops.py
-echo "PASS: Admin Operations — migration 003, 22 route x 5 vai trò, sản phẩm/ảnh, phân loại, kho, giao hàng, hoàn tiền, giấy gói, khám phá, cài đặt, nhân viên/chủ sở hữu, audit."
+echo "PASS: Admin Operations — migration 003, 23 route x 5 vai trò, sản phẩm/ảnh, phân loại, kho, giao hàng, hoàn tiền, giấy gói, khám phá, cài đặt, nhân viên/chủ sở hữu, audit."

@@ -64,6 +64,6 @@ Các script này cần PHP CLI, MySQL, `curl`, Python và môi trường Linux/G
 
 ## Nghiệm thu và những giới hạn
 
-Tài liệu đầy đủ: `REQUIREMENT2_SETUP.md`, `docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md`, `docs/INTEGRATION_REVIEW_2026-10-15.md`.
+Tài liệu đầy đủ: `REQUIREMENT2_SETUP.md`, `docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md`, `docs/INTEGRATION_REVIEW_2026-10-15.md` và **`docs/INTEGRATION_HARDENING_2026-10-15.md`** (migration 004, công thức kho, hoàn tiền và thu hồi phiên).
 
 Phải tự kiểm tra lại trên XAMPP của nhóm, gồm upload ảnh, phân quyền, checkout, tra cứu và mobile. Cần cấu hình mail/SMTP thật nếu demo quên mật khẩu qua email Internet. Định mức và trừ/hoàn nguyên liệu cần được cấu hình theo từng mẫu tại `admin/cong-thuc-hoa.php`; hoàn tiền được đối soát theo trạng thái đơn nhưng không tự chuyển tiền thật; xem danh sách ở tài liệu kiểm kê tích hợp.

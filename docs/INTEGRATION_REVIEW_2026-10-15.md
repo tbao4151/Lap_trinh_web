@@ -1,5 +1,7 @@
 # CÁ'S HOA — Kiểm kê tích hợp ba thành viên (15/10/2026)
 
+**Cập nhật sau tài liệu này:** Các khoảng trống về công thức/định mức kho, đồng bộ giao hàng, đối soát refund và session_version đã được triển khai ở migration 004, xem `docs/INTEGRATION_HARDENING_2026-10-15.md`. Các mục “chưa làm” dưới đây là lịch sử đánh giá tại thời điểm sau PR #1, không phải tình trạng của PR #2.
+
 ## Phạm vi và các nhánh
 - Repository môn học: tbao4151/Lap_trinh_web (PHP 8.2+, MySQL/MariaDB). Không lấy mã nguồn từ Web_Flower_Manus.
 - Nền gốc: `feature/requirement-2-php-mysql` tại 9c35a94.

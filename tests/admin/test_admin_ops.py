@@ -595,7 +595,7 @@ def main():
     sessions.update(staff=staff, admin=admin, owner=owner)
 
     groups = [
-        ('Ma trận quyền 22 route x 5 vai trò', lambda: test_role_matrix(sessions)),
+        ('Ma trận quyền 23 route x 5 vai trò', lambda: test_role_matrix(sessions)),
         ('Chặn POST trái phép / thiếu CSRF', lambda: test_post_guards(sessions, staff)),
         ('ADM-02 Sản phẩm, ảnh, giá nhanh', lambda: test_products(admin, staff)),
         ('ADM-02 Phân loại', lambda: test_taxonomy(admin, staff)),
