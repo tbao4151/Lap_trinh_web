@@ -21,7 +21,7 @@ STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie -c /tmp/
 [ "$STATUS" = "303" ] || { echo "Admin login failed: $STATUS";exit 1; }
 for page in index don-hang giao-hang khach-hang san-pham them-san-pham quan-ly-nhanh phan-loai-bo-loc kho-tong bao-cao; do
  STATUS=$(curl -s -o /tmp/r2-admin-page -w '%{http_code}' -b /tmp/r2-admin-cookie "$BASE/admin/$page.php")
- [ "$STATUS" = "200" ] && grep -q 'admin-content' /tmp/r2-admin-page || { echo "Admin page $page failed: $STATUS";exit 1; }
+ [ "$STATUS" = "200" ] && grep -q 'admin-content' /tmp/r2-admin-page || { echo "Admin page $page failed: $STATUS"; tail -n 50 /tmp/cas-r2-admin-http.log; exit 1; }
 done
 curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/sua-san-pham.php?id=1" | grep -q 'Lưu sản phẩm'
 TOKEN=$(curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/them-san-pham.php" | get_token)
