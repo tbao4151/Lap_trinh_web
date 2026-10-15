@@ -79,3 +79,8 @@ Khi lần chạy CI mới nhất hoàn tất thành công, vào **Actions → wo
 - Kiểm thử hồi quy và bảo mật bổ sung, đặc biệt luồng reset mật khẩu với dịch vụ mail thực, truy cập sai quyền, input sai và dữ liệu SQL.
 - Rà soát UI responsive trên nhiều viewport và dữ liệu biên.
 - 10 màn hình Admin còn lại (hoàn tiền, giấy gói, khám phá, kho hoa, kho phụ kiện, lịch sử kho, nhân viên, cài đặt, tài khoản, chủ sở hữu) đã có route PHP trên branch `feature/admin-operations-completion`; các điểm cần trưởng nhóm duyệt ghi ở `docs/admin-ops-contracts.md`.
+
+
+### Nâng cấp 004 (sau tích hợp)
+
+Sau migration `003_admin_ops.sql`, import `database/migrations/004_order_inventory_sessions.sql`. Tại Admin → Công thức nguyên liệu, khai báo định mức nguyên liệu cho từng sản phẩm trước khi chuyển đơn sang **Đang chuẩn bị**. Hệ thống xuất/hoàn nguyên liệu theo một transaction và không cho xuất thiếu tồn. Mọi phiên đăng nhập trước khi cập nhật 004 phải đăng nhập lại. Hoàn tiền từng phần/đủ được phản ánh vào `orders.payment_status` sau bước ghi nhận thủ công (không chuyển tiền thật).

@@ -19,7 +19,7 @@ $casNavGroups = [
         ['phan-loai-bo-loc.php', 'Phân loại & bộ lọc', $casNavAll], ['kham-pha.php', 'Danh mục khám phá', $casNavAll],
     ],
     'Kho' => [
-        ['kho-tong.php', 'Kho tổng', $casNavAll], ['kho-hoa.php', 'Kho Hoa', $casNavAll],
+        ['kho-tong.php', 'Kho tổng', $casNavAll], ['cong-thuc-hoa.php', 'Công thức nguyên liệu', ['admin', 'owner']], ['kho-hoa.php', 'Kho Hoa', $casNavAll],
         ['kho-phu-kien.php', 'Kho Phụ kiện', $casNavAll], ['lich-su-kho.php', 'Lịch sử kho', $casNavAll],
     ],
     'Hệ thống' => [

@@ -84,7 +84,7 @@ $rows=cas_admin_rows($db,$sql,$args);
 <td><?= cas_e($o['recipient_name']) ?><div><?= cas_e($o['receive_date']) ?> · <?= cas_e($o['receive_time']) ?></div></td>
 <td><?= cas_money($o['total_amount']) ?></td>
 <td><form method="post" class="cas-admin-table-form"><?= cas_csrf_form() ?><input type="hidden" name="action" value="order_update"><input type="hidden" name="id" value="<?= (int)$o['order_id'] ?>">
-<?= cas_admin_select('status',cas_order_choices($o['order_status']),$o['order_status']) ?>
+<?= cas_admin_select('status',cas_order_choices($o['order_status'],$o['delivery_method']),$o['order_status']) ?>
 <?php if(in_array($user['role'],['admin','owner'],true)): ?>
 <?= cas_admin_select('payment_status',$payments,$o['payment_status']) ?>
 <?php else: ?><input type="hidden" name="payment_status" value="<?= cas_e($o['payment_status']) ?>"><span class="cas-muted small"><?= cas_e($payments[$o['payment_status']]??$o['payment_status']) ?></span><?php endif; ?>

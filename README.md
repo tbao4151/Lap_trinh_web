@@ -27,6 +27,7 @@ Trong XAMPP bật **Apache** và **MySQL**, vào `http://localhost/phpmyadmin`. 
 3. `database/migrations/001_auth.php.sql`
 4. `database/migrations/002_inventory_seed.sql`
 5. `database/migrations/003_admin_ops.sql`
+6. `database/migrations/004_order_inventory_sessions.sql`
 
 Mặc định PDO kết nối `127.0.0.1:3306`, database `cas_hoa`, user `root`, mật khẩu rỗng (thiết lập XAMPP phổ biến). Nếu khác, đặt biến môi trường `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. **Không đưa mật khẩu hoặc file .env lên GitHub.**
 
@@ -65,4 +66,4 @@ Các script này cần PHP CLI, MySQL, `curl`, Python và môi trường Linux/G
 
 Tài liệu đầy đủ: `REQUIREMENT2_SETUP.md`, `docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md`, `docs/INTEGRATION_REVIEW_2026-10-15.md`.
 
-Phải tự kiểm tra lại trên XAMPP của nhóm, gồm upload ảnh, phân quyền, checkout, tra cứu và mobile. Cần cấu hình mail/SMTP thật nếu demo quên mật khẩu qua email Internet. Các mở rộng nâng cao như tự trừ nguyên liệu theo định mức và đối soát hoàn tiền với trạng thái thanh toán chưa được xem là hoàn tất; xem danh sách ở tài liệu kiểm kê tích hợp.
+Phải tự kiểm tra lại trên XAMPP của nhóm, gồm upload ảnh, phân quyền, checkout, tra cứu và mobile. Cần cấu hình mail/SMTP thật nếu demo quên mật khẩu qua email Internet. Định mức và trừ/hoàn nguyên liệu cần được cấu hình theo từng mẫu tại `admin/cong-thuc-hoa.php`; hoàn tiền được đối soát theo trạng thái đơn nhưng không tự chuyển tiền thật; xem danh sách ở tài liệu kiểm kê tích hợp.

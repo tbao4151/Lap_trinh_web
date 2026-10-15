@@ -147,7 +147,7 @@ function cas_staff_reset_password(PDO $db, array $actor): string
     $target = cas_people_assert_manageable($actor, cas_people_find(cas_in_id('id')), 'staff_reset_password');
     $password = cas_people_new_password('new_password', 'new_password_confirm');
     cas_people_confirm_password($actor);
-    $db->prepare('UPDATE users SET password_hash=? WHERE user_id=?')->execute([password_hash($password, PASSWORD_DEFAULT), $target['user_id']]);
+    $db->prepare('UPDATE users SET password_hash=?,session_version=session_version+1 WHERE user_id=?')->execute([password_hash($password, PASSWORD_DEFAULT), $target['user_id']]);
     cas_audit('staff_reset_password', 'user', $target['user_id']);
     return 'Đã đặt mật khẩu tạm cho ' . $target['email'] . '.';
 }
@@ -282,7 +282,10 @@ function cas_password_change(PDO $db, array $actor): string
     if (hash_equals((string)$_POST['current_password'], $password)) {
         throw new DomainException('Mật khẩu mới phải khác mật khẩu hiện tại.');
     }
-    $db->prepare('UPDATE users SET password_hash=? WHERE user_id=?')->execute([password_hash($password, PASSWORD_DEFAULT), $actor['user_id']]);
+    $db->prepare('UPDATE users SET password_hash=?,session_version=session_version+1 WHERE user_id=?')->execute([password_hash($password, PASSWORD_DEFAULT), $actor['user_id']]);
+    $version=$db->prepare('SELECT session_version FROM users WHERE user_id=?');
+    $version->execute([$actor['user_id']]);
+    $_SESSION['cas_session_version']=(int)$version->fetchColumn();
     session_regenerate_id(true);
     unset($_SESSION['cas_csrf']);
     cas_audit('password_change', 'user', $actor['user_id']);
