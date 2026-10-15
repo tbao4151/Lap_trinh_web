@@ -26,7 +26,7 @@ if(cas_post()){
        $q=$db->prepare("INSERT INTO customers(user_id,full_name,phone,email) VALUES(?,?,?,?)");
        $q->execute([$uid,$name,$phone,$email]);$db->commit();
     }catch(Throwable $e){$db->rollBack();throw $e;}
-    session_regenerate_id(true);$_SESSION['cas_uid']=$uid;
+    session_regenerate_id(true);$_SESSION['cas_uid']=$uid;$_SESSION['cas_session_version']=1;
     unset($_SESSION['cas_csrf']);cas_redirect('tai-khoan.php');
  }catch(Throwable $e){$error=($e instanceof PDOException)?'Dữ liệu tài khoản đã tồn tại hoặc MySQL chưa sẵn sàng.':$e->getMessage();}
 }
