@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eEuo pipefail
+trap 'echo "Failure in verify-r2-auth-admin.sh at line $LINENO"; tail -n 35 /tmp/cas-r2-admin-http.log 2>/dev/null || true' ERR
 export MYSQL_PWD="$DB_PASSWORD"
 mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/001_auth.php.sql
 mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/002_inventory_seed.sql
