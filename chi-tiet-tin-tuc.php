@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__.'/includes/bootstrap.php';
-$slug=(string)($_GET['slug']??'');$article=null;
+$slug=is_string($_GET['slug']??null)?$_GET['slug']:'';$article=null;
 if(preg_match('/^[a-z0-9-]{1,220}$/',$slug)){
  $stmt=cas_db()->prepare("SELECT title,thumbnail,content,published_at FROM news WHERE slug=? AND status='published' LIMIT 1");
  $stmt->execute([$slug]);$article=$stmt->fetch() ?: null;
@@ -14,10 +14,11 @@ if(!$article) http_response_code(404);
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Bài viết về hoa và quà tặng.">
   <title>Chi tiết tin tức | CÁ'S HOA</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
 </head>
 <body data-page="article" class="d-flex flex-column">
   <div id="siteHeader"></div>
@@ -40,13 +41,12 @@ if(!$article) http_response_code(404);
 
   <div id="siteFooter"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
   <script src="assets/js/products.php" defer></script>
   <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/batch2.js" defer></script>
-  <script src="assets/js/batch3.js" defer></script>
   
   <script src="assets/js/main-r2.js" defer></script>
 <script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
+  <script src="assets/js/customer-forms.js" defer></script>
 </body>
 </html>

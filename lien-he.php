@@ -6,10 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Liên hệ và gửi yêu cầu tới CÁ'S HOA.">
   <title>Liên hệ | CÁ'S HOA</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
 </head>
 <body data-page="contact" class="d-flex flex-column">
   <div id="siteHeader"></div>
@@ -36,10 +37,10 @@
             <h2 class="font-display fs-3 mt-2">Gửi lời nhắn cho shop</h2>
 
             <form id="contactForm" class="row g-3 mt-1" novalidate>
-              <div class="col-md-6"><label class="form-label small fw-semibold">Họ và tên</label><input name="name" class="form-control cas-form-control" placeholder="Nguyễn Văn A" required><div class="invalid-feedback">Vui lòng nhập họ tên.</div></div>
-              <div class="col-md-6"><label class="form-label small fw-semibold">Số điện thoại</label><input name="phone" class="form-control cas-form-control" inputmode="tel" placeholder="0123456789" required><div class="invalid-feedback">Vui lòng nhập số điện thoại.</div></div>
-              <div class="col-12"><label class="form-label small fw-semibold">Chủ đề</label><select name="subject" class="form-select cas-form-select" required><option value="">Chọn chủ đề</option><option>Tư vấn mẫu hoa</option><option>Hỗ trợ đơn hàng</option><option>Giao hàng</option><option>Góp ý dịch vụ</option></select><div class="invalid-feedback">Vui lòng chọn chủ đề.</div></div>
-              <div class="col-12"><label class="form-label small fw-semibold">Nội dung</label><textarea name="message" class="form-control cas-form-control" rows="5" placeholder="Nhập nội dung bạn muốn gửi..." required></textarea><div class="invalid-feedback">Vui lòng nhập nội dung.</div></div>
+              <div class="col-md-6"><label for="contact-name" class="form-label small fw-semibold">Họ và tên</label><input id="contact-name" name="name" class="form-control cas-form-control" placeholder="Nguyễn Văn A" required><div class="invalid-feedback">Vui lòng nhập họ tên.</div></div>
+              <div class="col-md-6"><label for="contact-phone" class="form-label small fw-semibold">Số điện thoại</label><input id="contact-phone" name="phone" class="form-control cas-form-control" inputmode="tel" placeholder="0123456789" required><div class="invalid-feedback">Vui lòng nhập số điện thoại.</div></div>
+              <div class="col-12"><label for="contact-subject" class="form-label small fw-semibold">Chủ đề</label><select id="contact-subject" name="subject" class="form-select cas-form-select" required><option value="">Chọn chủ đề</option><option>Tư vấn mẫu hoa</option><option>Hỗ trợ đơn hàng</option><option>Giao hàng</option><option>Góp ý dịch vụ</option></select><div class="invalid-feedback">Vui lòng chọn chủ đề.</div></div>
+              <div class="col-12"><label for="contact-message" class="form-label small fw-semibold">Nội dung</label><textarea id="contact-message" name="message" class="form-control cas-form-control" rows="5" placeholder="Nhập nội dung bạn muốn gửi..." required></textarea><div class="invalid-feedback">Vui lòng nhập nội dung.</div></div>
               <div class="col-12"><div id="contactMessage" class="auth-message d-none" role="status"></div><button class="btn-cas-primary mt-2" type="submit">Gửi nội dung</button></div>
             </form>
           </section>
@@ -69,12 +70,12 @@
 
   <div id="siteFooter"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
   <script src="assets/js/products.php" defer></script>
   <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/batch2.js" defer></script>
   <script src="assets/js/r2-contact.js" defer></script>
   <script src="assets/js/main-r2.js" defer></script>
 <script>window.CAS_CSRF=<?= json_encode(cas_csrf()) ?>;</script>
+  <script src="assets/js/customer-forms.js" defer></script>
 </body>
 </html>

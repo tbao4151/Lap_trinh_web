@@ -6,10 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Hoa tươi là sản phẩm có đặc tính tự nhiên nên màu sắc, độ nở và một số chi tiết có thể thay đổi nhẹ theo từng đợt hoa.">
   <title>Chính sách đổi trả | CÁ'S HOA</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
 </head>
 <body data-page="policy" class="d-flex flex-column">
   <div id="siteHeader"></div>
@@ -91,12 +92,11 @@
 
   <div id="siteFooter"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
   <script src="assets/js/products.php" defer></script>
   <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/batch2.js" defer></script>
-  <script src="assets/js/batch3.js" defer></script>
   <script src="assets/js/main-r2.js" defer></script>
 <script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
+  <script src="assets/js/customer-forms.js" defer></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php require_once __DIR__.'/includes/customer.php'; $options=cas_catalog_options(); ?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -6,10 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Danh sách hoa tươi tại CÁ'S HOA.">
   <title>Sản phẩm | CÁ'S HOA</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
 </head>
 <body data-page="catalog" class="d-flex flex-column">
   <div id="siteHeader"></div>
@@ -30,7 +31,7 @@
             <div class="col-7 col-md-4">
               <label class="visually-hidden" for="catalogSort">Sắp xếp</label>
               <select id="catalogSort" class="form-select cas-form-select">
-                <option value="featured">Nổi bật</option>
+                <option value="featured">Nổi bật</option><option value="new">Mới thêm</option>
                 <option value="low">Giá thấp đến cao</option>
                 <option value="high">Giá cao đến thấp</option>
                 <option value="name">Tên A–Z</option>
@@ -60,31 +61,36 @@
                 <div class="filter-group">
                   <div class="filter-title">Loại hoa</div>
                   <label class="filter-check"><input type="radio" name="flowerCategory" value="all" checked> Tất cả</label>
-                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Hoa ly"> Hoa ly</label>
-                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Hoa hồng"> Hoa hồng</label>
-                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Cẩm tú cầu"> Cẩm tú cầu</label>
-                  <label class="filter-check"><input type="radio" name="flowerCategory" value="Phi yến"> Phi yến</label>
-                </div>
+<?php foreach($options['categories'] as $option): ?>
+<label class="filter-check"><input type="radio" name="flowerCategory" value="<?= cas_e($option) ?>"> <?= cas_e($option) ?></label>
+<?php endforeach; ?>
+</div>
 
                 <div class="filter-group">
                   <div class="filter-title">Tone màu</div>
                   <label class="filter-check"><input type="radio" name="tone" value="all" checked> Tất cả</label>
-                  <label class="filter-check"><input type="radio" name="tone" value="Xanh"> Xanh</label>
-                  <label class="filter-check"><input type="radio" name="tone" value="Hồng"> Hồng</label>
-                  <label class="filter-check"><input type="radio" name="tone" value="Đỏ"> Đỏ</label>
-                  <label class="filter-check"><input type="radio" name="tone" value="Tím"> Tím</label>
-                </div>
+<?php foreach($options['tones'] as $option): ?>
+<label class="filter-check"><input type="radio" name="tone" value="<?= cas_e($option) ?>"> <?= cas_e($option) ?></label>
+<?php endforeach; ?>
+</div>
 
                 <div class="filter-group">
-                  <div class="filter-title d-flex justify-content-between"><span>Giá tối đa</span><span id="maxPriceLabel">500.000 ₫</span></div>
-                  <input id="maxPrice" class="form-range" type="range" min="290000" max="500000" step="10000" value="500000" style="accent-color:var(--primary)">
+                  <label class="filter-title" for="occasionFilter">Dịp tặng</label>
+                  <select id="occasionFilter" class="form-select cas-form-select"><option value="">Tất cả dịp</option>
+                  <?php foreach($options['occasions'] as $option): ?><option><?= cas_e($option) ?></option><?php endforeach; ?></select>
+                </div>
+                <div class="filter-group">
+                  <label class="filter-title" for="minPrice">Giá từ (đồng)</label><input id="minPrice" type="number" min="0" step="1000" class="form-control cas-form-control" placeholder="Không giới hạn" aria-describedby="catalogPriceError">
+                  <label class="filter-title mt-3" for="maxPrice">Giá đến (đồng)</label><input id="maxPrice" type="number" min="0" step="1000" class="form-control cas-form-control" placeholder="Không giới hạn" aria-describedby="catalogPriceError">
+                  <p id="catalogPriceError" class="auth-message error" role="alert" hidden></p>
+                  <label class="filter-check mt-3"><input id="todayFilter" type="checkbox"> Chỉ mẫu hôm nay</label>
                 </div>
               </aside>
             </div>
           </div>
 
           <div class="col-lg-9">
-            <div class="d-flex align-items-center justify-content-between mb-3"><span id="resultCount" class="cas-muted small">0 sản phẩm</span><a href="gio-hang.php" class="small fw-bold" style="color:var(--primary)">Xem giỏ hàng <i class="bi bi-arrow-right"></i></a></div>
+            <div class="d-flex align-items-center justify-content-between mb-3"><span id="resultCount" role="status" aria-live="polite" class="cas-muted small">0 sản phẩm</span><a href="gio-hang.php" class="small fw-bold" style="color:var(--primary)">Xem giỏ hàng <i class="bi bi-arrow-right"></i></a></div>
             <div id="catalogGrid" class="row g-3 g-lg-4"></div>
             <div id="catalogEmpty" class="catalog-empty d-none mt-3"><i class="bi bi-flower1 fs-3" style="color:var(--primary)"></i><h2 class="font-display fs-4 mt-3">Chưa tìm thấy mẫu phù hợp.</h2><p class="cas-muted mb-3">Bạn thử thay đổi từ khoá hoặc bộ lọc.</p><button class="btn-cas-outline" type="button" data-reset-filters>Đặt lại bộ lọc</button></div>
           </div>
@@ -95,10 +101,12 @@
 
   <div id="siteFooter"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
   <script src="assets/js/products.php" defer></script>
   <script src="assets/js/cart-r2.php" defer></script>
+  <script src="assets/js/customer-catalog.js" defer></script>
   <script src="assets/js/main-r2.js" defer></script>
 <script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
+  <script src="assets/js/customer-forms.js" defer></script>
 </body>
 </html>

@@ -1,16 +1,19 @@
 <?php
-require_once __DIR__.'/includes/auth.php';
+require_once __DIR__.'/includes/customer.php';
 $user=cas_require_user();$error='';
 if(cas_post()){
   try {
     cas_assert_csrf();
-    $name=trim((string)($_POST['full_name']??''));
-    $phone=cas_phone((string)($_POST['phone']??''));
-    $email=strtolower(trim((string)($_POST['email']??'')));
-    $address=trim((string)($_POST['address']??''));
+    $name=cas_customer_text($_POST,'full_name',255);
+    $phone=cas_phone(cas_customer_text($_POST,'phone',30));
+    $email=strtolower(trim(cas_customer_text($_POST,'email',150)));
+    $address=cas_customer_text($_POST,'address',255);
     if(mb_strlen($name)<2||mb_strlen($name)>120||mb_strlen($address)>255||!preg_match('/^0[0-9]{9}$/',$phone)||!filter_var($email,FILTER_VALIDATE_EMAIL)) throw new RuntimeException('Họ tên, email hoặc điện thoại chưa hợp lệ.');
     $db=cas_db();$db->beginTransaction();
     try{
+      $check=$db->prepare('SELECT user_id FROM users WHERE (email=? OR phone=?) AND user_id<>? LIMIT 1');
+      $check->execute([$email,$phone,$user['user_id']]);
+      if($check->fetch())throw new RuntimeException('Email hoặc số điện thoại đã được tài khoản khác sử dụng.');
       $q=$db->prepare("UPDATE users SET full_name=?,email=?,phone=? WHERE user_id=?");
       $q->execute([$name,$email,$phone,$user['user_id']]);
       $q=$db->prepare("UPDATE customers SET full_name=?,phone=?,email=?,address=? WHERE user_id=?");
@@ -18,7 +21,7 @@ if(cas_post()){
       $db->commit();
     }catch(Throwable $e){$db->rollBack();throw $e;}
     cas_redirect('tai-khoan.php?saved=1');
-  }catch(Throwable $e){$error=$e instanceof PDOException?'Email đã tồn tại hoặc MySQL xảy ra lỗi.':$e->getMessage();}
+  }catch(Throwable $e){$error=cas_customer_error($e);}
 }
 $q=cas_db()->prepare("SELECT u.full_name,u.email,u.phone,c.address FROM users u LEFT JOIN customers c ON c.user_id=u.user_id WHERE u.user_id=?");
 $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
@@ -30,10 +33,11 @@ $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Quản lý thông tin khách hàng.">
   <title>Tài khoản | CÁ'S HOA</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
 </head>
 <body data-page="account" class="d-flex flex-column">
   <div id="siteHeader"></div>
@@ -108,12 +112,13 @@ $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
 
   <div id="siteFooter"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
   <script src="assets/js/products.php" defer></script>
   <script src="assets/js/cart-r2.php" defer></script>
   
   
   <script src="assets/js/main-r2.js" defer></script>
 <script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
+  <script src="assets/js/customer-forms.js" defer></script>
 </body>
 </html>

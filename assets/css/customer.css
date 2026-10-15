@@ -1,0 +1,22 @@
+/* Tăng tương phản chữ và trạng thái cho các trang khách hàng. */
+:root{--primary:#4e6649;--primary-hover:#40573c;--muted-foreground:#545e55;--danger:#a13e2d}
+:focus-visible{outline:3px solid #405f42;outline-offset:3px}
+.cas-muted,.product-meta,.cas-subtitle,.auth-description,.filter-check{color:#545e55}
+.product-price,.cas-eyebrow{color:#4e6649}
+.product-name,.cart-line-name,.success-code strong,.order-history-card{overflow-wrap:anywhere}
+.detail-panel,.detail-description,.breadcrumb-cas{overflow-wrap:anywhere;min-width:0}
+button:disabled{opacity:.65;cursor:wait}
+.customer-message{position:sticky;top:0;z-index:1100;padding:12px 20px;background:#fff0e9;color:#783622;border-bottom:1px solid #d59c86}
+.customer-message[hidden]{display:none}
+.customer-message button{margin-left:12px}
+.customer-recommendations{padding:24px;background:var(--surface-muted);border-radius:24px;margin:28px 0}
+.customer-recommendations h2{font-family:'Lora',serif;font-size:1.65rem}
+.customer-recommendations form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}
+.customer-recommendations label{font-size:.8rem;font-weight:600}
+.customer-recommendations input,.customer-recommendations select{width:100%;margin-top:6px}
+.customer-pager{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:24px 0}
+.customer-order-items{margin-top:12px;padding-left:20px}
+.customer-empty{padding:32px;border:1px dashed var(--border);border-radius:24px;text-align:center}
+.checkout-message{margin:12px 0}
+@media(max-width:767px){.customer-recommendations form{grid-template-columns:1fr 1fr}.catalog-sidebar{position:static}.summary-card{position:static}.customer-recommendations{padding:18px}}
+@media(max-width:400px){.customer-recommendations form{grid-template-columns:1fr}.cas-brand-name{font-size:17px}.cas-icon-btn{width:36px;height:36px}.auth-shell,.auth-card,.checkout-card{min-width:0}.success-detail-row{flex-wrap:wrap}}

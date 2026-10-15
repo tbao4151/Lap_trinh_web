@@ -1,7 +1,15 @@
 (function () {
   'use strict';
 
-  function pageUrl(page) { return page; }
+  function escapeHtml(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]; }); }
+  async function cartAction(button, operation, message) {
+    if(button.disabled)return;
+    button.disabled=true;
+    button.setAttribute('aria-busy','true');
+    try { await operation(); if(message)showToast(message); }
+    catch(error){showToast(error.message || 'Chưa lưu được giỏ hàng. Hãy thử lại.');}
+    finally {button.disabled=false;button.removeAttribute('aria-busy');}
+  }
 
   function headerMarkup() {
     var page = document.body.dataset.page || '';
@@ -41,7 +49,7 @@
           '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a><br><a href="lien-he.php">Liên hệ</a><br><a href="tra-cuu-don-hang.php">Tra cứu đơn</a></p></div>' +
           '<div class="col-6 col-md-2"><div class="cas-footer-title">Thông tin</div><p class="mt-3 mb-0"><a href="gioi-thieu.php">Giới thiệu</a><br><a href="tin-tuc.php">Tin tức</a><br><a href="chinh-sach-giao-hang.php">Giao hàng</a><br><a href="chinh-sach-doi-tra.php">Đổi trả</a></p></div><div class="col-12 col-md-2"><div class="cas-footer-title">Địa chỉ</div><p class="mt-3 mb-0">126/13 đường số 17<br>Linh Xuân, Thủ Đức, TP.HCM</p></div>' +
         '</div></div>' +
-        '<div class="cas-footer-bottom"><div class="cas-container d-flex flex-column flex-sm-row gap-2 justify-content-between"><span>© 2026 CÁ\'S HOA</span><span>FrontEnd môn Lập trình Web · HTML · CSS · JavaScript · Bootstrap</span></div></div>' +
+        '<div class="cas-footer-bottom"><div class="cas-container d-flex flex-column flex-sm-row gap-2 justify-content-between"><span>© 2026 CÁ\'S HOA</span><span>Hoa tươi · Thiệp gửi lời thương</span></div></div>' +
       '</footer>';
   }
 
@@ -72,17 +80,17 @@
       toastEl = document.getElementById('casToast');
     }
     document.getElementById('casToastBody').textContent = message;
-    bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2400 }).show();
+    if(window.bootstrap) bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000 }).show(); else toastEl.classList.add('show');
   }
 
   function productCard(product) {
     var badge = product.today ? '<span class="product-badge">Mẫu hôm nay</span>' : '';
     return '<article class="product-card">' +
       '<div class="product-image-wrap">' + badge +
-        '<a href="chi-tiet-san-pham.php?slug=' + encodeURIComponent(product.slug) + '"><img src="' + product.image + '" alt="' + product.name + '" loading="lazy"></a>' +
-        '<button class="product-quick-add" type="button" data-add-product="' + product.id + '" aria-label="Thêm ' + product.name + ' vào giỏ"><i class="bi bi-plus-lg"></i></button>' +
+        '<a href="chi-tiet-san-pham.php?slug=' + encodeURIComponent(product.slug) + '"><img src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.name) + '" loading="lazy"></a>' +
+        '<button class="product-quick-add" type="button" data-add-product="' + escapeHtml(product.id) + '" aria-label="Thêm ' + escapeHtml(product.name) + ' vào giỏ"><i class="bi bi-plus-lg"></i></button>' +
       '</div>' +
-      '<div class="product-info"><a href="chi-tiet-san-pham.php?slug=' + encodeURIComponent(product.slug) + '"><h3 class="product-name">' + product.name + '</h3></a><div class="product-price">' + window.CAS_FORMAT_VND(product.price) + '</div><div class="product-meta">' + product.categories.join(' · ') + '</div></div>' +
+      '<div class="product-info"><a href="chi-tiet-san-pham.php?slug=' + encodeURIComponent(product.slug) + '"><h3 class="product-name">' + escapeHtml(product.name) + '</h3></a><div class="product-price">' + window.CAS_FORMAT_VND(product.price) + '</div><div class="product-meta">' + escapeHtml(product.categories.join(' · ')) + '</div></div>' +
     '</article>';
   }
 
@@ -91,9 +99,7 @@
       button.addEventListener('click', function () {
         var product = window.CAS_FIND_PRODUCT(button.dataset.addProduct);
         if (!product) return;
-        window.CASCart.add(product.id, 1);
-        updateCartCount();
-        showToast('Đã thêm “' + product.name + '” vào giỏ hàng.');
+        cartAction(button, function(){return window.CASCart.add(product.id,1);}, 'Đã thêm “'+product.name+'” vào giỏ hàng.');
       });
     });
   }
@@ -106,7 +112,7 @@
       var chunks = [heroProducts.slice(0, 3), heroProducts.slice(3, 6)];
       heroTrack.innerHTML = chunks.map(function (chunk, index) {
         return '<div class="carousel-item' + (index === 0 ? ' active' : '') + '"><div class="row g-2 g-sm-3 g-lg-4">' + chunk.map(function (product) {
-          return '<div class="col-4"><a class="hero-image-link" href="chi-tiet-san-pham.php?slug=' + product.slug + '"><img src="' + product.image + '" alt="' + product.name + '"></a></div>';
+          return '<div class="col-4"><a class="hero-image-link" href="chi-tiet-san-pham.php?slug=' + encodeURIComponent(product.slug) + '"><img src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.name) + '"></a></div>';
         }).join('') + '</div></div>';
       }).join('');
     }
@@ -118,120 +124,28 @@
     }
   }
 
-  function currentCatalogFilters() {
-    var params = new URLSearchParams(window.location.search);
-    var occasionMap = {
-      'sinh-nhat': 'Sinh nhật',
-      'nguoi-thuong': 'Tặng người thương',
-      'ky-niem': 'Kỷ niệm',
-      'chuc-mung': 'Chúc mừng'
-    };
-    var toneMap = { 'xanh': 'Xanh', 'hong': 'Hồng', 'do': 'Đỏ', 'tim': 'Tím' };
-    var occasionParam = params.get('occasion') || '';
-    var toneParam = params.get('tone') || 'all';
-    return {
-      type: params.get('type') || 'all',
-      today: params.get('today') === '1',
-      tone: toneMap[toneParam] || toneParam,
-      occasion: occasionMap[occasionParam] || occasionParam
-    };
-  }
-
-  function initCatalog() {
-    var grid = document.getElementById('catalogGrid');
-    if (!grid) return;
-    var searchInput = document.getElementById('catalogSearch');
-    var sortSelect = document.getElementById('catalogSort');
-    var resultCount = document.getElementById('resultCount');
-    var empty = document.getElementById('catalogEmpty');
-    var typeChecks = document.querySelectorAll('[name="productType"]');
-    var categoryChecks = document.querySelectorAll('[name="flowerCategory"]');
-    var toneChecks = document.querySelectorAll('[name="tone"]');
-    var maxPrice = document.getElementById('maxPrice');
-    var maxPriceLabel = document.getElementById('maxPriceLabel');
-    var urlFilter = currentCatalogFilters();
-
-    if (urlFilter.type !== 'all') typeChecks.forEach(function (input) { input.checked = input.value === urlFilter.type; });
-    if (urlFilter.tone !== 'all') toneChecks.forEach(function (input) { input.checked = input.value === urlFilter.tone; });
-
-    function checkedValue(nodes, fallback) {
-      var item = Array.from(nodes).find(function (node) { return node.checked; });
-      return item ? item.value : fallback;
-    }
-
-    function render() {
-      var query = (searchInput.value || '').trim().toLowerCase();
-      var type = checkedValue(typeChecks, 'all');
-      var category = checkedValue(categoryChecks, 'all');
-      var tone = checkedValue(toneChecks, 'all');
-      var ceiling = Number(maxPrice.value || 500000);
-      if (maxPriceLabel) maxPriceLabel.textContent = window.CAS_FORMAT_VND(ceiling);
-
-      var list = window.CAS_PRODUCTS.filter(function (product) {
-        var matchesQuery = !query || [product.name, product.categories.join(' '), product.occasion].join(' ').toLowerCase().includes(query);
-        var matchesOccasion = !urlFilter.occasion || product.occasion === urlFilter.occasion;
-        var matchesType = type === 'all' || product.type === type;
-        var matchesCategory = category === 'all' || product.categories.includes(category);
-        var matchesTone = tone === 'all' || product.tone === tone;
-        var matchesPrice = product.price <= ceiling;
-        var matchesToday = !urlFilter.today || product.today;
-        return matchesQuery && matchesType && matchesCategory && matchesTone && matchesPrice && matchesToday && matchesOccasion;
-      });
-
-      var sort = sortSelect.value;
-      if (sort === 'low') list.sort(function (a, b) { return a.price - b.price; });
-      if (sort === 'high') list.sort(function (a, b) { return b.price - a.price; });
-      if (sort === 'name') list.sort(function (a, b) { return a.name.localeCompare(b.name, 'vi'); });
-
-      grid.innerHTML = list.map(function (product) { return '<div class="col-6 col-xl-4">' + productCard(product) + '</div>'; }).join('');
-      if (resultCount) resultCount.textContent = list.length + ' sản phẩm';
-      if (empty) empty.classList.toggle('d-none', list.length !== 0);
-      bindAddButtons(grid);
-    }
-
-    [searchInput, sortSelect, maxPrice].forEach(function (el) { if (el) el.addEventListener('input', render); });
-    typeChecks.forEach(function (el) { el.addEventListener('change', render); });
-    categoryChecks.forEach(function (el) { el.addEventListener('change', render); });
-    toneChecks.forEach(function (el) { el.addEventListener('change', render); });
-    document.querySelectorAll('[data-reset-filters]').forEach(function (button) {
-      button.addEventListener('click', function () {
-        searchInput.value = '';
-        sortSelect.value = 'featured';
-        typeChecks.forEach(function (el) { el.checked = el.value === 'all'; });
-        categoryChecks.forEach(function (el) { el.checked = el.value === 'all'; });
-        toneChecks.forEach(function (el) { el.checked = el.value === 'all'; });
-        maxPrice.value = '500000';
-        urlFilter.today = false;
-        urlFilter.occasion = '';
-        render();
-      });
-    });
-    render();
-  }
-
   function initDetail() {
     var host = document.getElementById('productDetailHost');
     if (!host) return;
     var params = new URLSearchParams(window.location.search);
-    var product = window.CAS_FIND_PRODUCT(params.get('slug')); if (!product) { host.textContent='Không tìm thấy sản phẩm.'; return; }
+    var product = window.CAS_FIND_PRODUCT(params.get('slug')); if (!product) { host.innerHTML='<section class="customer-empty"><h1>Không tìm thấy mẫu hoa</h1><p>Mẫu hoa đã ngừng bán hoặc đường dẫn không tồn tại.</p><a class="btn-cas-primary" href="san-pham.php">Xem các mẫu khác</a></section>'; document.querySelector('.related-section').hidden=true; return; }
     document.title = product.name + ' | CÁ\'S HOA';
-    host.innerHTML = '<div class="breadcrumb-cas"><a href="index.php">Trang chủ</a> / <a href="san-pham.php">Sản phẩm</a> / <span>' + product.name + '</span></div>' +
-      '<div class="row g-4 g-lg-5 align-items-start"><div class="col-lg-6"><div class="detail-image-main"><img src="' + product.image + '" alt="' + product.name + '"></div></div>' +
-      '<div class="col-lg-6"><section class="detail-panel"><p class="cas-eyebrow">' + (product.today ? 'Mẫu hôm nay' : 'Đặt trước') + '</p><h1 class="cas-title" style="font-size:clamp(2rem,4vw,3.2rem)">' + product.name + '</h1><div class="detail-price">' + window.CAS_FORMAT_VND(product.price) + '</div><p class="detail-description">' + product.description + '</p>' +
-      '<div class="detail-divider"></div><div class="detail-feature"><i class="bi bi-envelope-paper-heart"></i><div><strong>Kèm thiệp và túi</strong><div class="cas-muted small mt-1">Mỗi đơn hoa đều có sẵn thiệp và túi phù hợp.</div></div></div><div class="detail-feature"><i class="bi bi-flower2"></i><div><strong>Hoa tươi theo mùa</strong><div class="cas-muted small mt-1">' + product.composition + '</div></div></div><div class="detail-divider"></div>' +
+    host.innerHTML = '<div class="breadcrumb-cas"><a href="index.php">Trang chủ</a> / <a href="san-pham.php">Sản phẩm</a> / <span>' + escapeHtml(product.name) + '</span></div>' +
+      '<div class="row g-4 g-lg-5 align-items-start"><div class="col-lg-6"><div class="detail-image-main"><img src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.name) + '"></div></div>' +
+      '<div class="col-lg-6"><section class="detail-panel"><p class="cas-eyebrow">' + (product.today ? 'Mẫu hôm nay' : 'Đặt trước') + '</p><h1 class="cas-title" style="font-size:clamp(2rem,4vw,3.2rem)">' + escapeHtml(product.name) + '</h1><div class="detail-price">' + window.CAS_FORMAT_VND(product.price) + '</div><p class="detail-description">' + escapeHtml(product.description) + '</p>' +
+      '<div class="detail-divider"></div><div class="detail-feature"><i class="bi bi-envelope-paper-heart"></i><div><strong>Kèm thiệp và túi</strong><div class="cas-muted small mt-1">Mỗi đơn hoa đều có sẵn thiệp và túi phù hợp.</div></div></div><div class="detail-feature"><i class="bi bi-flower2"></i><div><strong>Hoa tươi theo mùa</strong><div class="cas-muted small mt-1">' + escapeHtml(product.composition) + '</div></div></div><div class="detail-divider"></div>' +
+      ((product.wrappings||[]).length ? '<label class="form-label" for="detailWrapping">Màu giấy gói</label><select id="detailWrapping" class="form-select cas-form-select mb-3">'+product.wrappings.map(function(w){return '<option value="'+w.id+'">'+escapeHtml(w.name)+'</option>';}).join('')+'</select><p class="cas-muted small">Giấy gói đã bao gồm trong giá. Một màu áp dụng cho toàn bộ số lượng của mẫu hoa này.</p>' : '') +
       '<div class="d-flex flex-wrap align-items-center gap-3"><div class="quantity-picker"><button type="button" id="qtyMinus" aria-label="Giảm số lượng"><i class="bi bi-dash"></i></button><input id="detailQty" value="1" inputmode="numeric" aria-label="Số lượng"><button type="button" id="qtyPlus" aria-label="Tăng số lượng"><i class="bi bi-plus"></i></button></div><button class="btn-cas-primary flex-grow-1" id="detailAdd"><i class="bi bi-bag-plus"></i> Thêm vào giỏ hàng</button></div>' +
       '<a class="btn-cas-outline w-100 mt-3" href="gio-hang.php">Xem giỏ hàng</a></section></div></div>';
 
     var qtyInput = document.getElementById('detailQty');
-    function normalizeQty() { qtyInput.value = String(Math.max(1, Math.min(20, Number(qtyInput.value) || 1))); }
+    function normalizeQty() { qtyInput.value = String(Math.max(1, Math.min(20, Math.trunc(Number(qtyInput.value)) || 1))); }
     document.getElementById('qtyMinus').addEventListener('click', function () { qtyInput.value = String((Number(qtyInput.value) || 1) - 1); normalizeQty(); });
     document.getElementById('qtyPlus').addEventListener('click', function () { qtyInput.value = String((Number(qtyInput.value) || 1) + 1); normalizeQty(); });
     qtyInput.addEventListener('change', normalizeQty);
     document.getElementById('detailAdd').addEventListener('click', function () {
       normalizeQty();
-      window.CASCart.add(product.id, Number(qtyInput.value));
-      updateCartCount();
-      showToast('Đã thêm “' + product.name + '” vào giỏ hàng.');
+      cartAction(this, function(){return window.CASCart.add(product.id,Number(qtyInput.value),document.getElementById('detailWrapping')?.value);}, 'Đã thêm “'+product.name+'” vào giỏ hàng.');
     });
 
     var related = document.getElementById('relatedGrid');
@@ -250,9 +164,11 @@
     function render() {
       var lines = window.CASCart.detailed();
       list.innerHTML = lines.map(function (line) {
-        return '<article class="cart-line"><a class="cart-line-image" href="chi-tiet-san-pham.php?slug=' + line.product.slug + '"><img src="' + line.product.image + '" alt="' + line.product.name + '"></a><div><a href="chi-tiet-san-pham.php?slug=' + line.product.slug + '" class="cart-line-name">' + line.product.name + '</a><div class="cart-line-price">' + window.CAS_FORMAT_VND(line.product.price) + '</div><div class="cas-muted small mt-2">' + line.product.categories.join(' · ') + '</div></div><div class="cart-line-actions text-lg-end"><div class="quantity-picker"><button type="button" data-cart-minus="' + line.product.id + '" aria-label="Giảm số lượng"><i class="bi bi-dash"></i></button><input value="' + line.quantity + '" readonly aria-label="Số lượng"><button type="button" data-cart-plus="' + line.product.id + '" aria-label="Tăng số lượng"><i class="bi bi-plus"></i></button></div><div class="mt-2 fw-bold">' + window.CAS_FORMAT_VND(line.lineTotal) + '</div><button class="cart-remove mt-2" type="button" data-cart-remove="' + line.product.id + '">Xóa</button></div></article>';
+        return '<article class="cart-line"><a class="cart-line-image" href="chi-tiet-san-pham.php?slug=' + encodeURIComponent(line.product.slug) + '"><img src="' + escapeHtml(line.product.image) + '" alt="' + escapeHtml(line.product.name) + '"></a><div><a href="chi-tiet-san-pham.php?slug=' + encodeURIComponent(line.product.slug) + '" class="cart-line-name">' + escapeHtml(line.product.name) + '</a><div class="cart-line-price">' + window.CAS_FORMAT_VND(line.product.price) + '</div><div class="cas-muted small mt-2">' + escapeHtml(line.product.categories.join(' · ')) + '</div>'+(line.wrappingName?'<div class="cas-muted small mt-1">Giấy gói: '+escapeHtml(line.wrappingName)+'</div>':'')+'</div><div class="cart-line-actions text-lg-end"><div class="quantity-picker"><button type="button" data-cart-minus="' + escapeHtml(line.product.id) + '" aria-label="Giảm số lượng"><i class="bi bi-dash"></i></button><input value="' + line.quantity + '" readonly aria-label="Số lượng"><button type="button" data-cart-plus="' + escapeHtml(line.product.id) + '" aria-label="Tăng số lượng"><i class="bi bi-plus"></i></button></div><div class="mt-2 fw-bold">' + window.CAS_FORMAT_VND(line.lineTotal) + '</div><button class="cart-remove mt-2" type="button" data-cart-remove="' + escapeHtml(line.product.id) + '">Xóa</button></div></article>';
       }).join('');
-      empty.classList.toggle('d-none', lines.length > 0);
+      var unavailable=window.CASCart.unavailable();
+      if(unavailable.length){var row=document.createElement('div');row.className='auth-message error';row.textContent=unavailable.length+' mẫu hoa trong giỏ đã ngừng bán. ';var button=document.createElement('button');button.type='button';button.className='btn-cas-outline';button.textContent='Xóa các mẫu ngừng bán';button.onclick=function(){cartAction(button,function(){return window.CASCart.removeUnavailable();});};row.append(button);list.append(row);}
+      empty.classList.toggle('d-none', lines.length > 0 || unavailable.length>0);
       summary.classList.toggle('d-none', lines.length === 0);
       var subtotal = window.CASCart.subtotal();
       document.querySelectorAll('[data-cart-subtotal]').forEach(function (node) { node.textContent = window.CAS_FORMAT_VND(subtotal); });
@@ -263,22 +179,21 @@
         button.addEventListener('click', function () {
           var line = window.CASCart.read().find(function (item) { return item.productId === button.dataset.cartMinus; });
           if (!line) return;
-          if (line.quantity <= 1) window.CASCart.remove(line.productId); else window.CASCart.update(line.productId, line.quantity - 1);
-          render();
+          cartAction(button,function(){return window.CASCart.adjust(line.productId,-1);});
         });
       });
       list.querySelectorAll('[data-cart-plus]').forEach(function (button) {
         button.addEventListener('click', function () {
           var line = window.CASCart.read().find(function (item) { return item.productId === button.dataset.cartPlus; });
           if (!line) return;
-          window.CASCart.update(line.productId, line.quantity + 1);
-          render();
+          cartAction(button,function(){return window.CASCart.adjust(line.productId,1);});
         });
       });
       list.querySelectorAll('[data-cart-remove]').forEach(function (button) {
-        button.addEventListener('click', function () { window.CASCart.remove(button.dataset.cartRemove); render(); showToast('Đã xóa sản phẩm khỏi giỏ hàng.'); });
+        button.addEventListener('click', function () { cartAction(button,function(){return window.CASCart.remove(button.dataset.cartRemove);},'Đã xóa sản phẩm khỏi giỏ hàng.'); });
       });
     }
+    window.addEventListener('cas-cart-updated',render);
     render();
   }
 
@@ -287,6 +202,7 @@
     var form = document.getElementById('checkoutForm');
     if (!summaryList || !form) return;
     var lines = window.CASCart.detailed();
+    if(window.CASCart.unavailable().length){form.innerHTML='<div class="auth-message error">Có mẫu hoa không còn bán. <a href="gio-hang.php">Cập nhật giỏ hàng</a> trước khi đặt.</div>';return;}
     var emptyNotice = document.getElementById('checkoutEmpty');
     var submitButton = document.getElementById('checkoutSubmit');
     if (!lines.length) {
@@ -296,7 +212,7 @@
       return;
     }
     summaryList.innerHTML = lines.map(function (line) {
-      return '<div class="checkout-mini-line"><img src="' + line.product.image + '" alt="' + line.product.name + '"><div><strong>' + line.product.name + '</strong><small>Số lượng: ' + line.quantity + '</small></div><span class="small fw-bold">' + window.CAS_FORMAT_VND(line.lineTotal) + '</span></div>';
+      return '<div class="checkout-mini-line"><img src="' + escapeHtml(line.product.image) + '" alt="' + escapeHtml(line.product.name) + '"><div><strong>' + escapeHtml(line.product.name) + '</strong><small>Số lượng: ' + line.quantity + '</small>'+(line.wrappingName?'<small>Giấy gói: '+escapeHtml(line.wrappingName)+'</small>':'')+'</div><span class="small fw-bold">' + window.CAS_FORMAT_VND(line.lineTotal) + '</span></div>';
     }).join('');
     document.querySelectorAll('[data-checkout-subtotal], [data-checkout-total]').forEach(function (node) { node.textContent = window.CAS_FORMAT_VND(window.CASCart.subtotal()); });
 
@@ -308,19 +224,16 @@
     document.querySelectorAll('[name="fulfillment"]').forEach(function (radio) { radio.addEventListener('change', toggleAddress); });
     toggleAddress();
 
-    var dateInput = document.getElementById('receiveDate');
-    if (dateInput) {
-      var tomorrow = new Date(Date.now() + 86400000);
-      var year = tomorrow.getFullYear();
-      var month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-      var day = String(tomorrow.getDate()).padStart(2, '0');
-      dateInput.min = year + '-' + month + '-' + day;
-    }
-
+    var dateInput=document.getElementById('receiveDate'),slot=document.getElementById('receiveTime');
+    function checkDate(){var invalid=!dateInput.value || dateInput.value<dateInput.min;slot.disabled=invalid;if(invalid)slot.value='';}
+    dateInput.addEventListener('change',checkDate);checkDate();
+    var message=document.getElementById('checkoutMessage');
     form.addEventListener('submit', async function (event) {
       event.preventDefault();
-      if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
+      if(submitButton.disabled)return;
+      if (!form.checkValidity()) { form.classList.add('was-validated'); form.reportValidity(); return; }
       submitButton.disabled = true;
+      submitButton.setAttribute('aria-busy','true');
       var text = submitButton.innerHTML; submitButton.textContent = 'Đang lưu đơn...';
       try {
         var data = new FormData(form); data.set('csrf',window.CAS_CSRF||'');
@@ -329,8 +242,8 @@
         var response = await fetch('actions/checkout.php',{method:'POST',body:data,credentials:'same-origin'});
         var result=await response.json();
         if(!response.ok||!result.ok) throw new Error(result.message||'Không thể tạo đơn');
-        window.CASCart.clear(); location.href='dat-hang-thanh-cong.php?code='+encodeURIComponent(result.orderCode);
-      } catch(e) { showToast(e.message||'Lỗi kết nối');submitButton.disabled=false;submitButton.innerHTML=text; }
+        location.href='dat-hang-thanh-cong.php?code='+encodeURIComponent(result.orderCode);
+      } catch(e) { message.textContent=e.message||'Mất kết nối. Hãy thử lại; đơn đã nhận sẽ không tạo lần hai.';message.className='auth-message error checkout-message';message.focus();submitButton.disabled=false;submitButton.removeAttribute('aria-busy');submitButton.innerHTML=text; }
     });
   }
 
@@ -344,8 +257,14 @@
     renderLayout();
     initDemoLinks();
     var page = document.body.dataset.page;
+    if((window.CAS_PRODUCTS_ERROR || !Array.isArray(window.CAS_PRODUCTS)) && ['home','catalog','detail','cart','checkout'].includes(page)){
+      var host=document.querySelector('main'),error=document.createElement('section');
+      error.className='customer-empty cas-container';error.setAttribute('role','alert');
+      error.innerHTML='<h1>Chưa tải được danh sách hoa</h1><p>Kết nối tạm thời gián đoạn. Giỏ hàng của bạn vẫn được giữ.</p><button type="button" class="btn-cas-primary">Tải lại</button>';
+      error.querySelector('button').onclick=function(){location.reload();};host.replaceChildren(error);return;
+    }
     if (page === 'home') initHome();
-    if (page === 'catalog') initCatalog();
+    if (page === 'catalog' && window.casInitCatalog) window.casInitCatalog(productCard, bindAddButtons);
     if (page === 'detail') initDetail();
     if (page === 'cart') initCart();
     if (page === 'checkout') initCheckout();

@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__.'/includes/auth.php';
+require_once __DIR__.'/includes/customer.php';
 if(cas_user() && cas_user()['role']==='customer')cas_redirect('tai-khoan.php');
 $error='';
-$next=(string)($_GET['next']??'tai-khoan.php');
+$next=is_string($_GET['next']??null)?$_GET['next']:'tai-khoan.php';
 if(!in_array($next,['tai-khoan.php','lich-su-don-hang.php','thanh-toan.php'],true))$next='tai-khoan.php';
 if(cas_post()){
  try{
@@ -11,9 +11,9 @@ if(cas_post()){
    $attempts=array_values(array_filter($attempts,static fn($t)=>$t>time()-600));
    if(count($attempts)>=10)throw new RuntimeException('Đăng nhập quá nhiều lần. Hãy thử lại sau 10 phút.');
    $attempts[]=time();$_SESSION['cas_login_attempts']=$attempts;
-   if(!cas_login(trim((string)($_POST['identifier']??'')),(string)($_POST['password']??'')))throw new RuntimeException('Email, số điện thoại hoặc mật khẩu chưa đúng.');
+   if(!cas_login(cas_customer_text($_POST,'identifier',255),(string)($_POST['password']??'')))throw new RuntimeException('Email, số điện thoại hoặc mật khẩu chưa đúng.');
    unset($_SESSION['cas_login_attempts']);cas_redirect($next);
- }catch(Throwable $e){$error=$e->getMessage();}
+ }catch(Throwable $e){$error=cas_customer_error($e);}
 }
 ?>
 <!doctype html>
@@ -23,10 +23,11 @@ if(cas_post()){
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Đăng nhập tài khoản khách hàng CÁ'S HOA.">
   <title>Đăng nhập | CÁ'S HOA</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
 </head>
 <body data-page="login" class="auth-page">
   <main class="auth-main">
@@ -59,5 +60,6 @@ if(cas_post()){
     </div></div>
   </main>
   
+  <script src="assets/js/customer-forms.js" defer></script>
 </body>
 </html>
