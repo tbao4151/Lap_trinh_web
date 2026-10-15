@@ -49,7 +49,7 @@ function cas_order_transitions(): array {
     'pending_confirmation'=>['confirmed','cancelled'],
     'confirmed'=>['preparing','cancelled'],
     'preparing'=>['ready','cancelled'],
-    'ready'=>['delivering','completed'],
+    'ready'=>['delivering','completed','cancelled'],
     'delivering'=>['completed','ready'],
     'completed'=>[],
     'cancelled'=>[]
@@ -99,7 +99,7 @@ if(cas_post()){
         }
         if($status!==$from && in_array($status,['cancelled','ready'],true) && $from==='delivering' && mb_strlen($reason)<3)
           throw new DomainException('Quay lại trạng thái trước cần ghi lý do tối thiểu 3 ký tự.');
-        if($status==='cancelled'&&$from==='preparing'&&mb_strlen($reason)<3)
+        if($status==='cancelled'&&in_array($from,['preparing','ready'],true)&&mb_strlen($reason)<3)
           throw new DomainException('Hủy đơn đang chuẩn bị cần ghi lý do tối thiểu 3 ký tự.');
         if($payment!==$oldPayment){
           if(!in_array($user['role'],['admin','owner'],true))
