@@ -30,8 +30,8 @@ RESULTS = []
 
 ROUTES = ['dang-nhap', 'index', 'don-hang', 'giao-hang', 'khach-hang', 'san-pham', 'them-san-pham', 'sua-san-pham?id=1',
           'quan-ly-nhanh', 'phan-loai-bo-loc', 'kho-tong', 'bao-cao',
-          'hoan-tien', 'giay-goi', 'kham-pha', 'kho-hoa', 'kho-phu-kien', 'lich-su-kho', 'nhan-vien', 'cai-dat', 'tai-khoan', 'chu-so-huu']
-STAFF_FORBIDDEN = {'them-san-pham', 'sua-san-pham?id=1', 'nhan-vien', 'cai-dat', 'chu-so-huu'}
+          'hoan-tien', 'giay-goi', 'kham-pha', 'cong-thuc-hoa', 'kho-hoa', 'kho-phu-kien', 'lich-su-kho', 'nhan-vien', 'cai-dat', 'tai-khoan', 'chu-so-huu']
+STAFF_FORBIDDEN = {'cong-thuc-hoa', 'them-san-pham', 'sua-san-pham?id=1', 'nhan-vien', 'cai-dat', 'chu-so-huu'}
 ADMIN_FORBIDDEN = {'chu-so-huu'}
 
 
@@ -327,17 +327,38 @@ def test_inventory(admin, staff):
 
 
 def test_delivery(admin, staff, order_id):
+    # Cross-module: configure recipe, reserve actual stock only on preparing,
+    # let delivery move the order ready -> delivering -> completed.
+    item = sql_int(f"SELECT item_id FROM inventory_items WHERE name={q('Hoa thử ' + RUN)}")
+    product_id = 2  # make_paid_order builds an order for p002
+    status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'preparing', 'payment_status': 'paid'})
+    check('Thiếu công thức: chặn chuẩn bị và giữ trạng thái/stock', status == 422 and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}') == 'confirmed'
+          and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}') == 8, status)
+    status, _, _ = admin.post('admin/cong-thuc-hoa.php?product_id=2',
+        {'action':'recipe_save','product_id':product_id,'item_id':item,'quantity':'2'})
+    check('Admin cấu hình định mức 2 cành cho p002 -> 303',status==303
+          and sql_int(f'SELECT quantity FROM product_recipes WHERE product_id=2 AND item_id={item}')==2,status)
+    status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'preparing', 'payment_status': 'paid'})
+    check('Chuyển preparing tự trừ 2 cành, có snapshot',status==303 and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='preparing'
+          and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==6
+          and sql_int(f'SELECT quantity FROM order_inventory_usage WHERE order_id={order_id} AND item_id={item}')==2,status)
+    status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'preparing', 'payment_status': 'paid'})
+    check('Gửi lại preparing không trừ tồn lần hai',status==303 and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==6,status)
+    status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'ready', 'payment_status': 'paid'})
+    check('Đơn hoàn tất chuẩn bị -> ready',status==303 and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='ready',status)
     did = sql_int(f'SELECT delivery_id FROM deliveries WHERE order_id={order_id}')
     status, _, _ = staff.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'delivered'})
     check('Nhảy cóc Chưa giao -> Đã giao bị chặn 422', status == 422 and sql(f'SELECT delivery_status FROM deliveries WHERE delivery_id={did}') == 'not_delivered', status)
     status, _, _ = staff.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'out_for_delivery'})
-    check('Nhân viên chuyển sang Đang giao -> 303', status == 303, status)
+    check('Giao hàng đồng bộ đơn -> delivering',status==303 and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='delivering',status)
     status, _, _ = staff.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'not_delivered'})
     check('Giao thất bại không ghi lý do -> 422', status == 422, status)
     staff.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'not_delivered', 'note': 'Khách vắng nhà'})
+    check('Giao thất bại trở lại ready', sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='ready')
     staff.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'out_for_delivery'})
     status, _, _ = staff.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'delivered'})
-    check('Đang giao -> Đã giao -> 303', status == 303 and sql(f'SELECT delivery_status FROM deliveries WHERE delivery_id={did}') == 'delivered', status)
+    check('Đã giao đồng bộ hoàn tất đơn', status == 303 and sql(f'SELECT delivery_status FROM deliveries WHERE delivery_id={did}') == 'delivered'
+          and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='completed', status)
     status, _, _ = admin.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'not_delivered', 'note': 'Thử quay lại'})
     check('Đã giao là trạng thái cuối -> 422', status == 422, status)
     check('delivery_events lưu đủ 4 bước có người thực hiện', sql_int(f'SELECT COUNT(*) FROM delivery_events WHERE delivery_id={did} AND actor_id IS NOT NULL') == 4)
@@ -345,6 +366,31 @@ def test_delivery(admin, staff, order_id):
     _, html, _ = admin.get(f'admin/giao-hang.php?date={day}')
     code = sql(f'SELECT order_code FROM orders WHERE order_id={order_id}')
     check('Lịch giao theo ngày (SQL) hiển thị đơn', code in html)
+
+
+def test_inventory_cancellation(admin, order_id_for_reference):
+    # Independent order, with recipe already created during test_delivery.
+    code, order_id = make_paid_order(admin)
+    item = sql_int(f"SELECT item_id FROM inventory_items WHERE name={q('Hoa thử ' + RUN)}")
+    before = sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')
+    status, _, _ = admin.post('admin/cong-thuc-hoa.php?product_id=2',
+        {'action':'recipe_save','product_id':2,'item_id':item,'quantity':'1000'})
+    check('Có thể quản lý định mức từ Admin',status==303,status)
+    status, _, _ = admin.post('admin/don-hang.php', {'action':'order_update','id':order_id,'status':'preparing','payment_status':'paid'})
+    check('Thiếu tồn: rollback trạng thái đơn và số tồn kho',status==422 and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='confirmed'
+          and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==before,status)
+    admin.post('admin/cong-thuc-hoa.php?product_id=2',
+        {'action':'recipe_save','product_id':2,'item_id':item,'quantity':'2'})
+    status, _, _ = admin.post('admin/don-hang.php', {'action':'order_update','id':order_id,'status':'preparing','payment_status':'paid'})
+    check('Đủ tồn: trừ kho chính xác theo định mức',status==303 and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==before-2,status)
+    admin.post('admin/cong-thuc-hoa.php?product_id=2',
+        {'action':'recipe_save','product_id':2,'item_id':item,'quantity':'3'})
+    status, _, _ = admin.post('admin/don-hang.php', {'action':'order_update','id':order_id,'status':'cancelled','payment_status':'paid','reason':'Khách hủy đơn trước khi làm hoa'})
+    check('Hủy đơn hoàn lại 2 theo snapshot, không hoàn 3 theo công thức mới',status==303 and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==before
+          and sql_int(f"SELECT COUNT(*) FROM order_inventory_usage WHERE order_id={order_id} AND restored_at IS NOT NULL")==1,status)
+    status, _, _ = admin.post('admin/don-hang.php', {'action':'order_update','id':order_id,'status':'cancelled','payment_status':'paid'})
+    check('Gửi lại trạng thái huỷ không hoàn kho lần hai',status==303 and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==before,status)
+    return code, order_id
 
 
 def test_refunds(admin, staff, order_code, order_id):
@@ -371,7 +417,15 @@ def test_refunds(admin, staff, order_code, order_id):
     check('Ghi nhận đã hoàn thiếu mã giao dịch -> 422', status == 422, status)
     status, _, _ = admin.post('admin/hoan-tien.php', {'action': 'refund_transition', 'id': rid, 'status': 'recorded', 'reference': 'FT' + RUN})
     check('Ghi nhận đã hoàn có mã giao dịch -> 303', status == 303 and sql(f'SELECT reference FROM refunds WHERE refund_id={rid}') == 'FT' + RUN, status)
-    check('Hoàn tiền KHÔNG tự đổi orders.payment_status (contract của lead)', sql(f'SELECT payment_status FROM orders WHERE order_id={order_id}') == 'paid')
+    check('Hoàn tiền đồng bộ trạng thái thanh toán một phần', sql(f'SELECT payment_status FROM orders WHERE order_id={order_id}') == 'partially_refunded')
+    token2=secrets.token_hex(16)
+    status, _, _ = staff.post('admin/hoan-tien.php',{'action':'refund_create','order_code':order_code,
+        'amount':total-50000,'reason':'Hoàn phần tiền còn lại','request_token':token2})
+    second=sql_int(f'SELECT refund_id FROM refunds WHERE request_token={q(token2)}')
+    check('Đơn hoàn một phần tiếp tục được hoàn phần còn lại',status==303 and second>rid,status)
+    admin.post('admin/hoan-tien.php',{'action':'refund_transition','id':second,'status':'approved','note':'Duyệt'})
+    status, _, _ = admin.post('admin/hoan-tien.php',{'action':'refund_transition','id':second,'status':'recorded','reference':'FULL'+RUN})
+    check('Ghi nhận hoàn đủ: orders.payment_status=refunded',status==303 and sql(f'SELECT payment_status FROM orders WHERE order_id={order_id}')=='refunded',status)
     check('refund_events có đủ 3 bước', sql_int(f'SELECT COUNT(*) FROM refund_events WHERE refund_id={rid}') == 3)
 
 
@@ -467,6 +521,14 @@ def test_people(admin, staff, owner):
     new_id = sql_int(f'SELECT user_id FROM users WHERE email={q(new_email)}')
     check('Admin tạo nhân viên -> 303, mật khẩu lưu dạng băm', status == 303 and new_id > 0 and sql(f'SELECT password_hash FROM users WHERE user_id={new_id}').startswith('$2y$'), status)
     newbie = login_admin(new_email, new_pass)
+    new_secret = strong_password()
+    version_before=sql_int(f'SELECT session_version FROM users WHERE user_id={new_id}')
+    status, _, _ = admin.post('admin/nhan-vien.php',{'action':'staff_reset_password','id':new_id,
+        'new_password':new_secret,'new_password_confirm':new_secret,'confirm_password':os.environ['CAS_ADMIN_PASSWORD']})
+    check('Admin reset mật khẩu tăng session_version',status==303 and sql_int(f'SELECT session_version FROM users WHERE user_id={new_id}')==version_before+1,status)
+    status, _, loc = newbie.get('admin/index.php')
+    check('Phiên cũ bị thu hồi sau reset mật khẩu',status==303 and 'dang-nhap.php' in loc,f'{status} {loc}')
+    newbie=login_admin(new_email,new_secret)
     status, _, _ = admin.post('admin/nhan-vien.php', {'action': 'staff_status', 'id': new_id, 'status': 'locked'})
     check('Admin khoá nhân viên -> 303', status == 303, status)
     status, _, loc = newbie.get('admin/index.php')
@@ -533,7 +595,7 @@ def main():
     sessions.update(staff=staff, admin=admin, owner=owner)
 
     groups = [
-        ('Ma trận quyền 22 route x 5 vai trò', lambda: test_role_matrix(sessions)),
+        ('Ma trận quyền 23 route x 5 vai trò', lambda: test_role_matrix(sessions)),
         ('Chặn POST trái phép / thiếu CSRF', lambda: test_post_guards(sessions, staff)),
         ('ADM-02 Sản phẩm, ảnh, giá nhanh', lambda: test_products(admin, staff)),
         ('ADM-02 Phân loại', lambda: test_taxonomy(admin, staff)),
@@ -544,6 +606,7 @@ def main():
         fn()
     order_code, order_id = make_paid_order(admin)
     for title, fn in [('ADM-04 Giao hàng', lambda: test_delivery(admin, staff, order_id)),
+                      ('Định mức, thiếu tồn, hủy/hoàn kho', lambda: test_inventory_cancellation(admin, order_id)),
                       ('ADM-04 Hoàn tiền', lambda: test_refunds(admin, staff, order_code, order_id)),
                       ('ADM-05 Giấy gói', lambda: test_wrapping(admin, staff)),
                       ('ADM-05 Khám phá', lambda: test_discovery(admin, staff)),

@@ -84,7 +84,7 @@ $rows=cas_admin_rows($db,$sql,$args);
 <td><?= cas_e($o['recipient_name']) ?><div><?= cas_e($o['receive_date']) ?> · <?= cas_e($o['receive_time']) ?></div></td>
 <td><?= cas_money($o['total_amount']) ?></td>
 <td><form method="post" class="cas-admin-table-form"><?= cas_csrf_form() ?><input type="hidden" name="action" value="order_update"><input type="hidden" name="id" value="<?= (int)$o['order_id'] ?>">
-<?= cas_admin_select('status',cas_order_choices($o['order_status']),$o['order_status']) ?>
+<?= cas_admin_select('status',cas_order_choices($o['order_status'],$o['delivery_method']),$o['order_status']) ?>
 <?php if(in_array($user['role'],['admin','owner'],true)): ?>
 <?= cas_admin_select('payment_status',$payments,$o['payment_status']) ?>
 <?php else: ?><input type="hidden" name="payment_status" value="<?= cas_e($o['payment_status']) ?>"><span class="cas-muted small"><?= cas_e($payments[$o['payment_status']]??$o['payment_status']) ?></span><?php endif; ?>
@@ -208,7 +208,12 @@ foreach($items as $i){$qty+=(float)$i['quantity'];if((float)$i['quantity']<=(flo
 case 'reports':
 $start=(string)($_GET['start']??date('Y-m-01'));$end=(string)($_GET['end']??date('Y-m-d'));
 if(!preg_match('/^\d{4}-\d\d-\d\d$/',$start)||!preg_match('/^\d{4}-\d\d-\d\d$/',$end)||$end<$start){$start=date('Y-m-01');$end=date('Y-m-d');}
-$q=$db->prepare("SELECT DATE(created_at) day,COUNT(*) order_count, SUM(total_amount) gross_sales, SUM(CASE WHEN order_status='completed' AND payment_status='paid' THEN total_amount ELSE 0 END) confirmed_revenue FROM orders WHERE DATE(created_at) BETWEEN ? AND ? GROUP BY DATE(created_at) ORDER BY day DESC");
+$q=$db->prepare("SELECT DATE(o.created_at) day,COUNT(*) order_count, SUM(o.total_amount) gross_sales,
+    SUM(CASE WHEN o.order_status='completed' AND o.payment_status IN ('paid','partially_refunded','refunded')
+      THEN GREATEST(0,o.total_amount-COALESCE(r.amount,0)) ELSE 0 END) confirmed_revenue
+    FROM orders o LEFT JOIN (SELECT order_id,SUM(amount) amount FROM refunds WHERE status='recorded' GROUP BY order_id) r
+      ON r.order_id=o.order_id
+    WHERE DATE(o.created_at) BETWEEN ? AND ? GROUP BY DATE(o.created_at) ORDER BY day DESC");
 $q->execute([$start,$end]);$rows=$q->fetchAll();
 $totals=['orders'=>0,'gross'=>0,'revenue'=>0];
 foreach($rows as $r){$totals['orders']+=(int)$r['order_count'];$totals['gross']+=(float)$r['gross_sales'];$totals['revenue']+=(float)$r['confirmed_revenue'];}

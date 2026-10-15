@@ -2,7 +2,7 @@
 declare(strict_types=1);
 /**
  * ADM-04 — Hoàn tiền: yêu cầu → duyệt / từ chối → ghi nhận đã hoàn thủ công, có lịch sử từng bước.
- * Hệ thống KHÔNG chuyển tiền và KHÔNG tự đổi orders.payment_status (thuộc contract thanh toán của trưởng nhóm).
+ * Không chuyển tiền thật. Khi admin ghi nhận chứng từ hoàn tiền, trạng thái thanh toán cập nhật trong cùng transaction.
  */
 
 const CAS_REFUND_LABELS = ['requested' => 'Chờ duyệt', 'approved' => 'Đã duyệt – chờ hoàn', 'recorded' => 'Đã ghi nhận hoàn', 'rejected' => 'Từ chối'];
@@ -12,7 +12,7 @@ const CAS_REFUND_OPEN = ['requested', 'approved', 'recorded'];
 /** Số tiền tối đa còn có thể hoàn của một đơn (chỉ đơn đã thanh toán đủ). */
 function cas_refund_remaining(array $order): int
 {
-    if ($order['payment_status'] !== 'paid') {
+    if (!in_array($order['payment_status'], ['paid','partially_refunded'], true)) {
         return 0;
     }
     $used = (float)cas_value('SELECT COALESCE(SUM(amount),0) FROM refunds WHERE order_id=? AND status IN (\'requested\',\'approved\',\'recorded\')', [$order['order_id']]);
@@ -34,7 +34,7 @@ function cas_refund_create(PDO $db, array $user): string
         $db->rollBack();
         throw new DomainException('Không tìm thấy đơn ' . $code . '.');
     }
-    if ($order['payment_status'] !== 'paid') {
+    if (!in_array($order['payment_status'], ['paid','partially_refunded'], true)) {
         $db->rollBack();
         throw new DomainException('Đơn ' . $code . ' chưa ghi nhận thanh toán đủ (' . $order['payment_status'] . '), chưa thể tạo yêu cầu hoàn tiền.');
     }
@@ -70,7 +70,13 @@ function cas_refund_transition(PDO $db, array $user): string
         throw new DomainException('Ghi chú tối đa 255 ký tự.');
     }
     $db->beginTransaction();
-    $q = $db->prepare('SELECT r.*, o.order_code FROM refunds r JOIN orders o ON o.order_id=r.order_id WHERE r.refund_id=? FOR UPDATE');
+    // Serialize all refunds of an order by locking orders before any refund row.
+    $key=$db->prepare('SELECT order_id FROM refunds WHERE refund_id=?');
+    $key->execute([$id]);$orderId=(int)$key->fetchColumn();
+    if(!$orderId){$db->rollBack();throw new DomainException('Không tìm thấy yêu cầu hoàn tiền.');}
+    $orderLock=$db->prepare('SELECT order_id FROM orders WHERE order_id=? FOR UPDATE');
+    $orderLock->execute([$orderId]);
+    $q = $db->prepare('SELECT r.*, o.order_code, o.total_amount, o.payment_status FROM refunds r JOIN orders o ON o.order_id=r.order_id WHERE r.refund_id=? FOR UPDATE');
     $q->execute([$id]);
     $r = $q->fetch();
     if (!$r) {
@@ -93,6 +99,14 @@ function cas_refund_transition(PDO $db, array $user): string
        ->execute([$to, $user['user_id'], $reference, $id]);
     $db->prepare('INSERT INTO refund_events(refund_id,from_status,to_status,actor_id,note) VALUES(?,?,?,?,?)')
        ->execute([$id, $r['status'], $to, $user['user_id'], trim($note . ($reference ? ' | Mã GD: ' . $reference : '')) ?: null]);
+    if($to==='recorded'){
+        $q=$db->prepare("SELECT COALESCE(SUM(amount),0) FROM refunds WHERE order_id=? AND status='recorded'");
+        $q->execute([$orderId]);$refunded=(int)round((float)$q->fetchColumn());
+        $total=(int)round((float)$r['total_amount']);
+        if($refunded>$total)throw new DomainException('Tổng hoàn tiền vượt số tiền đơn.');
+        $payment=$refunded===$total?'refunded':'partially_refunded';
+        $db->prepare('UPDATE orders SET payment_status=? WHERE order_id=?')->execute([$payment,$orderId]);
+    }
     $db->commit();
     cas_audit('refund_' . $to, 'refund', $id, ['order' => $r['order_code'], 'amount' => (float)$r['amount'], 'from' => $r['status'], 'reference' => $reference]);
     return 'RF-' . str_pad((string)$id, 4, '0', STR_PAD_LEFT) . ': ' . CAS_REFUND_LABELS[$r['status']] . ' → ' . CAS_REFUND_LABELS[$to] . '.';
@@ -116,7 +130,7 @@ function cas_refunds_page(): void
     foreach (cas_rows('SELECT e.*, u.full_name actor FROM refund_events e LEFT JOIN users u ON u.user_id=e.actor_id ORDER BY e.event_id') as $e) {
         $events[(int)$e['refund_id']][] = $e;
     }
-    $paidOrders = cas_rows("SELECT o.order_code, o.total_amount FROM orders o WHERE o.payment_status='paid' ORDER BY o.order_id DESC LIMIT 50");
+    $paidOrders = cas_rows("SELECT o.order_code, o.total_amount FROM orders o WHERE o.payment_status IN ('paid','partially_refunded') ORDER BY o.order_id DESC LIMIT 50");
     $canReview = cas_can($user, 'refund.review');
 
     cas_ops_start('Hoàn tiền', 'Yêu cầu hoàn tiền theo lý do và số tiền, có người duyệt và lịch sử. Hệ thống không tự chuyển tiền.', 'bi-arrow-counterclockwise');
@@ -130,7 +144,7 @@ function cas_refunds_page(): void
 <section class="admin-grid-2 admin-section">
 <article class="admin-card">
   <h2 class="admin-card-title">Tạo yêu cầu hoàn tiền</h2>
-  <p class="admin-card-subtitle">Chỉ đơn đã thanh toán đủ; tổng các yêu cầu không vượt giá trị đơn.</p>
+  <p class="admin-card-subtitle">Đơn đã thu đủ hoặc hoàn một phần; tổng yêu cầu không vượt giá trị đơn.</p>
   <form method="post" class="admin-form-grid mt-3">
     <?= cas_csrf_form() ?><input type="hidden" name="action" value="refund_create"><input type="hidden" name="request_token" value="<?= cas_form_token() ?>">
     <div><label class="admin-label">Mã đơn</label><input class="admin-input" name="order_code" list="paidOrders" required maxlength="40" placeholder="CSH-2026-...">

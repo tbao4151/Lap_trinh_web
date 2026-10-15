@@ -16,16 +16,19 @@ echo "== Migration tăng dần (001, 002, 003 x2)"
 "${MYSQL[@]}" < database/migrations/001_auth.php.sql
 "${MYSQL[@]}" < database/migrations/002_inventory_seed.sql
 "${MYSQL[@]}" < database/migrations/003_admin_ops.sql
+"${MYSQL[@]}" < database/migrations/004_order_inventory_sessions.sql
 COUNTS_SQL="SELECT CONCAT_WS(',',(SELECT COUNT(*) FROM product_images),(SELECT COUNT(*) FROM wrapping_colors),(SELECT COUNT(*) FROM discovery_groups),(SELECT COUNT(*) FROM shop_settings),(SELECT COUNT(*) FROM products),(SELECT COUNT(*) FROM inventory_items))"
 BEFORE="$(db "$COUNTS_SQL")"
 "${MYSQL[@]}" < database/migrations/003_admin_ops.sql
+"${MYSQL[@]}" < database/migrations/004_order_inventory_sessions.sql
 AFTER="$(db "$COUNTS_SQL")"
 [ "$BEFORE" = "$AFTER" ] || { echo "Migration 003 chạy lại làm thay đổi dữ liệu: $BEFORE -> $AFTER"; exit 1; }
-for t in product_images discovery_groups delivery_events refund_events shop_settings admin_audit_log; do
+for t in product_images discovery_groups delivery_events refund_events shop_settings admin_audit_log product_recipes order_inventory_usage; do
   [ "$(db "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='$DB_NAME' AND table_name='$t'")" = "1" ] || { echo "Thiếu bảng $t"; exit 1; }
 done
 [ "$(db "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='$DB_NAME' AND table_name='inventory_transactions' AND column_name IN ('quantity_before','quantity_after','request_token')")" = "3" ] || { echo "Thiếu cột lịch sử kho"; exit 1; }
-echo "Migration 003 idempotent: $AFTER"
+[ "$(db "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='$DB_NAME' AND table_name='users' AND column_name='session_version'")" = "1" ] || { echo 'Missing session_version'; exit 1; }
+echo "Migration 003/004 idempotent: $AFTER"
 
 echo "== Tài khoản kiểm thử qua CLI (mật khẩu ngẫu nhiên)"
 gen_password() { python3 -c 'import secrets;print("Ops_"+secrets.token_hex(6)+"!Z9")'; }
@@ -50,4 +53,4 @@ sleep 2
 export CAS_BASE_URL="http://127.0.0.1:$PORT_HTTP/"
 export CAS_TEST_REPORT="${CAS_TEST_REPORT:-/tmp/cas-admin-ops-report.json}"
 python3 tests/admin/test_admin_ops.py
-echo "PASS: Admin Operations — migration 003, 22 route x 5 vai trò, sản phẩm/ảnh, phân loại, kho, giao hàng, hoàn tiền, giấy gói, khám phá, cài đặt, nhân viên/chủ sở hữu, audit."
+echo "PASS: Admin Operations — migration 003, 23 route x 5 vai trò, sản phẩm/ảnh, phân loại, kho, giao hàng, hoàn tiền, giấy gói, khám phá, cài đặt, nhân viên/chủ sở hữu, audit."

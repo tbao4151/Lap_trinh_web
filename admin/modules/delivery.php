@@ -22,6 +22,11 @@ function cas_delivery_update(PDO $db, array $user): string
         throw new DomainException('Ghi chú giao hàng tối đa 255 ký tự.');
     }
     $db->beginTransaction();
+    $k=$db->prepare('SELECT order_id FROM deliveries WHERE delivery_id=?');
+    $k->execute([$id]);$orderId=(int)$k->fetchColumn();
+    if(!$orderId){$db->rollBack();throw new DomainException('Không tìm thấy lịch giao.');}
+    $ol=$db->prepare('SELECT order_status,delivery_method FROM orders WHERE order_id=? FOR UPDATE');
+    $ol->execute([$orderId]);$order=$ol->fetch();
     $q = $db->prepare('SELECT d.delivery_id, d.delivery_status, o.order_code, o.order_status FROM deliveries d JOIN orders o ON o.order_id=d.order_id WHERE d.delivery_id=? FOR UPDATE');
     $q->execute([$id]);
     $d = $q->fetch();
@@ -44,7 +49,28 @@ function cas_delivery_update(PDO $db, array $user): string
         $db->rollBack();
         throw new DomainException('Giao không thành công cần ghi lý do (tối thiểu 3 ký tự).');
     }
+    if($to==='pickup_ready' && $order['delivery_method']!=='pickup'){
+        $db->rollBack();throw new DomainException('Trạng thái Chờ lấy chỉ áp dụng cho đơn nhận tại cửa hàng.');
+    }
+    $nextOrder=null;
+    if($to==='out_for_delivery'){
+        if($order['delivery_method']!=='delivery'||$order['order_status']!=='ready'){
+            $db->rollBack();throw new DomainException('Đơn cần ở trạng thái Sẵn sàng trước khi xuất giao.');
+        }
+        $nextOrder='delivering';
+    } elseif($to==='not_delivered' && $from==='out_for_delivery'){
+        if($order['order_status']!=='delivering'){
+            $db->rollBack();throw new DomainException('Đơn giao không có trạng thái đang giao.');
+        }
+        $nextOrder='ready';
+    } elseif($to==='delivered'){
+        if($order['order_status']!=='delivering'){
+            $db->rollBack();throw new DomainException('Đơn cần ở trạng thái đang giao trước khi xác nhận đã giao.');
+        }
+        $nextOrder='completed';
+    }
     $db->prepare('UPDATE deliveries SET delivery_status=?, note=COALESCE(NULLIF(?,\'\'),note) WHERE delivery_id=?')->execute([$to, $note, $id]);
+    if($nextOrder!==null)$db->prepare('UPDATE orders SET order_status=? WHERE order_id=?')->execute([$nextOrder,$orderId]);
     $db->prepare('INSERT INTO delivery_events(delivery_id,from_status,to_status,actor_id,note) VALUES(?,?,?,?,?)')->execute([$id, $from, $to, $user['user_id'], $note ?: null]);
     $db->commit();
     cas_audit('delivery_update', 'delivery', $id, ['order' => $d['order_code'], 'from' => $from, 'to' => $to, 'note' => $note]);

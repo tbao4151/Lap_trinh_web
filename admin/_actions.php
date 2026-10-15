@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/../includes/auth.php';
+require_once __DIR__.'/../includes/order-inventory.php';
 $user=cas_require_user(true);
 $db=cas_db();
 $error='';$notice=isset($_GET['saved'])?'Thao tác đã lưu vào MySQL.':'';
@@ -48,16 +49,20 @@ function cas_order_transitions(): array {
     'pending_confirmation'=>['confirmed','cancelled'],
     'confirmed'=>['preparing','cancelled'],
     'preparing'=>['ready','cancelled'],
-    'ready'=>['delivering','completed'],
+    'ready'=>['delivering','completed','cancelled'],
     'delivering'=>['completed','ready'],
     'completed'=>[],
     'cancelled'=>[]
   ];
 }
-function cas_order_choices(string $current): array {
+function cas_order_choices(string $current,string $method): array {
   global $statuses;
   $choices=[$current=>$statuses[$current]??$current];
-  foreach(cas_order_transitions()[$current]??[] as $next) $choices[$next]=$statuses[$next]??$next;
+  foreach(cas_order_transitions()[$current]??[] as $next) {
+    // Orders with delivery method "delivery" use the delivery page to advance.
+    if($current==='ready'&&$method==='delivery'&&in_array($next,['delivering','completed'],true))continue;
+    $choices[$next]=$statuses[$next]??$next;
+  }
   return $choices;
 }
 
@@ -71,7 +76,7 @@ if(cas_post()){
       $payment=(string)($_POST['payment_status']??'');
       $reason=trim((string)($_POST['reason']??''));
       $allowedStatuses=cas_order_transitions();
-      if(!array_key_exists($status,$allowedStatuses) || !in_array($payment,['unpaid','partial','paid','refunded'],true))
+      if(!array_key_exists($status,$allowedStatuses) || !in_array($payment,['unpaid','partial','paid','partially_refunded','refunded'],true))
         throw new DomainException('Trạng thái không hợp lệ.');
       if(mb_strlen($reason)>255)throw new DomainException('Lý do tối đa 255 ký tự.');
       $db->beginTransaction();
@@ -82,8 +87,11 @@ if(cas_post()){
         $from=$previous['order_status'];$oldPayment=$previous['payment_status'];
         if($status!==$from && !in_array($status,$allowedStatuses[$from]??[],true))
           throw new DomainException('Không được chuyển trạng thái đơn hàng từ '.$from.' sang '.$status.'.');
-        if($status==='delivering'&&$previous['delivery_method']!=='delivery')
-          throw new DomainException('Đơn nhận tại cửa hàng không có trạng thái đang giao.');
+        if($status==='delivering'){
+          if($previous['delivery_method']!=='delivery')
+            throw new DomainException('Đơn nhận tại cửa hàng không có trạng thái đang giao.');
+          if($status!==$from)throw new DomainException('Vui lòng chuyển trạng thái Đang giao từ màn hình Giao hàng để đồng bộ lịch và đơn.');
+        }
         if($status==='completed'&&$previous['delivery_method']==='delivery'){
           $q=$db->prepare('SELECT delivery_status FROM deliveries WHERE order_id=? LIMIT 1');
           $q->execute([$id]);
@@ -91,15 +99,19 @@ if(cas_post()){
         }
         if($status!==$from && in_array($status,['cancelled','ready'],true) && $from==='delivering' && mb_strlen($reason)<3)
           throw new DomainException('Quay lại trạng thái trước cần ghi lý do tối thiểu 3 ký tự.');
-        if($status==='cancelled'&&$from==='preparing'&&mb_strlen($reason)<3)
+        if($status==='cancelled'&&in_array($from,['preparing','ready'],true)&&mb_strlen($reason)<3)
           throw new DomainException('Hủy đơn đang chuẩn bị cần ghi lý do tối thiểu 3 ký tự.');
         if($payment!==$oldPayment){
           if(!in_array($user['role'],['admin','owner'],true))
             throw new DomainException('Chỉ quản trị viên được cập nhật thanh toán.');
-          $paymentFlow=['unpaid'=>['partial','paid'],'partial'=>['paid'],'paid'=>[],'refunded'=>[]];
+          $paymentFlow=['unpaid'=>['partial','paid'],'partial'=>['paid'],'paid'=>[],'partially_refunded'=>[],'refunded'=>[]];
           if(!in_array($payment,$paymentFlow[$oldPayment]??[],true))
             throw new DomainException('Trạng thái thanh toán không hợp lệ; hoàn tiền phải xử lý qua chức năng Hoàn tiền.');
         }
+        if($status!==$from && $status==='preparing')
+          cas_order_consume_inventory($db,$id,(int)$user['user_id']);
+        if($status!==$from && $status==='cancelled')
+          cas_order_restore_inventory($db,$id,(int)$user['user_id']);
         $q=$db->prepare('UPDATE orders SET order_status=?,payment_status=? WHERE order_id=?');
         $q->execute([$status,$payment,$id]);
         $db->commit();
@@ -167,5 +179,5 @@ function cas_admin_select(string $field,array $options,string $selected): string
   return $s.'</select>';
 }
 $statuses=['pending_confirmation'=>'Chờ xác nhận','confirmed'=>'Đã xác nhận','preparing'=>'Đang chuẩn bị','ready'=>'Sẵn sàng','delivering'=>'Đang giao','completed'=>'Hoàn tất','cancelled'=>'Đã hủy'];
-$payments=['unpaid'=>'Chưa thu','partial'=>'Đã cọc','paid'=>'Đã thu','refunded'=>'Đã hoàn'];
+$payments=['unpaid'=>'Chưa thu','partial'=>'Đã cọc','paid'=>'Đã thu','partially_refunded'=>'Hoàn một phần','refunded'=>'Đã hoàn'];
 $deliveries=['not_delivered'=>'Chưa giao','out_for_delivery'=>'Đang giao','delivered'=>'Đã giao','pickup_ready'=>'Chờ lấy'];

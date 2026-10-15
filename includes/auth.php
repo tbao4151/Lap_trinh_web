@@ -4,18 +4,23 @@ require_once __DIR__ . '/bootstrap.php';
 
 function cas_user(): ?array {
     if (empty($_SESSION['cas_uid'])) return null;
-    $q=cas_db()->prepare("SELECT u.user_id,u.full_name,u.email,u.phone,u.status,r.name AS role FROM users u JOIN roles r ON r.role_id=u.role_id WHERE u.user_id=? LIMIT 1");
+    $q=cas_db()->prepare("SELECT u.user_id,u.full_name,u.email,u.phone,u.status,u.session_version,r.name AS role FROM users u JOIN roles r ON r.role_id=u.role_id WHERE u.user_id=? LIMIT 1");
     $q->execute([(int)$_SESSION['cas_uid']]);$user=$q->fetch();
-    if (!$user || $user['status']!=='active') { unset($_SESSION['cas_uid']);return null; }
+    if (!$user || $user['status']!=='active' || !isset($_SESSION['cas_session_version']) ||
+        (int)$_SESSION['cas_session_version'] !== (int)$user['session_version']) {
+        unset($_SESSION['cas_uid'], $_SESSION['cas_session_version'], $_SESSION['cas_csrf']);
+        return null;
+    }
     return $user;
 }
 function cas_login(string $identifier,string $password,array $allowedRoles=['customer']): bool {
     $identifier=trim($identifier);
-    $sql="SELECT u.user_id,u.password_hash,u.status,r.name AS role FROM users u JOIN roles r ON r.role_id=u.role_id WHERE u.email=? OR u.phone=? LIMIT 1";
+    $sql="SELECT u.user_id,u.password_hash,u.status,u.session_version,r.name AS role FROM users u JOIN roles r ON r.role_id=u.role_id WHERE u.email=? OR u.phone=? LIMIT 1";
     $q=cas_db()->prepare($sql);$q->execute([$identifier,cas_phone($identifier)]);$u=$q->fetch();
     if(!$u || $u['status']!=='active' || !in_array($u['role'],$allowedRoles,true) || !password_verify($password,$u['password_hash'])) return false;
     session_regenerate_id(true);
     $_SESSION['cas_uid']=(int)$u['user_id'];
+    $_SESSION['cas_session_version']=(int)$u['session_version'];
     unset($_SESSION['cas_csrf']);
     return true;
 }

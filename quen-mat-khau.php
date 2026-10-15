@@ -41,7 +41,7 @@ if(cas_post()){
         $q=$db->prepare('SELECT reset_id FROM password_resets WHERE user_id=? AND token_hash=? AND consumed_at IS NULL AND expires_at>NOW() FOR UPDATE');
         $q->execute([$uid,hash('sha256',$token)]);$rid=$q->fetchColumn();
         if(!$rid)throw new RuntimeException('Liên kết không hợp lệ hoặc đã hết hạn.');
-        $q=$db->prepare('UPDATE users SET password_hash=? WHERE user_id=?');
+        $q=$db->prepare('UPDATE users SET password_hash=?,session_version=session_version+1 WHERE user_id=?');
         $q->execute([password_hash($password,PASSWORD_DEFAULT),$uid]);
         $q=$db->prepare('UPDATE password_resets SET consumed_at=NOW() WHERE user_id=? AND consumed_at IS NULL');
         $q->execute([$uid]);$db->commit();
