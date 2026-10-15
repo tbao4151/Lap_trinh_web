@@ -1,4 +1,4 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
+<?php require_once __DIR__.'/includes/storefront.php'; $shop = cas_settings(); ?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -24,8 +24,9 @@
           <p class="cas-subtitle">Bạn có thể gửi yêu cầu về mẫu hoa, thời gian nhận, thông tin đơn hàng hoặc góp ý về trải nghiệm mua sắm.</p>
 
           <div class="contact-info mt-4">
-            <div class="contact-row"><i class="bi bi-geo-alt"></i><div><strong>Địa chỉ</strong><div class="cas-muted small mt-1">126/13 đường số 17, Linh Xuân, Thủ Đức, TP.HCM</div></div></div>
-            <div class="contact-row"><i class="bi bi-clock"></i><div><strong>Thời gian hỗ trợ</strong><div class="cas-muted small mt-1">08:00 - 20:00, từ thứ Hai đến Chủ nhật</div></div></div>
+            <div class="contact-row"><i class="bi bi-geo-alt"></i><div><strong>Địa chỉ</strong><div class="cas-muted small mt-1"><?= cas_e($shop['address']) ?></div></div></div>
+            <div class="contact-row"><i class="bi bi-clock"></i><div><strong>Thời gian hỗ trợ</strong><div class="cas-muted small mt-1"><?= cas_e($shop['opening_hours']) ?></div></div></div>
+            <div class="contact-row"><i class="bi bi-telephone"></i><div><strong>Hotline / Zalo</strong><div class="cas-muted small mt-1"><a href="tel:<?= cas_e($shop['hotline']) ?>"><?= cas_e($shop['hotline']) ?></a><?= $shop['zalo'] !== '' && $shop['zalo'] !== $shop['hotline'] ? ' · Zalo ' . cas_e($shop['zalo']) : '' ?> · <a href="mailto:<?= cas_e($shop['email']) ?>"><?= cas_e($shop['email']) ?></a></div></div></div>
             <div class="contact-row"><i class="bi bi-truck"></i><div><strong>Giao hoa</strong><div class="cas-muted small mt-1">Khu vực TP.HCM, phí giao được xác nhận theo địa chỉ nhận.</div></div></div>
             <div class="contact-row"><i class="bi bi-bag-heart"></i><div><strong>Đặt hoa</strong><div class="cas-muted small mt-1">Đặt trực tiếp trên website hoặc gửi yêu cầu tư vấn.</div></div></div>
           </div>

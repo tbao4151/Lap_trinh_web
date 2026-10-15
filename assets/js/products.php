@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../../includes/bootstrap.php';
+require_once __DIR__ . '/../../includes/storefront.php';
 header('Content-Type: application/javascript; charset=utf-8');
 header('Cache-Control: no-store');
 try {
@@ -10,6 +10,8 @@ try {
     $wrapping[(int)$w['product_id']][]=['id'=>(int)$w['color_id'],'name'=>$w['name']];
   }
   $products=[];
+  $gallery=cas_product_gallery_map();
+  $displayWrapping=cas_product_wrapping_map();
   foreach($rows as $p) $products[]=[
     'id'=>sprintf('p%03d',(int)$p['product_id']), 'numericId'=>(int)$p['product_id'], 'sku'=>$p['sku'], 'slug'=>$p['slug'],'name'=>$p['name'],
     'type'=>$p['product_type'],'price'=>(float)$p['price'],'image'=>$p['image'],
@@ -17,9 +19,14 @@ try {
     'tone'=>$p['tone_name']??'','occasion'=>$p['occasion_name']??'',
     'description'=>$p['description']??'','composition'=>$p['composition']??'',
     'featured'=>(bool)$p['featured'],'today'=>(bool)$p['today'],
-    'wrappings'=>$wrapping[(int)$p['product_id']]??[]
+    'wrappings'=>$wrapping[(int)$p['product_id']]??[],
+    'category'=>$p['category_name']??'',
+    'gallery'=>$gallery[(int)$p['product_id']]??[$p['image']],
+    'wrapping'=>$displayWrapping[(int)$p['product_id']]??[]
   ];
   echo 'window.CAS_PRODUCTS=',json_encode($products,JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT),";\n";
+  $settings=array_intersect_key(cas_settings(),array_flip(['shop_name','hotline','email','address','opening_hours','announcement','instagram','zalo']));
+  echo 'window.CAS_SETTINGS=',json_encode($settings,JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT),";\n";
 } catch(Throwable $e) {
   error_log('Database products: '.$e->getMessage());
   http_response_code(503);

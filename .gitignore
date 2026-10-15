@@ -5,3 +5,7 @@ Thumbs.db
 .env
 .env.*
 .local/
+# Ảnh Admin tải lên khi chạy thử (giữ lại .htaccess bảo vệ thư mục)
+assets/uploads/*
+!assets/uploads/.htaccess
+__pycache__/

@@ -8,14 +8,6 @@ $titles=[
  'inventory'=>'Kho tổng','reports'=>'Báo cáo doanh thu'
 ];
 $title=$titles[$cas_page]??'CÁ\'S HOA Admin';
-$nav=[
- 'index.php'=>'Tổng quan',
- 'don-hang.php'=>'Đơn hàng','giao-hang.php'=>'Giao hàng','khach-hang.php'=>'Khách hàng',
- 'san-pham.php'=>'Sản phẩm','them-san-pham.php'=>'Thêm sản phẩm',
- 'quan-ly-nhanh.php'=>'Quản lý nhanh','phan-loai-bo-loc.php'=>'Phân loại & bộ lọc',
- 'kho-tong.php'=>'Kho tổng','bao-cao.php'=>'Báo cáo'
-];
-$nowPage=basename($_SERVER['SCRIPT_NAME']??'');
 ?>
 <!doctype html><html lang="vi"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -40,11 +32,7 @@ $nowPage=basename($_SERVER['SCRIPT_NAME']??'');
 <div class="admin-app">
 <aside class="admin-sidebar">
   <div class="p-3"><a class="admin-brand" href="index.php">CÁ'S HOA <small>Admin PHP/MySQL</small></a></div>
-  <nav class="cas-admin-nav px-2 pb-4" aria-label="Điều hướng quản trị">
-  <?php foreach($nav as $url=>$label): ?>
-  <a href="<?= cas_e($url) ?>" class="<?= $nowPage===$url?'active':'' ?>"><?= cas_e($label) ?></a>
-  <?php endforeach; ?>
-  </nav>
+  <?php require __DIR__.'/_nav.php'; ?>
 </aside>
 <div class="admin-workspace">
 <header class="admin-topbar d-flex justify-content-between align-items-center px-4">

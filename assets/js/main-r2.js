@@ -2,6 +2,8 @@
   'use strict';
 
   function escapeHtml(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]; }); }
+  function esc(v) { return escapeHtml(v); }
+  function shop(key, fallback) { var settings=window.CAS_SETTINGS||{}; return typeof settings[key]==='string'?settings[key]:fallback; }
   async function cartAction(button, operation, message) {
     if(button.disabled)return;
     button.disabled=true;
@@ -16,7 +18,7 @@
     function active(name) { return page === name ? ' active' : ''; }
     return '' +
       '<div class="cas-site-shell">' +
-        '<div class="cas-announcement">Có sẵn thiệp và túi · Shop xác nhận đơn sau khi nhận thông tin</div>' +
+        (shop('announcement', 'Có sẵn thiệp và túi · Shop xác nhận đơn sau khi nhận thông tin') ? '<div class="cas-announcement">' + esc(shop('announcement', '')) + '</div>' : '') +
         '<header>' +
           '<div class="cas-container cas-navbar d-flex align-items-center justify-content-between gap-3">' +
             '<a href="index.php" class="cas-brand" aria-label="Về trang chủ CÁ\'S HOA">' +
@@ -46,8 +48,8 @@
       '<footer class="cas-footer" id="footer">' +
         '<div class="cas-container cas-footer-main"><div class="row g-4">' +
           '<div class="col-md-5"><div class="cas-brand"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span class="cas-brand-name">CÁ\'S HOA</span></div><p class="mt-3 mb-0" style="max-width:380px">Tiệm hoa tươi online. Hoa cho những điều khó nói. Luôn kèm sẵn thiệp và túi.</p></div>' +
-          '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a><br><a href="lien-he.php">Liên hệ</a><br><a href="tra-cuu-don-hang.php">Tra cứu đơn</a></p></div>' +
-          '<div class="col-6 col-md-2"><div class="cas-footer-title">Thông tin</div><p class="mt-3 mb-0"><a href="gioi-thieu.php">Giới thiệu</a><br><a href="tin-tuc.php">Tin tức</a><br><a href="chinh-sach-giao-hang.php">Giao hàng</a><br><a href="chinh-sach-doi-tra.php">Đổi trả</a></p></div><div class="col-12 col-md-2"><div class="cas-footer-title">Địa chỉ</div><p class="mt-3 mb-0">126/13 đường số 17<br>Linh Xuân, Thủ Đức, TP.HCM</p></div>' +
+          '<div class="col-6 col-md-3"><div class="cas-footer-title">Liên hệ</div><p class="mt-3 mb-0"><a href="' + esc(shop('instagram', 'https://www.instagram.com')) + '" target="_blank" rel="noreferrer">Instagram</a><br><a href="tel:' + esc(shop('hotline', '0707309255')) + '">' + esc(shop('hotline', '0707309255')) + '</a><br><a href="lien-he.php">Liên hệ</a><br><a href="tra-cuu-don-hang.php">Tra cứu đơn</a></p></div>' +
+          '<div class="col-6 col-md-2"><div class="cas-footer-title">Thông tin</div><p class="mt-3 mb-0"><a href="gioi-thieu.php">Giới thiệu</a><br><a href="tin-tuc.php">Tin tức</a><br><a href="chinh-sach-giao-hang.php">Giao hàng</a><br><a href="chinh-sach-doi-tra.php">Đổi trả</a></p></div><div class="col-12 col-md-2"><div class="cas-footer-title">Địa chỉ</div><p class="mt-3 mb-0">' + esc(shop('address', '126/13 đường số 17, Linh Xuân, Thủ Đức, TP.HCM')) + '</p></div>' +
         '</div></div>' +
         '<div class="cas-footer-bottom"><div class="cas-container d-flex flex-column flex-sm-row gap-2 justify-content-between"><span>© 2026 CÁ\'S HOA</span><span>Hoa tươi · Thiệp gửi lời thương</span></div></div>' +
       '</footer>';
@@ -124,6 +126,16 @@
     }
   }
 
+
+  function galleryMarkup(product) {
+    var images=Array.isArray(product.gallery)?product.gallery:[];
+    if(images.length<2)return '';
+    return '<div class="d-flex flex-wrap gap-2 mt-3" aria-label="Ảnh sản phẩm">' +
+      images.map(function(src,index){
+        return '<button type="button" class="p-0 border rounded-3 overflow-hidden bg-white'+(index===0?' border-dark':'')+'" style="width:72px;height:72px" data-gallery-src="'+escapeHtml(src)+'" aria-label="Xem ảnh '+(index+1)+'"><img src="'+escapeHtml(src)+'" alt="" style="width:100%;height:100%;object-fit:cover"></button>';
+      }).join('')+'</div>';
+  }
+
   function initDetail() {
     var host = document.getElementById('productDetailHost');
     if (!host) return;
@@ -131,13 +143,20 @@
     var product = window.CAS_FIND_PRODUCT(params.get('slug')); if (!product) { host.innerHTML='<section class="customer-empty"><h1>Không tìm thấy mẫu hoa</h1><p>Mẫu hoa đã ngừng bán hoặc đường dẫn không tồn tại.</p><a class="btn-cas-primary" href="san-pham.php">Xem các mẫu khác</a></section>'; document.querySelector('.related-section').hidden=true; return; }
     document.title = product.name + ' | CÁ\'S HOA';
     host.innerHTML = '<div class="breadcrumb-cas"><a href="index.php">Trang chủ</a> / <a href="san-pham.php">Sản phẩm</a> / <span>' + escapeHtml(product.name) + '</span></div>' +
-      '<div class="row g-4 g-lg-5 align-items-start"><div class="col-lg-6"><div class="detail-image-main"><img src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.name) + '"></div></div>' +
+      '<div class="row g-4 g-lg-5 align-items-start"><div class="col-lg-6"><div class="detail-image-main"><img id="detailMainImage" src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.name) + '"></div>' + galleryMarkup(product) + '</div>' +
       '<div class="col-lg-6"><section class="detail-panel"><p class="cas-eyebrow">' + (product.today ? 'Mẫu hôm nay' : 'Đặt trước') + '</p><h1 class="cas-title" style="font-size:clamp(2rem,4vw,3.2rem)">' + escapeHtml(product.name) + '</h1><div class="detail-price">' + window.CAS_FORMAT_VND(product.price) + '</div><p class="detail-description">' + escapeHtml(product.description) + '</p>' +
       '<div class="detail-divider"></div><div class="detail-feature"><i class="bi bi-envelope-paper-heart"></i><div><strong>Kèm thiệp và túi</strong><div class="cas-muted small mt-1">Mỗi đơn hoa đều có sẵn thiệp và túi phù hợp.</div></div></div><div class="detail-feature"><i class="bi bi-flower2"></i><div><strong>Hoa tươi theo mùa</strong><div class="cas-muted small mt-1">' + escapeHtml(product.composition) + '</div></div></div><div class="detail-divider"></div>' +
-      ((product.wrappings||[]).length ? '<label class="form-label" for="detailWrapping">Màu giấy gói</label><select id="detailWrapping" class="form-select cas-form-select mb-3">'+product.wrappings.map(function(w){return '<option value="'+w.id+'">'+escapeHtml(w.name)+'</option>';}).join('')+'</select><p class="cas-muted small">Giấy gói đã bao gồm trong giá. Một màu áp dụng cho toàn bộ số lượng của mẫu hoa này.</p>' : '') +
+      ((product.wrappings||[]).length ? '<label class="form-label" for="detailWrapping">Màu giấy gói</label><select id="detailWrapping" class="form-select cas-form-select mb-3">'+product.wrappings.map(function(w){return '<option value="'+w.id+'">'+escapeHtml(w.name)+'</option>';}).join('')+'</select><p class="cas-muted small">Một màu giấy gói áp dụng cho toàn bộ số lượng; phụ thu nếu có sẽ được cửa hàng xác nhận trước khi giao.</p>' : '') +
       '<div class="d-flex flex-wrap align-items-center gap-3"><div class="quantity-picker"><button type="button" id="qtyMinus" aria-label="Giảm số lượng"><i class="bi bi-dash"></i></button><input id="detailQty" value="1" inputmode="numeric" aria-label="Số lượng"><button type="button" id="qtyPlus" aria-label="Tăng số lượng"><i class="bi bi-plus"></i></button></div><button class="btn-cas-primary flex-grow-1" id="detailAdd"><i class="bi bi-bag-plus"></i> Thêm vào giỏ hàng</button></div>' +
       '<a class="btn-cas-outline w-100 mt-3" href="gio-hang.php">Xem giỏ hàng</a></section></div></div>';
 
+    host.querySelectorAll('[data-gallery-src]').forEach(function(button){
+      button.addEventListener('click',function(){
+        var image=document.getElementById('detailMainImage');
+        if(image)image.src=button.dataset.gallerySrc;
+        host.querySelectorAll('[data-gallery-src]').forEach(function(b){b.classList.toggle('border-dark',b===button);});
+      });
+    });
     var qtyInput = document.getElementById('detailQty');
     function normalizeQty() { qtyInput.value = String(Math.max(1, Math.min(20, Math.trunc(Number(qtyInput.value)) || 1))); }
     document.getElementById('qtyMinus').addEventListener('click', function () { qtyInput.value = String((Number(qtyInput.value) || 1) - 1); normalizeQty(); });

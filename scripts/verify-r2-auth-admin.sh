@@ -3,6 +3,7 @@ set -euo pipefail
 export MYSQL_PWD="$DB_PASSWORD"
 mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/001_auth.php.sql
 mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/002_inventory_seed.sql
+mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/003_admin_ops.sql
 export CAS_ADMIN_EMAIL="admin-coursework@example.test"
 export CAS_ADMIN_PASSWORD="AdminTest_2026!"
 php scripts/create-admin.php
