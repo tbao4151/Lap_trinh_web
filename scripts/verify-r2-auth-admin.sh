@@ -68,8 +68,8 @@ STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-u
 [ "$(db "SELECT COUNT(*) FROM categories WHERE name='Hoa moi kiem thu'")" = "1" ] || exit 1
 TOKEN=$(curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/giao-hang.php" | get_token)
 STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode "action=delivery_update" --data-urlencode "id=1" --data-urlencode "status=out_for_delivery" "$BASE/admin/giao-hang.php")
-[ "$STATUS" = "303" ] || exit 1
-[ "$(db "SELECT COUNT(*) FROM deliveries WHERE delivery_id=1 AND delivery_status='out_for_delivery'")" = "1" ] || exit 1
+[ "$STATUS" = "422" ] || { echo "Premature delivery must be rejected: $STATUS"; exit 1; }
+[ "$(db "SELECT COUNT(*) FROM deliveries WHERE delivery_id=1 AND delivery_status='not_delivered'")" = "1" ] || exit 1
 [ "$(db "SELECT COUNT(*) FROM inventory_items")" -ge 10 ] || exit 1
 
 # Pricing regression: admin-configured surcharge and delivery fee must be authoritative.
