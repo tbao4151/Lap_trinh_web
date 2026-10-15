@@ -1,8 +1,16 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__.'/../includes/auth.php';
+require_once __DIR__.'/../includes/customer.php';
 cas_require_post();
 if(!cas_csrf_valid($_POST['csrf']??null)) cas_json(403,['ok'=>false,'message'=>'Phiên làm việc hết hạn, hãy tải lại trang.']);
+$requestKey=cas_str('checkoutKey',48);
+// Same-session replay returns the committed order; PHP's session lock serializes requests.
+// Optional for legacy clients; the Customer form always supplies this key.
+if($requestKey!=='') {
+  if(!preg_match('/^[a-f0-9]{48}$/D',$requestKey)) cas_json(422,['ok'=>false,'message'=>'Mã xác nhận không hợp lệ.']);
+  if(isset($_SESSION['cas_checkout_done'][$requestKey])) cas_json(200,['ok'=>true,'orderCode'=>$_SESSION['cas_checkout_done'][$requestKey]]);
+  if(!hash_equals(cas_checkout_key(),$requestKey)) cas_json(409,['ok'=>false,'message'=>'Giỏ hàng đã thay đổi. Hãy tải lại trang thanh toán.']);
+}
 $cart=$_SESSION['cas_cart']??[];
 if(!is_array($cart)||count($cart)<1||count($cart)>40) cas_json(422,['ok'=>false,'message'=>'Giỏ hàng không hợp lệ.']);
 $name=cas_str('customerName',120);$phone=cas_phone(cas_str('customerPhone',20));
@@ -19,7 +27,7 @@ if(!$receive||$receive->format('Y-m-d')!==$date||$receive<new DateTimeImmutable(
   cas_json(422,['ok'=>false,'message'=>'Ngày nhận phải từ ngày mai trở đi.']);
 $slots=['08:00 - 10:00','10:00 - 12:00','13:00 - 15:00','15:00 - 17:00','17:00 - 19:00'];
 if(!in_array($time,$slots,true)) cas_json(422,['ok'=>false,'message'=>'Khung giờ nhận không hợp lệ.']);
-$lines=[];
+$lines=[];$wrapIds=[];
 foreach($cart as $item){
   if(!is_array($item)||!isset($item['productId'],$item['quantity'])||
      !is_string($item['productId'])||!preg_match('/^p[0-9]{3,}$/',$item['productId']))
@@ -29,17 +37,24 @@ foreach($cart as $item){
   $id=(int)substr($item['productId'],1);
   if(isset($lines[$id])) cas_json(422,['ok'=>false,'message'=>'Sản phẩm bị trùng trong giỏ.']);
   $lines[$id]=$qty;
+  if(isset($item['wrappingId'])) $wrapIds[$id]=(int)$item['wrappingId'];
 }
 try {
   $db=cas_db();$db->beginTransaction();
   $find=$db->prepare("SELECT price FROM products WHERE product_id=? AND status='active'");
-  $ordered=[];$subtotal=0;
+  $ordered=[];$subtotal=0;$wrappingNotes=[];
   foreach($lines as $id=>$qty){
     $find->execute([$id]);$p=$find->fetch();
     if(!$p) throw new DomainException('Sản phẩm đã ngừng bán, vui lòng cập nhật giỏ.');
     $price=(int)round((float)$p['price']);$sum=$qty*$price;
     if($price<0||$sum>99999999999) throw new DomainException('Giá hoặc tổng tiền không hợp lệ.');
     $subtotal+=$sum;$ordered[]=[$id,$qty,$price,$sum];
+    if(isset($wrapIds[$id])) {
+      $wrap=$db->prepare("SELECT w.name FROM wrapping_colors w JOIN product_wrapping pw ON pw.color_id=w.color_id WHERE pw.product_id=? AND w.color_id=? AND w.status='active'");
+      $wrap->execute([$id,$wrapIds[$id]]);$wrapName=$wrap->fetchColumn();
+      if($wrapName===false)throw new DomainException('Giấy gói đã ngừng áp dụng. Hãy cập nhật giỏ hàng.');
+      $wrappingNotes[]='Mẫu '.sprintf('p%03d',$id).': '.$wrapName;
+    }
   }
   if($subtotal<=0||$subtotal>99999999999) throw new DomainException('Tổng tiền không hợp lệ.');
   $user=cas_user();
@@ -51,6 +66,10 @@ try {
   $code='CSH-'.date('Y').'-'.strtoupper(bin2hex(random_bytes(4)));
   $orderSql="INSERT INTO orders(customer_id,order_code,recipient_name,recipient_phone,delivery_method,delivery_address,receive_date,receive_time,payment_method,payment_status,order_status,card_message,order_note,subtotal,shipping_fee,total_amount) VALUES(?,?,?,?,?,?,?,?,?,'unpaid','pending_confirmation',?,?,?,0,?)";
   $stmt=$db->prepare($orderSql);
+  // Existing schema has free wrapping colors, but no order-item wrapping column.
+  // Preserve the server-validated selection as an order note snapshot, without a price change.
+  $note=trim($note."\nThông tin người đặt tại thời điểm tạo đơn: ".$name.' — '.$phone);
+  if($wrappingNotes) $note=trim($note."\nGiấy gói đã chọn:\n".implode("\n",$wrappingNotes));
   $stmt->execute([$customerId,$code,$recipient,$recipientPhone,$method,$method==='delivery'?$address:null,$date,$time,'cod',$card,$note,$subtotal,$subtotal]);
   $orderId=(int)$db->lastInsertId();
   $add=$db->prepare("INSERT INTO order_items(order_id,product_id,quantity,unit_price,line_total) VALUES(?,?,?,?,?)");
@@ -60,6 +79,11 @@ try {
     $delivery->execute([$orderId,$date.' '.substr($time,0,5).':00']);
   }
   $db->commit();
+  if($requestKey!=='') {
+    $_SESSION['cas_checkout_done'][$requestKey]=$code;
+    $_SESSION['cas_checkout_done']=array_slice($_SESSION['cas_checkout_done'],-10,null,true);
+  }
+  unset($_SESSION['cas_checkout_key']);
   unset($_SESSION['cas_cart']);
   $_SESSION['cas_last_order_id']=$orderId;
   $_SESSION['cas_last_order_code']=$code;
