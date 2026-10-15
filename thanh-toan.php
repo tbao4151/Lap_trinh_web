@@ -76,9 +76,9 @@
             <h2 class="font-display fs-4 mt-2 mb-3">Sản phẩm</h2>
             <div id="checkoutSummaryList"></div>
             <div class="summary-row mt-2"><span>Tạm tính</span><strong data-checkout-subtotal>0 ₫</strong></div>
-            <div class="summary-row"><span>Phí giao hàng</span><span>Shop xác nhận sau</span></div>
+            <div class="summary-row"><span>Phí giao hàng</span><span data-checkout-shipping>0 ₫</span></div>
             <div class="summary-row total"><span>Tổng tạm tính</span><span data-checkout-total>0 ₫</span></div>
-            <p class="demo-note mt-3 mb-0">Phí giao hàng và tình trạng hoa sẽ được shop xác nhận trước khi chuẩn bị đơn.</p>
+            <p class="demo-note mt-3 mb-0">Giá và phí giao hàng được tính lại từ cơ sở dữ liệu khi xác nhận đơn. Tình trạng hoa sẽ được shop kiểm tra trước khi chuẩn bị.</p>
           </aside>
         </div>
       </div>

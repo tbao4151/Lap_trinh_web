@@ -5,13 +5,16 @@ header('Content-Type: application/javascript; charset=utf-8');
 header('Cache-Control: no-store');
 try {
   $rows=cas_db()->query("SELECT p.*,c.name category_name,t.name tone_name,o.name occasion_name FROM products p LEFT JOIN categories c ON p.category_id=c.category_id LEFT JOIN tones t ON p.tone_id=t.tone_id LEFT JOIN occasions o ON p.occasion_id=o.occasion_id WHERE p.status='active' ORDER BY p.product_id")->fetchAll();
+  $displayWrapping=cas_product_wrapping_map();
   $wrapping=[];
   foreach(cas_db()->query("SELECT pw.product_id,w.color_id,w.name FROM product_wrapping pw JOIN wrapping_colors w ON w.color_id=pw.color_id WHERE w.status='active' ORDER BY w.color_id") as $w) {
-    $wrapping[(int)$w['product_id']][]=['id'=>(int)$w['color_id'],'name'=>$w['name']];
+    $extra=0;
+    foreach($displayWrapping[(int)$w['product_id']]??[] as $option)
+      if($option['name']===$w['name']){$extra=(int)$option['surcharge'];break;}
+    $wrapping[(int)$w['product_id']][]=['id'=>(int)$w['color_id'],'name'=>$w['name'],'surcharge'=>$extra];
   }
   $products=[];
   $gallery=cas_product_gallery_map();
-  $displayWrapping=cas_product_wrapping_map();
   foreach($rows as $p) $products[]=[
     'id'=>sprintf('p%03d',(int)$p['product_id']), 'numericId'=>(int)$p['product_id'], 'sku'=>$p['sku'], 'slug'=>$p['slug'],'name'=>$p['name'],
     'type'=>$p['product_type'],'price'=>(float)$p['price'],'image'=>$p['image'],
@@ -25,7 +28,7 @@ try {
     'wrapping'=>$displayWrapping[(int)$p['product_id']]??[]
   ];
   echo 'window.CAS_PRODUCTS=',json_encode($products,JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT),";\n";
-  $settings=array_intersect_key(cas_settings(),array_flip(['shop_name','hotline','email','address','opening_hours','announcement','instagram','zalo']));
+  $settings=array_intersect_key(cas_settings(),array_flip(['shop_name','hotline','email','address','opening_hours','announcement','instagram','zalo','default_shipping_fee']));
   echo 'window.CAS_SETTINGS=',json_encode($settings,JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT),";\n";
 } catch(Throwable $e) {
   error_log('Database products: '.$e->getMessage());

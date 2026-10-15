@@ -146,7 +146,7 @@
       '<div class="row g-4 g-lg-5 align-items-start"><div class="col-lg-6"><div class="detail-image-main"><img id="detailMainImage" src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.name) + '"></div>' + galleryMarkup(product) + '</div>' +
       '<div class="col-lg-6"><section class="detail-panel"><p class="cas-eyebrow">' + (product.today ? 'Mẫu hôm nay' : 'Đặt trước') + '</p><h1 class="cas-title" style="font-size:clamp(2rem,4vw,3.2rem)">' + escapeHtml(product.name) + '</h1><div class="detail-price">' + window.CAS_FORMAT_VND(product.price) + '</div><p class="detail-description">' + escapeHtml(product.description) + '</p>' +
       '<div class="detail-divider"></div><div class="detail-feature"><i class="bi bi-envelope-paper-heart"></i><div><strong>Kèm thiệp và túi</strong><div class="cas-muted small mt-1">Mỗi đơn hoa đều có sẵn thiệp và túi phù hợp.</div></div></div><div class="detail-feature"><i class="bi bi-flower2"></i><div><strong>Hoa tươi theo mùa</strong><div class="cas-muted small mt-1">' + escapeHtml(product.composition) + '</div></div></div><div class="detail-divider"></div>' +
-      ((product.wrappings||[]).length ? '<label class="form-label" for="detailWrapping">Màu giấy gói</label><select id="detailWrapping" class="form-select cas-form-select mb-3">'+product.wrappings.map(function(w){return '<option value="'+w.id+'">'+escapeHtml(w.name)+'</option>';}).join('')+'</select><p class="cas-muted small">Một màu giấy gói áp dụng cho toàn bộ số lượng; phụ thu nếu có sẽ được cửa hàng xác nhận trước khi giao.</p>' : '') +
+      ((product.wrappings||[]).length ? '<label class="form-label" for="detailWrapping">Màu giấy gói</label><select id="detailWrapping" class="form-select cas-form-select mb-3">'+product.wrappings.map(function(w){return '<option value="'+w.id+'">'+escapeHtml(w.name)+(Number(w.surcharge)>0?' (+'+window.CAS_FORMAT_VND(w.surcharge)+')':'')+'</option>';}).join('')+'</select><p class="cas-muted small">Phụ thu giấy gói (nếu có) được tính vào tạm tính giỏ hàng theo giá hiện tại.</p>' : '') +
       '<div class="d-flex flex-wrap align-items-center gap-3"><div class="quantity-picker"><button type="button" id="qtyMinus" aria-label="Giảm số lượng"><i class="bi bi-dash"></i></button><input id="detailQty" value="1" inputmode="numeric" aria-label="Số lượng"><button type="button" id="qtyPlus" aria-label="Tăng số lượng"><i class="bi bi-plus"></i></button></div><button class="btn-cas-primary flex-grow-1" id="detailAdd"><i class="bi bi-bag-plus"></i> Thêm vào giỏ hàng</button></div>' +
       '<a class="btn-cas-outline w-100 mt-3" href="gio-hang.php">Xem giỏ hàng</a></section></div></div>';
 
@@ -233,12 +233,19 @@
     summaryList.innerHTML = lines.map(function (line) {
       return '<div class="checkout-mini-line"><img src="' + escapeHtml(line.product.image) + '" alt="' + escapeHtml(line.product.name) + '"><div><strong>' + escapeHtml(line.product.name) + '</strong><small>Số lượng: ' + line.quantity + '</small>'+(line.wrappingName?'<small>Giấy gói: '+escapeHtml(line.wrappingName)+'</small>':'')+'</div><span class="small fw-bold">' + window.CAS_FORMAT_VND(line.lineTotal) + '</span></div>';
     }).join('');
-    document.querySelectorAll('[data-checkout-subtotal], [data-checkout-total]').forEach(function (node) { node.textContent = window.CAS_FORMAT_VND(window.CASCart.subtotal()); });
+    document.querySelectorAll('[data-checkout-subtotal]').forEach(function(node){node.textContent=window.CAS_FORMAT_VND(window.CASCart.subtotal());});
+    function updateCheckoutTotals(){
+      var isDelivery=document.querySelector('[name="fulfillment"]:checked').value==='delivery';
+      var fee=isDelivery?Math.max(0,Number((window.CAS_SETTINGS||{}).default_shipping_fee)||0):0;
+      document.querySelectorAll('[data-checkout-shipping]').forEach(function(node){node.textContent=window.CAS_FORMAT_VND(fee);});
+      document.querySelectorAll('[data-checkout-total]').forEach(function(node){node.textContent=window.CAS_FORMAT_VND(window.CASCart.subtotal()+fee);});
+    }
 
     function toggleAddress() {
       var delivery = document.querySelector('[name="fulfillment"]:checked').value === 'delivery';
       document.getElementById('deliveryFields').classList.toggle('d-none', !delivery);
       document.getElementById('address').required = delivery;
+      updateCheckoutTotals();
     }
     document.querySelectorAll('[name="fulfillment"]').forEach(function (radio) { radio.addEventListener('change', toggleAddress); });
     toggleAddress();

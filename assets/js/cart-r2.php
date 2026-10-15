@@ -36,7 +36,7 @@ function adjust(id,delta){return change(function(next){var index=next.findIndex(
 function removeUnavailable(){return change(function(next){for(var i=next.length-1;i>=0;i--)if(!window.CAS_FIND_PRODUCT(next[i].productId))next.splice(i,1);});}
 function remove(id){return change(function(next){var i=next.findIndex(function(l){return l.productId===id;});if(i>=0)next.splice(i,1);});}
 function clear(){return change(function(next){next.length=0;});}
-function detailed(){return state.map(function(l){var p=window.CAS_FIND_PRODUCT(l.productId);return p?{product:p,quantity:l.quantity,lineTotal:p.price*l.quantity,wrappingName:l.wrappingName||''}:null;}).filter(Boolean);}
+function detailed(){return state.map(function(l){var p=window.CAS_FIND_PRODUCT(l.productId);return p?{product:p,quantity:l.quantity,lineTotal:(p.price+(p.wrappings||[]).filter(function(w){return Number(w.id)===Number(l.wrappingId);}).reduce(function(s,w){return s+Math.max(0,Number(w.surcharge)||0);},0))*l.quantity,wrappingName:l.wrappingName||''}:null;}).filter(Boolean);}
 window.CASCart={read:read,add:add,update:update,adjust:adjust,remove:remove,removeUnavailable:removeUnavailable,clear:clear,
  count:function(){return state.reduce(function(s,l){return s+l.quantity;},0);},detailed:detailed,
  subtotal:function(){return detailed().reduce(function(s,l){return s+l.lineTotal;},0);},
