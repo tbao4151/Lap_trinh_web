@@ -72,7 +72,7 @@ try:
     driver.find_element(By.ID,"customerName").send_keys("Khách kiểm thử")
     driver.find_element(By.ID,"customerPhone").send_keys("0900000000")
     driver.find_element(By.ID,"address").send_keys("Linh Xuân, Thủ Đức")
-    driver.execute_script("document.getElementById('receiveDate').value='2030-01-01'")
+    driver.execute_script("var field=document.getElementById('receiveDate');field.value='2030-01-01';field.dispatchEvent(new Event('change',{bubbles:true}))")
     Select(driver.find_element(By.ID,"receiveTime")).select_by_visible_text("08:00 - 10:00")
     driver.find_element(By.ID,"recipientName").send_keys("Người nhận kiểm thử")
     driver.find_element(By.ID,"recipientPhone").send_keys("0911111111")
