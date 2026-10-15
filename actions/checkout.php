@@ -80,8 +80,8 @@ try {
   $code='CSH-'.date('Y').'-'.strtoupper(bin2hex(random_bytes(4)));
   $orderSql="INSERT INTO orders(customer_id,order_code,recipient_name,recipient_phone,delivery_method,delivery_address,receive_date,receive_time,payment_method,payment_status,order_status,card_message,order_note,subtotal,shipping_fee,total_amount) VALUES(?,?,?,?,?,?,?,?,?,'unpaid','pending_confirmation',?,?,?,?,?)";
   $stmt=$db->prepare($orderSql);
-  // Existing schema has free wrapping colors, but no order-item wrapping column.
-  // Preserve the server-validated selection as an order note snapshot, without a price change.
+  // Preserve the selected wrapping in the order note and persist the all-inclusive unit price.
+  // The price snapshot includes the selected wrapping surcharge without requiring an order-item schema change.
   $note=trim($note."\nThông tin người đặt tại thời điểm tạo đơn: ".$name.' — '.$phone);
   if($wrappingNotes) $note=trim($note."\nGiấy gói đã chọn:\n".implode("\n",$wrappingNotes));
   $stmt->execute([$customerId,$code,$recipient,$recipientPhone,$method,$method==='delivery'?$address:null,$date,$time,'cod',$card,$note,$subtotal,$shippingFee,$total]);

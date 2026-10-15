@@ -69,4 +69,19 @@ STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-u
 [ "$STATUS" = "303" ] || exit 1
 [ "$(db "SELECT COUNT(*) FROM deliveries WHERE delivery_id=1 AND delivery_status='out_for_delivery'")" = "1" ] || exit 1
 [ "$(db "SELECT COUNT(*) FROM inventory_items")" -ge 10 ] || exit 1
+
+# Pricing regression: admin-configured surcharge and delivery fee must be authoritative.
+TOKEN=$(curl -fsS -b /tmp/r2-customer-cookie "$BASE/thanh-toan.php" | python3 -c 'import re,sys;s=sys.stdin.read();m=re.search(r"window.CAS_CSRF\s*=\s*\"([a-f0-9]+)\"",s);assert m;print(m.group(1))')
+CART_JSON=$(curl -fsS -b /tmp/r2-customer-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode 'cart=[{"productId":"p001","quantity":2,"wrappingId":3}]' "$BASE/actions/cart.php")
+printf '%s' "$CART_JSON" | python3 -c 'import json,sys;x=json.load(sys.stdin);assert x["ok"] and x["cart"][0]["wrappingId"]==3,x'
+PRICE_RESULT=$(curl -sS -b /tmp/r2-customer-cookie --data-urlencode "csrf=$TOKEN" \
+ --data-urlencode "customerName=Khach test gia" --data-urlencode "customerPhone=0922222222" \
+ --data-urlencode "recipientName=Nguoi nhan gia" --data-urlencode "recipientPhone=0933333333" \
+ --data-urlencode "fulfillment=delivery" --data-urlencode "address=Thu Duc" \
+ --data-urlencode "receiveDate=2030-01-01" --data-urlencode "receiveTime=08:00 - 10:00" "$BASE/actions/checkout.php")
+PRICE_CODE=$(printf '%s' "$PRICE_RESULT" | python3 -c 'import json,sys;x=json.load(sys.stdin);assert x["ok"],x;print(x["orderCode"])')
+[ "$(db "SELECT COUNT(*) FROM orders o JOIN order_items i ON i.order_id=o.order_id WHERE o.order_code='$PRICE_CODE' AND o.subtotal=820000 AND o.shipping_fee=30000 AND o.total_amount=850000 AND i.quantity=2 AND i.unit_price=410000 AND i.line_total=820000")" = "1" ] || { echo "Mismatch wrapping/ship pricing snapshot for $PRICE_CODE"; exit 1; }
+[ "$(db "SELECT COUNT(*) FROM deliveries d JOIN orders o ON o.order_id=d.order_id WHERE o.order_code='$PRICE_CODE' AND d.fee=30000")" = "1" ] || exit 1
+echo "PASS: wrapping surcharge, configured shipping fee, and SQL price snapshots."
+
 echo "PASS: Admin login/RBAC, 11 pages, product SQL CRUD, order update, customer registration/profile/history."
