@@ -13,6 +13,7 @@ $MYSQL < database/migrations/001_auth.php.sql
 $MYSQL < database/migrations/002_inventory_seed.sql
 $MYSQL < database/migrations/003_admin_ops.sql
 $MYSQL < database/migrations/004_order_inventory_sessions.sql
+$MYSQL < database/migrations/005_profit_cost_snapshot.sql
 PRODUCTS="$($MYSQL --batch --skip-column-names cas_hoa -e 'SELECT COUNT(*) FROM products')"
 [ "$PRODUCTS" -ge 11 ] || { echo "Missing catalog seed"; exit 1; }
 TABLES="$($MYSQL --batch --skip-column-names cas_hoa -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='cas_hoa'")"

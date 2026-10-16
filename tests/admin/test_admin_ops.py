@@ -29,9 +29,9 @@ RUN = secrets.token_hex(3)
 RESULTS = []
 
 ROUTES = ['dang-nhap', 'index', 'don-hang', 'giao-hang', 'khach-hang', 'san-pham', 'them-san-pham', 'sua-san-pham?id=1',
-          'quan-ly-nhanh', 'phan-loai-bo-loc', 'kho-tong', 'bao-cao',
+          'quan-ly-nhanh', 'phan-loai-bo-loc', 'kho-tong', 'bao-cao', 'loi-nhuan',
           'hoan-tien', 'giay-goi', 'kham-pha', 'cong-thuc-hoa', 'kho-hoa', 'kho-phu-kien', 'lich-su-kho', 'nhan-vien', 'cai-dat', 'tai-khoan', 'chu-so-huu']
-STAFF_FORBIDDEN = {'cong-thuc-hoa', 'them-san-pham', 'sua-san-pham?id=1', 'nhan-vien', 'cai-dat', 'chu-so-huu'}
+STAFF_FORBIDDEN = {'loi-nhuan', 'cong-thuc-hoa', 'them-san-pham', 'sua-san-pham?id=1', 'nhan-vien', 'cai-dat', 'chu-so-huu'}
 ADMIN_FORBIDDEN = {'chu-so-huu'}
 
 
@@ -166,6 +166,22 @@ def make_paid_order(admin):
 
 
 # ------------------------------------------------------------------ các nhóm kiểm thử
+def test_flower_advisor():
+    guest=Client()
+    status, html, _ = guest.get('tu-van-hoa.php')
+    check('Trang tư vấn hoa tải thành công, có token và biểu mẫu',status==200 and 'advisorForm' in html and bool(guest.csrf),status)
+    status,body,_=guest.post('actions/flower-advisor.php',{'message':'Tìm hoa sinh nhật','budget':'500000'})
+    try: obj=json.loads(body)
+    except ValueError: obj={}
+    check('Không có API key: gợi ý đúng dạng bộ lọc, mẫu đang bán',status==200 and obj.get('ok') and obj.get('mode')=='rules'
+          and isinstance(obj.get('products'),list) and len(obj['products'])>0
+          and all(isinstance(p.get('price'),int) for p in obj['products']),f'{status} {body[:180]}')
+    status,body,_=guest.post('actions/flower-advisor.php',{'message':'Tìm hoa','budget':'-1'})
+    check('Ngân sách âm bị chặn',status==422,status)
+    status,body,_=guest.post('actions/flower-advisor.php',{'message':'Tìm hoa'},csrf=False)
+    check('Tư vấn từ chối POST thiếu CSRF',status==403,status)
+
+
 def test_role_matrix(sessions):
     for route in ROUTES:
         path = 'admin/' + (route.replace('?', '.php?', 1) if '?' in route else route + '.php')
@@ -342,6 +358,11 @@ def test_delivery(admin, staff, order_id):
     check('Chuyển preparing tự trừ 2 cành, có snapshot',status==303 and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='preparing'
           and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==6
           and sql_int(f'SELECT quantity FROM order_inventory_usage WHERE order_id={order_id} AND item_id={item}')==2,status)
+    check('Giá vốn nguyên liệu lưu cố định lúc xuất kho',
+          sql(f'SELECT unit_cost_snapshot, cost_amount_snapshot FROM order_inventory_usage WHERE order_id={order_id} AND item_id={item}') == '12000.00\t24000.00')
+    status_report, html_report, _ = admin.get('admin/loi-nhuan.php?group=day')
+    check('Báo cáo lợi nhuận có đồ thị và số liệu SQL', status_report == 200 and 'Biểu đồ lợi nhuận gộp' in html_report
+          and 'Doanh thu có đủ giá vốn' in html_report, status_report)
     status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'preparing', 'payment_status': 'paid'})
     check('Gửi lại preparing không trừ tồn lần hai',status==303 and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==6,status)
     status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'ready', 'payment_status': 'paid'})
@@ -359,6 +380,11 @@ def test_delivery(admin, staff, order_id):
     status, _, _ = staff.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'delivered'})
     check('Đã giao đồng bộ hoàn tất đơn', status == 303 and sql(f'SELECT delivery_status FROM deliveries WHERE delivery_id={did}') == 'delivered'
           and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='completed', status)
+    status_profit, profit_html, _ = admin.get('admin/loi-nhuan.php?group=day')
+    check('Đơn hoàn tất lên đồ thị lợi nhuận, giá vốn snapshot 24.000 đ', status_profit==200
+          and '24.000' in profit_html and 'gross_profit' not in profit_html,
+          status_profit)
+
     status, _, _ = admin.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'not_delivered', 'note': 'Thử quay lại'})
     check('Đã giao là trạng thái cuối -> 422', status == 422, status)
     check('delivery_events lưu đủ 4 bước có người thực hiện', sql_int(f'SELECT COUNT(*) FROM delivery_events WHERE delivery_id={did} AND actor_id IS NOT NULL') == 4)
@@ -595,7 +621,8 @@ def main():
     sessions.update(staff=staff, admin=admin, owner=owner)
 
     groups = [
-        ('Ma trận quyền 23 route x 5 vai trò', lambda: test_role_matrix(sessions)),
+        ('AI tư vấn / gợi ý bộ lọc', test_flower_advisor),
+        ('Ma trận quyền 24 route x 5 vai trò', lambda: test_role_matrix(sessions)),
         ('Chặn POST trái phép / thiếu CSRF', lambda: test_post_guards(sessions, staff)),
         ('ADM-02 Sản phẩm, ảnh, giá nhanh', lambda: test_products(admin, staff)),
         ('ADM-02 Phân loại', lambda: test_taxonomy(admin, staff)),

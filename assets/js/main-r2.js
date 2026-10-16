@@ -29,6 +29,7 @@
               '<a class="cas-nav-link' + active('home') + '" href="index.php">Trang chủ</a>' +
               '<a class="cas-nav-link' + active('catalog') + '" href="san-pham.php?type=bouquet">Bó hoa</a>' +
               '<a class="cas-nav-link" href="san-pham.php?type=basket">Giỏ hoa</a>' +
+              '<a class="cas-nav-link' + active('advisor') + '" href="tu-van-hoa.php">Tư vấn chọn hoa</a>' +
               '<a class="cas-nav-link" href="tin-tuc.php">Tin tức</a><a class="cas-nav-link" href="lien-he.php">Liên hệ</a>' +
             '</nav>' +
             '<div class="d-flex align-items-center gap-1">' +
@@ -38,7 +39,7 @@
               '<button class="cas-icon-btn d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#casMobileNav" aria-controls="casMobileNav" aria-expanded="false" aria-label="Mở menu"><i class="bi bi-list fs-5"></i></button>' +
             '</div>' +
           '</div>' +
-          '<div class="collapse cas-mobile-nav d-md-none" id="casMobileNav"><nav class="cas-container py-2"><a href="index.php">Trang chủ</a><a href="san-pham.php?type=bouquet">Bó hoa</a><a href="san-pham.php?type=basket">Giỏ hoa</a><a href="gio-hang.php">Giỏ hàng</a><a href="tra-cuu-don-hang.php">Tra cứu đơn</a><a href="tai-khoan.php">Tài khoản</a><a href="tin-tuc.php">Tin tức</a><a href="lien-he.php">Liên hệ</a></nav></div>' +
+          '<div class="collapse cas-mobile-nav d-md-none" id="casMobileNav"><nav class="cas-container py-2"><a href="index.php">Trang chủ</a><a href="san-pham.php?type=bouquet">Bó hoa</a><a href="san-pham.php?type=basket">Giỏ hoa</a><a href="tu-van-hoa.php">Tư vấn chọn hoa</a><a href="gio-hang.php">Giỏ hàng</a><a href="tra-cuu-don-hang.php">Tra cứu đơn</a><a href="tai-khoan.php">Tài khoản</a><a href="tin-tuc.php">Tin tức</a><a href="lien-he.php">Liên hệ</a></nav></div>' +
         '</header>' +
       '</div>';
   }

@@ -6,6 +6,7 @@ mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/001_auth.php.
 mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/002_inventory_seed.sql
 mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/003_admin_ops.sql
 mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/004_order_inventory_sessions.sql
+mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/migrations/005_profit_cost_snapshot.sql
 export CAS_ADMIN_EMAIL="admin-coursework@example.test"
 export CAS_ADMIN_PASSWORD="AdminTest_2026!"
 php scripts/create-admin.php

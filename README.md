@@ -28,6 +28,7 @@ Trong XAMPP bật **Apache** và **MySQL**, vào `http://localhost/phpmyadmin`. 
 4. `database/migrations/002_inventory_seed.sql`
 5. `database/migrations/003_admin_ops.sql`
 6. `database/migrations/004_order_inventory_sessions.sql`
+7. `database/migrations/005_profit_cost_snapshot.sql`
 
 Mặc định PDO kết nối `127.0.0.1:3306`, database `cas_hoa`, user `root`, mật khẩu rỗng (thiết lập XAMPP phổ biến). Nếu khác, đặt biến môi trường `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. **Không đưa mật khẩu hoặc file .env lên GitHub.**
 
@@ -67,3 +68,10 @@ Các script này cần PHP CLI, MySQL, `curl`, Python và môi trường Linux/G
 Tài liệu đầy đủ: `REQUIREMENT2_SETUP.md`, `docs/REQUIREMENT2_SCOPE_AND_ACCEPTANCE.md`, `docs/INTEGRATION_REVIEW_2026-10-15.md` và **`docs/INTEGRATION_HARDENING_2026-10-15.md`** (migration 004, công thức kho, hoàn tiền và thu hồi phiên).
 
 Phải tự kiểm tra lại trên XAMPP của nhóm, gồm upload ảnh, phân quyền, checkout, tra cứu và mobile. Cần cấu hình mail/SMTP thật nếu demo quên mật khẩu qua email Internet. Định mức và trừ/hoàn nguyên liệu cần được cấu hình theo từng mẫu tại `admin/cong-thuc-hoa.php`; hoàn tiền được đối soát theo trạng thái đơn nhưng không tự chuyển tiền thật; xem danh sách ở tài liệu kiểm kê tích hợp.
+
+
+## Tư vấn chọn hoa và báo cáo lợi nhuận gộp (nâng cấp 005)
+
+- Khách hàng: `tu-van-hoa.php` lọc mẫu theo dịp, tone và ngân sách. Khi môi trường PHP có `OPENAI_API_KEY` và cURL, máy chủ gọi AI tạo lời tư vấn dựa trên mẫu đang bán trong MySQL. Nếu không có API hoặc gặp lỗi, kết quả ghi rõ `Gợi ý dựa trên bộ lọc sản phẩm`, không giả lập AI. Hạn chế 8 lần gửi/15 phút/phiên, kiểm tra CSRF; không commit API key.
+- Admin/Owner: `admin/loi-nhuan.php` vẽ đồ thị theo ngày/tháng, doanh thu sau hoàn tiền, giá vốn nguyên liệu theo snapshot khi xuất, lợi nhuận gộp và tỷ suất. Đơn cũ chưa có giá vốn lịch sử được đánh dấu chưa đủ dữ liệu, không tính lợi nhuận giả. Đây KHÔNG phải lợi nhuận ròng (chưa trừ chi phí vận hành).
+- Migrations `005` thêm hai cột snapshot giá vốn không phá dữ liệu lịch sử. Chỉ các lần xuất sau nâng cấp mới có snapshot mới.
