@@ -3,7 +3,7 @@
 # Chạy sau scripts/verify-r2.sh (đã import schema + seed). Không cần mật khẩu cố định: tài khoản kiểm thử
 # owner/admin/staff được tạo qua scripts/create-admin.php với mật khẩu sinh ngẫu nhiên cho mỗi lần chạy.
 set -eEuo pipefail
-trap 'echo "--- PHP server errors for Admin Operations ---"; tail -n 65 /tmp/cas-admin-ops-http.log 2>/dev/null || true' ERR
+trap 'echo "--- PHP exceptions (full server run) ---"; grep -E "PHP Fatal|SQLSTATE|loi-nhuan.php|Uncaught|Error" /tmp/cas-admin-ops-http.log 2>/dev/null | tail -n 75 || true; echo "--- last requests ---"; tail -n 18 /tmp/cas-admin-ops-http.log 2>/dev/null || true' ERR
 DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-3306}"
 DB_USER="${DB_USER:-root}"
