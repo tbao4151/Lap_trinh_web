@@ -35,10 +35,10 @@ function cas_order_consume_inventory(PDO $db,int $orderId,int $actorId): void {
         }
     }
     ksort($need,SORT_NUMERIC);
-    $lock=$db->prepare('SELECT name,unit,quantity,status FROM inventory_items WHERE item_id=? FOR UPDATE');
+    $lock=$db->prepare('SELECT name,unit,quantity,status,unit_cost FROM inventory_items WHERE item_id=? FOR UPDATE');
     $update=$db->prepare('UPDATE inventory_items SET quantity=?,updated_at=NOW() WHERE item_id=?');
     $insert=$db->prepare('INSERT INTO inventory_transactions(item_id,user_id,transaction_type,quantity,quantity_before,quantity_after,note,request_token) VALUES(?,?,?,?,?,?,?,?)');
-    $usage=$db->prepare('INSERT INTO order_inventory_usage(order_id,item_id,quantity,actor_id) VALUES(?,?,?,?)');
+    $usage=$db->prepare('INSERT INTO order_inventory_usage(order_id,item_id,quantity,actor_id,unit_cost_snapshot,cost_amount_snapshot) VALUES(?,?,?,?,?,?)');
     foreach($need as $id=>$units){
         $lock->execute([$id]);$item=$lock->fetch();
         if(!$item||$item['status']!=='active')throw new DomainException('Nguyên liệu #'.$id.' đã bị ngừng dùng hoặc không tồn tại.');
@@ -47,7 +47,11 @@ function cas_order_consume_inventory(PDO $db,int $orderId,int $actorId): void {
         $quantity=$units/100;$after=($before-$units)/100;
         $update->execute([$after,$id]);
         $insert->execute([$id,$actorId,'out',-$quantity,$before/100,$after,'Xuất nguyên liệu cho đơn #'.$orderId,substr(hash('sha256','order-out:'.$orderId.':'.$id),0,32)]);
-        $usage->execute([$orderId,$id,$quantity,$actorId]);
+        // Snapshot the current unit cost at the moment ingredients leave stock.
+        $cost=(int)round((float)$item['unit_cost']*100);
+        if($cost<0)throw new DomainException('Giá vốn nguyên liệu không hợp lệ.');
+        $amount=round(($units/100)*($cost/100),2);
+        $usage->execute([$orderId,$id,$quantity,$actorId,$cost/100,$amount]);
     }
 }
 

@@ -218,7 +218,7 @@ $q->execute([$start,$end]);$rows=$q->fetchAll();
 $totals=['orders'=>0,'gross'=>0,'revenue'=>0];
 foreach($rows as $r){$totals['orders']+=(int)$r['order_count'];$totals['gross']+=(float)$r['gross_sales'];$totals['revenue']+=(float)$r['confirmed_revenue'];}
 ?>
-<section class="admin-card admin-section"><form method="get" class="cas-admin-stack mb-3">Từ <input name="start" type="date" class="admin-input" value="<?= cas_e($start) ?>"> đến <input name="end" type="date" class="admin-input" value="<?= cas_e($end) ?>"><button class="admin-btn-light">Xem báo cáo</button></form>
+<section class="admin-card admin-section"><p><a class="admin-btn-light" href="loi-nhuan.php">Xem biểu đồ lợi nhuận gộp và giá vốn nguyên liệu →</a></p><form method="get" class="cas-admin-stack mb-3">Từ <input name="start" type="date" class="admin-input" value="<?= cas_e($start) ?>"> đến <input name="end" type="date" class="admin-input" value="<?= cas_e($end) ?>"><button class="admin-btn-light">Xem báo cáo</button></form>
 <div class="cas-admin-metrics mb-4"><article class="cas-admin-metric">Tổng đơn<strong><?= $totals['orders'] ?></strong></article><article class="cas-admin-metric">Giá trị đơn<strong><?= cas_money($totals['gross']) ?></strong></article><article class="cas-admin-metric">Doanh thu đã hoàn tất và thanh toán<strong><?= cas_money($totals['revenue']) ?></strong></article></div>
 <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Ngày</th><th>Số đơn</th><th>Giá trị tạo đơn</th><th>Doanh thu hợp lệ</th></tr></thead><tbody>
 <?php foreach($rows as $r): ?><tr><td><?= cas_e($r['day']) ?></td><td><?= (int)$r['order_count'] ?></td><td><?= cas_money($r['gross_sales']) ?></td><td><?= cas_money($r['confirmed_revenue']) ?></td></tr><?php endforeach; ?>

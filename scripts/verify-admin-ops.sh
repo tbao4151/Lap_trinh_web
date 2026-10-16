@@ -2,7 +2,8 @@
 # Kiểm thử Admin Operations (Thành viên 3, ADM-01..ADM-07) trên MySQL + PHP thật.
 # Chạy sau scripts/verify-r2.sh (đã import schema + seed). Không cần mật khẩu cố định: tài khoản kiểm thử
 # owner/admin/staff được tạo qua scripts/create-admin.php với mật khẩu sinh ngẫu nhiên cho mỗi lần chạy.
-set -euo pipefail
+set -eEuo pipefail
+trap 'echo "--- PHP exceptions (full server run) ---"; grep -E "PHP Fatal|SQLSTATE|loi-nhuan.php|Uncaught|Error" /tmp/cas-admin-ops-http.log 2>/dev/null | tail -n 75 || true; echo "--- last requests ---"; tail -n 18 /tmp/cas-admin-ops-http.log 2>/dev/null || true' ERR
 DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-3306}"
 DB_USER="${DB_USER:-root}"
@@ -17,10 +18,12 @@ echo "== Migration tăng dần (001, 002, 003 x2)"
 "${MYSQL[@]}" < database/migrations/002_inventory_seed.sql
 "${MYSQL[@]}" < database/migrations/003_admin_ops.sql
 "${MYSQL[@]}" < database/migrations/004_order_inventory_sessions.sql
+"${MYSQL[@]}" < database/migrations/005_profit_cost_snapshot.sql
 COUNTS_SQL="SELECT CONCAT_WS(',',(SELECT COUNT(*) FROM product_images),(SELECT COUNT(*) FROM wrapping_colors),(SELECT COUNT(*) FROM discovery_groups),(SELECT COUNT(*) FROM shop_settings),(SELECT COUNT(*) FROM products),(SELECT COUNT(*) FROM inventory_items))"
 BEFORE="$(db "$COUNTS_SQL")"
 "${MYSQL[@]}" < database/migrations/003_admin_ops.sql
 "${MYSQL[@]}" < database/migrations/004_order_inventory_sessions.sql
+"${MYSQL[@]}" < database/migrations/005_profit_cost_snapshot.sql
 AFTER="$(db "$COUNTS_SQL")"
 [ "$BEFORE" = "$AFTER" ] || { echo "Migration 003 chạy lại làm thay đổi dữ liệu: $BEFORE -> $AFTER"; exit 1; }
 for t in product_images discovery_groups delivery_events refund_events shop_settings admin_audit_log product_recipes order_inventory_usage; do
@@ -28,7 +31,8 @@ for t in product_images discovery_groups delivery_events refund_events shop_sett
 done
 [ "$(db "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='$DB_NAME' AND table_name='inventory_transactions' AND column_name IN ('quantity_before','quantity_after','request_token')")" = "3" ] || { echo "Thiếu cột lịch sử kho"; exit 1; }
 [ "$(db "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='$DB_NAME' AND table_name='users' AND column_name='session_version'")" = "1" ] || { echo 'Missing session_version'; exit 1; }
-echo "Migration 003/004 idempotent: $AFTER"
+[ "$(db "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='$DB_NAME' AND table_name='order_inventory_usage' AND column_name IN ('unit_cost_snapshot','cost_amount_snapshot')")" = "2" ] || { echo 'Missing cost snapshot fields'; exit 1; }
+echo "Migration 003/004/005 idempotent: $AFTER"
 
 echo "== Tài khoản kiểm thử qua CLI (mật khẩu ngẫu nhiên)"
 gen_password() { python3 -c 'import secrets;print("Ops_"+secrets.token_hex(6)+"!Z9")'; }

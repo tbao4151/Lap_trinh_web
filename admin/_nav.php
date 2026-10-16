@@ -11,7 +11,7 @@ $casNavGroups = [
     'Vận hành' => [
         ['don-hang.php', 'Đơn hàng', $casNavAll], ['hoan-tien.php', 'Hoàn tiền', $casNavAll],
         ['giao-hang.php', 'Giao hàng', $casNavAll], ['khach-hang.php', 'Khách hàng', $casNavAll],
-        ['bao-cao.php', 'Báo cáo doanh thu', $casNavAll],
+        ['bao-cao.php', 'Báo cáo doanh thu', $casNavAll], ['loi-nhuan.php', 'Biểu đồ lợi nhuận', ['admin', 'owner']],
     ],
     'Sản phẩm' => [
         ['san-pham.php', 'Sản phẩm', $casNavAll], ['them-san-pham.php', 'Thêm sản phẩm', ['admin', 'owner']],

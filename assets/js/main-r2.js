@@ -25,20 +25,21 @@
               '<span class="cas-brand-mark"><i class="bi bi-flower1"></i></span>' +
               '<span><span class="cas-brand-name">CÁ\'S HOA</span><span class="cas-brand-tagline">flowers & feelings</span></span>' +
             '</a>' +
-            '<nav class="d-none d-md-flex align-items-center gap-4" aria-label="Điều hướng chính">' +
+            '<nav class="d-none d-lg-flex align-items-center gap-4" aria-label="Điều hướng chính">' +
               '<a class="cas-nav-link' + active('home') + '" href="index.php">Trang chủ</a>' +
               '<a class="cas-nav-link' + active('catalog') + '" href="san-pham.php?type=bouquet">Bó hoa</a>' +
               '<a class="cas-nav-link" href="san-pham.php?type=basket">Giỏ hoa</a>' +
+              '<a class="cas-nav-link' + active('advisor') + '" href="tu-van-hoa.php">Tư vấn chọn hoa</a>' +
               '<a class="cas-nav-link" href="tin-tuc.php">Tin tức</a><a class="cas-nav-link" href="lien-he.php">Liên hệ</a>' +
             '</nav>' +
             '<div class="d-flex align-items-center gap-1">' +
               '<a class="cas-icon-btn" href="san-pham.php" aria-label="Tìm kiếm sản phẩm"><i class="bi bi-search"></i></a>' +
               '<a class="cas-account-link d-none d-sm-inline-flex" href="tai-khoan.php">Tài khoản</a>' +
               '<a class="cas-icon-btn surface position-relative" href="gio-hang.php" aria-label="Giỏ hàng"><i class="bi bi-bag"></i><span class="cas-cart-count d-none" id="headerCartCount">0</span></a>' +
-              '<button class="cas-icon-btn d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#casMobileNav" aria-controls="casMobileNav" aria-expanded="false" aria-label="Mở menu"><i class="bi bi-list fs-5"></i></button>' +
+              '<button class="cas-icon-btn d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#casMobileNav" aria-controls="casMobileNav" aria-expanded="false" aria-label="Mở menu"><i class="bi bi-list fs-5"></i></button>' +
             '</div>' +
           '</div>' +
-          '<div class="collapse cas-mobile-nav d-md-none" id="casMobileNav"><nav class="cas-container py-2"><a href="index.php">Trang chủ</a><a href="san-pham.php?type=bouquet">Bó hoa</a><a href="san-pham.php?type=basket">Giỏ hoa</a><a href="gio-hang.php">Giỏ hàng</a><a href="tra-cuu-don-hang.php">Tra cứu đơn</a><a href="tai-khoan.php">Tài khoản</a><a href="tin-tuc.php">Tin tức</a><a href="lien-he.php">Liên hệ</a></nav></div>' +
+          '<div class="collapse cas-mobile-nav d-lg-none" id="casMobileNav"><nav class="cas-container py-2"><a href="index.php">Trang chủ</a><a href="san-pham.php?type=bouquet">Bó hoa</a><a href="san-pham.php?type=basket">Giỏ hoa</a><a href="tu-van-hoa.php">Tư vấn chọn hoa</a><a href="gio-hang.php">Giỏ hàng</a><a href="tra-cuu-don-hang.php">Tra cứu đơn</a><a href="tai-khoan.php">Tài khoản</a><a href="tin-tuc.php">Tin tức</a><a href="lien-he.php">Liên hệ</a></nav></div>' +
         '</header>' +
       '</div>';
   }
