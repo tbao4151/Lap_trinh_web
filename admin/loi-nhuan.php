@@ -17,7 +17,7 @@ if(!in_array($group,['day','month'],true))$group='day';
 $format=$group==='month'?'%Y-%m':'%Y-%m-%d';
 // Cost snapshot is frozen when preparing the order, NEVER based on today's material prices.
 // Legacy orders without a complete cost snapshot are excluded from profit, but counted.
-$sql="SELECT DATE_FORMAT(o.created_at, ?) bucket,
+$sql="SELECT DATE_FORMAT(o.created_at, '$format') bucket,
  COUNT(*) order_count,
  COALESCE(SUM(GREATEST(o.total_amount-COALESCE(r.refunded,0),0)),0) net_all,
  COALESCE(SUM(COALESCE(r.refunded,0)),0) refunded,
@@ -33,8 +33,8 @@ $sql="SELECT DATE_FORMAT(o.created_at, ?) bucket,
    FROM order_inventory_usage WHERE restored_at IS NULL GROUP BY order_id) u ON u.order_id=o.order_id
  WHERE o.order_status='completed' AND o.payment_status IN ('paid','partially_refunded','refunded')
  AND o.created_at >= ? AND o.created_at < DATE_ADD(?,INTERVAL 1 DAY)
- GROUP BY DATE_FORMAT(o.created_at, ?) ORDER BY bucket ASC";
-$q=$db->prepare($sql);$q->execute([$format,$from,$to,$format]);$rows=$q->fetchAll();
+ GROUP BY DATE_FORMAT(o.created_at, '$format') ORDER BY bucket ASC";
+$q=$db->prepare($sql);$q->execute([$from,$to]);$rows=$q->fetchAll();
 $totals=['orders'=>0,'net_all'=>0.0,'refunded'=>0.0,'known_revenue'=>0.0,'material_cost'=>0.0,'gross_profit'=>0.0,'unknown_count'=>0];
 foreach($rows as $r)foreach($totals as $k=>$v)$totals[$k]+=(float)$r[$k];
 $margin=$totals['known_revenue']>0 ? $totals['gross_profit']/$totals['known_revenue']*100 : 0;
