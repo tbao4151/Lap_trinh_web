@@ -2,7 +2,8 @@
 # Kiểm thử Admin Operations (Thành viên 3, ADM-01..ADM-07) trên MySQL + PHP thật.
 # Chạy sau scripts/verify-r2.sh (đã import schema + seed). Không cần mật khẩu cố định: tài khoản kiểm thử
 # owner/admin/staff được tạo qua scripts/create-admin.php với mật khẩu sinh ngẫu nhiên cho mỗi lần chạy.
-set -euo pipefail
+set -eEuo pipefail
+trap 'echo "--- PHP server errors for Admin Operations ---"; tail -n 65 /tmp/cas-admin-ops-http.log 2>/dev/null || true' ERR
 DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-3306}"
 DB_USER="${DB_USER:-root}"
