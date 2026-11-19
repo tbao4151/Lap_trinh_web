@@ -4,9 +4,12 @@
 
 ## Nhánh Git và trạng thái dự án
 
-- **`main`** (`9cb1b995`): Nhánh nộp chính thức hiện tại (bảo toàn nền tảng trước đợt nâng cấp UI và refactor).
-- **`feature/ui-professional-polish`** (`5ae77980`): Nhánh hoàn tất kiểm toán và nâng cấp UI/UX, tương phản WCAG AA, a11y và responsive (kèm báo cáo tại `docs/ui-audit/`).
-- **`feature/project-structure-refactor`**: Nhánh tái cấu trúc mã nguồn từ nền `5ae77980`, **chưa merge vào `main`**. Giữ nguyên toàn bộ URL công khai, giao diện đã duyệt và logic nghiệp vụ PHP/MySQL.
+- **`main`**: Nhánh mặc định dùng cho bản nộp và clean clone. Sau khi Pull Request tích hợp cuối được nghiệm thu và merge, nhánh này có UI mới, kiến trúc PHP/MySQL và các sửa lỗi Customer/Admin.
+- **`feature/ui-professional-polish`** (`5ae77980`): Lịch sử nâng cấp UI/UX, WCAG AA và responsive (báo cáo tại `docs/ui-audit/`).
+- **`feature/project-structure-refactor`** (`d68e0a8e`): Lịch sử tái cấu trúc layout, module và bảo mật đường dẫn nội bộ.
+- **`feature/tv2-customer-backend-final`** (`7bda713`, tác giả Jouise-source): Kiểm tra và sửa giỏ hàng, mở rộng bộ kiểm thử Customer ([PR #5](https://github.com/tbao4151/Lap_trinh_web/pull/5)).
+- **`feature/tv3-admin-backend-final`** (`c70b877`, tác giả MysticMoth999): Sửa thống kê doanh thu sau hoàn tiền và luồng giao hàng, bổ sung kiểm thử Admin ([PR #6](https://github.com/tbao4151/Lap_trinh_web/pull/6)).
+- **`integration/cas-hoa-final-20261119`**: Nhánh nghiệm thu tích hợp, với CI PHP 8.2/MySQL 8.0 trước khi đưa lên `main` ([PR #7](https://github.com/tbao4151/Lap_trinh_web/pull/7)).
 
 Xem chi tiết kiến trúc, sơ đồ tách module và kết quả kiểm thử tái cấu trúc tại:
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
@@ -30,7 +33,7 @@ Yêu cầu **XAMPP với PHP 8.2+** (`pdo_mysql`, `mbstring`, `fileinfo`), **MyS
 cd D:\xampp\htdocs   # hoặc C:\xampp\htdocs tùy nơi cài XAMPP
 git clone https://github.com/tbao4151/Lap_trinh_web.git
 cd Lap_trinh_web
-git switch feature/project-structure-refactor
+# Mặc định Git clone nhánh main; không cần chuyển nhánh khác.
 ```
 
 (Nếu phát triển trực tiếp ở thư mục riêng như `E:\Lap_trinh_web`, có thể trỏ Apache `Alias /Lap_trinh_web "E:/Lap_trinh_web"` với `AllowOverride All` hoặc đồng bộ vào `<xampp>\htdocs\Lap_trinh_web`.)
@@ -70,9 +73,15 @@ Mở trình duyệt tới `http://localhost/Lap_trinh_web/index.php` và `http:/
   bash scripts/verify-r2-auth-admin.sh
   bash scripts/verify-admin-ops.sh
   ```
+- Kiểm thử mở rộng: `tests/admin/test_admin_backend_final.py` (đối soát doanh thu, trạng thái giao hàng, giá vốn) và `tests/customer/http.cjs` (đăng nhập, giỏ hàng, checkout, reset mật khẩu). Cần cài môi trường test và chạy **chỉ trên database cô lập**; tham khảo `docs/TV2_CUSTOMER_BACKEND_TEST_REPORT.md` và `docs/TV3_ADMIN_BACKEND_TEST_REPORT.md`.
 - Trên Windows với XAMPP cục bộ, sử dụng cơ chế DB riêng ở cổng khác hoặc đọc thêm tại `docs/REFACTOR_TEST_REPORT.md` và `docs/customer-preview.md`.
 
 ## Tư vấn chọn hoa và báo cáo lợi nhuận gộp (nâng cấp 005)
 
 - **Khách hàng (`tu-van-hoa.php`)**: Lọc mẫu theo dịp, tông màu và ngân sách. Khi biến môi trường PHP có `OPENAI_API_KEY` và bật cURL, máy chủ gọi API tạo lời tư vấn dựa trên mẫu đang bán trong MySQL; khi không có API key hoặc lỗi mạng, hệ thống dùng chế độ `Gợi ý dựa trên bộ lọc sản phẩm`, không giả lập AI. Giới hạn 8 yêu cầu / 15 phút / phiên, kiểm tra CSRF.
 - **Admin/Owner (`admin/loi-nhuan.php`)**: Biểu đồ doanh thu sau hoàn tiền, giá vốn nguyên liệu theo snapshot tại thời điểm xuất kho và lợi nhuận gộp (chưa trừ chi phí vận hành). Các đơn cũ trước migration `005` chưa có snapshot được thống kê riêng, không tính lợi nhuận giả.
+
+## Giới hạn đã biết
+
+- Gửi email đặt lại mật khẩu ra Internet phụ thuộc cấu hình SMTP của máy chủ; bài test chỉ xác minh SMTP loopback, không cam kết XAMPP mặc định gửi email được.
+- Không chạy các script kiểm thử tích hợp với database có dữ liệu kinh doanh. Chúng có thể tạo đơn, tài khoản và cập nhật sản phẩm/kho.
