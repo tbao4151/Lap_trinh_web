@@ -5,48 +5,29 @@ if(preg_match('/^[a-z0-9-]{1,220}$/',$slug)){
  $stmt=cas_db()->prepare("SELECT title,thumbnail,content,published_at FROM news WHERE slug=? AND status='published' LIMIT 1");
  $stmt->execute([$slug]);$article=$stmt->fetch() ?: null;
 }
-if(!$article) http_response_code(404);
+if (!$article) http_response_code(404);
+cas_page_start("Chi tiết tin tức | CÁ'S HOA", 'article', "Bài viết về hoa và quà tặng.");
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Bài viết về hoa và quà tặng.">
-  <title>Chi tiết tin tức | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="article" class="d-flex flex-column">
-  <div id="siteHeader"></div>
 
   <main class="cas-page content-page">
     <div class="cas-container">
       <article id="articleHost" class="mx-auto" style="max-width: 900px">
 <?php if($article): ?>
+  <nav class="breadcrumb-cas" aria-label="Đường dẫn"><a href="index.php">Trang chủ</a> / <a href="tin-tuc.php">Tin tức</a> / <span aria-current="page"><?= cas_e($article['title']) ?></span></nav>
   <div class="article-meta"><?= cas_e(date('d.m.Y',strtotime($article['published_at']))) ?> · Tin tức</div>
   <h1 class="cas-title mt-3"><?= cas_e($article['title']) ?></h1>
-  <img class="img-fluid rounded mt-4" src="<?= cas_e($article['thumbnail']) ?>" alt="<?= cas_e($article['title']) ?>">
-  <div class="content-card mt-4"><p style="white-space:pre-line"><?= cas_e($article['content']) ?></p></div>
+  <img class="article-cover mt-4" src="<?= cas_e($article['thumbnail']) ?>" alt="<?= cas_e($article['title']) ?>">
+  <div class="content-card mt-4 p-4"><p class="article-body mb-0"><?= cas_e($article['content']) ?></p></div>
+  <div class="mt-4"><a class="btn-cas-outline" href="tin-tuc.php"><i class="bi bi-arrow-left" aria-hidden="true"></i> Trở lại tin tức</a></div>
 <?php else: ?>
-  <h1 class="cas-title">Không tìm thấy bài viết.</h1>
-  <a href="tin-tuc.php">Trở lại tin tức</a>
+  <section class="customer-empty">
+    <i class="bi bi-journal-x"></i>
+    <h1 class="font-display fs-3">Không tìm thấy bài viết.</h1>
+    <p class="cas-muted">Bài viết đã được gỡ hoặc đường dẫn không tồn tại.</p>
+    <a class="btn-cas-primary mt-2" href="tin-tuc.php">Trở lại tin tức</a>
+  </section>
 <?php endif; ?>
 </article>
     </div>
   </main>
-
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

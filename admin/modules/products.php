@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /**
  * ADM-02 — Sản phẩm, hình ảnh, giấy gói theo sản phẩm, quản lý nhanh và phân loại.
  * Giữ nguyên tên action / field cũ (product_save, quick_save, taxonomy_save) để kiểm thử CI của nhóm vẫn chạy.
@@ -365,25 +369,25 @@ function cas_products_list_page(): void
     ?>
 <section class="admin-card admin-section">
   <form method="get" class="cas-admin-stack mb-3">
-    <input class="admin-input" name="q" value="<?= cas_e($search) ?>" placeholder="Tên, SKU hoặc slug">
-    <?= cas_select('status', ['' => 'Mọi trạng thái'] + CAS_PRODUCT_STATUS, $status) ?>
-    <select class="admin-select" name="category"><option value="">Mọi loại hoa</option><?php foreach ($categories as $c): ?><option value="<?= (int)$c['category_id'] ?>" <?= $category === (int)$c['category_id'] ? 'selected' : '' ?>><?= cas_e($c['name']) ?></option><?php endforeach; ?></select>
+    <input class="admin-input" name="q" value="<?= cas_e($search) ?>" aria-label="Tìm tên, SKU hoặc slug" placeholder="Tên, SKU hoặc slug">
+    <?= cas_select('status', ['' => 'Mọi trạng thái'] + CAS_PRODUCT_STATUS, $status, 'aria-label="Lọc trạng thái"') ?>
+    <select class="admin-select" name="category" aria-label="Lọc theo loại hoa"><option value="">Mọi loại hoa</option><?php foreach ($categories as $c): ?><option value="<?= (int)$c['category_id'] ?>" <?= $category === (int)$c['category_id'] ? 'selected' : '' ?>><?= cas_e($c['name']) ?></option><?php endforeach; ?></select>
     <button class="admin-btn-light" type="submit">Tìm kiếm</button><span class="admin-badge"><?= count($rows) ?> sản phẩm</span>
     <?php if ($canEdit): ?><a class="admin-btn" href="them-san-pham.php">Thêm sản phẩm</a><?php endif; ?>
   </form>
   <div class="admin-table-wrap"><table class="admin-table">
     <thead><tr><th>Ảnh</th><th>Sản phẩm</th><th>Phân loại</th><th>Giá</th><th>Hiển thị</th><th>Ảnh / đơn</th><?php if ($canEdit): ?><th>Thao tác</th><?php endif; ?></tr></thead><tbody>
     <?php foreach ($rows as $p): ?>
-    <tr><td><img src="../<?= cas_e($p['image']) ?>" width="64" height="64" style="object-fit:cover;border-radius:10px" alt=""></td>
+    <tr><td><img class="admin-thumb" src="../<?= cas_e($p['image']) ?>" width="64" height="64" alt=""></td>
       <td><strong><?= cas_e($p['name']) ?></strong><div class="cas-muted"><?= cas_e($p['sku']) ?> · /<?= cas_e($p['slug']) ?></div></td>
       <td><?= cas_e($p['category_name'] ?? '—') ?><div class="cas-muted"><?= cas_e(CAS_PRODUCT_TYPES[$p['product_type']] ?? $p['product_type']) ?> · <?= cas_e($p['tone_name'] ?? '—') ?> · <?= cas_e($p['occasion_name'] ?? '—') ?></div></td>
-      <td><strong><?= cas_money($p['price']) ?></strong></td>
+      <td class="admin-money"><?= cas_money($p['price']) ?></td>
       <td><?= cas_status_badge(CAS_PRODUCT_STATUS[$p['status']] ?? $p['status'], $p['status'] === 'active' ? 'success' : '') ?></td>
       <td><?= (int)$p['images'] ?> ảnh<div class="cas-muted"><?= (int)$p['orders'] ?> đơn</div></td>
       <?php if ($canEdit): ?><td><div class="cas-admin-table-form">
         <a class="admin-btn-light" href="sua-san-pham.php?id=<?= (int)$p['product_id'] ?>">Sửa</a>
         <form method="post"><?= cas_csrf_form() ?><input type="hidden" name="action" value="product_toggle"><input type="hidden" name="id" value="<?= (int)$p['product_id'] ?>"><button class="admin-btn-light" type="submit"><?= $p['status'] === 'active' ? 'Ẩn' : 'Hiện' ?></button></form>
-        <form method="post" data-confirm="Xoá vĩnh viễn sản phẩm này? Sản phẩm đã có đơn hàng sẽ bị từ chối."><?= cas_csrf_form() ?><input type="hidden" name="action" value="product_delete"><input type="hidden" name="confirm" value="yes"><input type="hidden" name="id" value="<?= (int)$p['product_id'] ?>"><button class="admin-btn-light text-danger" type="submit">Xoá</button></form>
+        <form method="post" data-confirm="Xoá vĩnh viễn sản phẩm này? Sản phẩm đã có đơn hàng sẽ bị từ chối."><?= cas_csrf_form() ?><input type="hidden" name="action" value="product_delete"><input type="hidden" name="confirm" value="yes"><input type="hidden" name="id" value="<?= (int)$p['product_id'] ?>"><button class="admin-btn-light admin-btn-danger" type="submit">Xoá</button></form>
       </div></td><?php endif; ?></tr>
     <?php endforeach; ?>
     <?php if (!$rows): ?><tr><td colspan="7"><div class="admin-empty">Không có sản phẩm phù hợp.</div></td></tr><?php endif; ?>
@@ -441,17 +445,17 @@ function cas_product_form_page(bool $edit): void
   <div><label class="admin-label" for="pSku">SKU</label><input class="admin-input" id="pSku" name="sku" maxlength="50" required pattern="[A-Za-z0-9][A-Za-z0-9_\-]{2,49}" value="<?= cas_e((string)($product['sku'] ?? '')) ?>" placeholder="BH-TEN-MAU-400"></div>
   <div><label class="admin-label" for="pSlug">Slug (để trống sẽ tạo từ tên)</label><input class="admin-input" id="pSlug" name="slug" maxlength="190" value="<?= cas_e((string)($product['slug'] ?? '')) ?>"></div>
   <div><label class="admin-label" for="pPrice">Giá bán (VND)</label><input class="admin-input" id="pPrice" name="price" type="number" min="0" max="100000000" step="1000" required value="<?= cas_e(isset($product['price']) ? (string)(int)$product['price'] : '') ?>"></div>
-  <div><label class="admin-label">Kiểu sản phẩm</label><?= cas_select('product_type', CAS_PRODUCT_TYPES, (string)($product['product_type'] ?? 'bouquet')) ?></div>
-  <div><label class="admin-label">Trạng thái</label><?= cas_select('status', CAS_PRODUCT_STATUS, (string)($product['status'] ?? 'active')) ?></div>
+  <div><label class="admin-label" for="pType">Kiểu sản phẩm</label><?= cas_select('product_type', CAS_PRODUCT_TYPES, (string)($product['product_type'] ?? 'bouquet'), 'id="pType"') ?></div>
+  <div><label class="admin-label" for="pStatus">Trạng thái</label><?= cas_select('status', CAS_PRODUCT_STATUS, (string)($product['status'] ?? 'active'), 'id="pStatus"') ?></div>
   <?php foreach (CAS_TAXONOMIES as $table => [$pk, $label]): ?>
-  <div><label class="admin-label"><?= cas_e($label) ?></label><select class="admin-select" name="<?= $pk ?>"><option value="">Không chọn</option>
+  <div><label class="admin-label" for="p_<?= $pk ?>"><?= cas_e($label) ?></label><select id="p_<?= $pk ?>" class="admin-select" name="<?= $pk ?>"><option value="">Không chọn</option>
     <?php foreach ($options[$pk] as $o): ?><option value="<?= (int)$o['id'] ?>" <?= (int)($product[$pk] ?? 0) === (int)$o['id'] ? 'selected' : '' ?>><?= cas_e($o['name']) ?><?= $o['status'] !== 'active' ? ' (ngừng dùng)' : '' ?></option><?php endforeach; ?></select></div>
   <?php endforeach; ?>
-  <div><label class="admin-label">Ảnh thư viện làm ảnh đại diện</label><select class="admin-select" name="image"><option value=""><?= $edit ? '— Giữ ảnh đại diện hiện tại —' : '— Không chọn —' ?></option>
+  <div><label class="admin-label" for="pImage">Ảnh thư viện làm ảnh đại diện</label><select id="pImage" class="admin-select" name="image"><option value=""><?= $edit ? '— Giữ ảnh đại diện hiện tại —' : '— Không chọn —' ?></option>
     <?php foreach ($library as $file): ?><option value="<?= cas_e($file) ?>"><?= cas_e($file) ?></option><?php endforeach; ?></select></div>
-  <div class="full"><label class="admin-label">Tải ảnh mới (PNG / JPG / WEBP, ≤ 2 MB / ảnh, tối đa <?= CAS_PRODUCT_MAX_IMAGES ?> ảnh)</label><input class="admin-input" type="file" name="images[]" accept="image/png,image/jpeg,image/webp" multiple></div>
-  <div class="full"><label class="admin-label">Mô tả</label><textarea class="admin-textarea" name="description" rows="3" maxlength="2000"><?= cas_e((string)($product['description'] ?? '')) ?></textarea></div>
-  <div class="full"><label class="admin-label">Thành phần</label><textarea class="admin-textarea" name="composition" rows="2" maxlength="1000"><?= cas_e((string)($product['composition'] ?? '')) ?></textarea></div>
+  <div class="full"><label class="admin-label" for="pImages">Tải ảnh mới (PNG / JPG / WEBP, ≤ 2 MB / ảnh, tối đa <?= CAS_PRODUCT_MAX_IMAGES ?> ảnh)</label><input id="pImages" class="admin-input" type="file" name="images[]" accept="image/png,image/jpeg,image/webp" multiple></div>
+  <div class="full"><label class="admin-label" for="pDesc">Mô tả</label><textarea id="pDesc" class="admin-textarea" name="description" rows="3" maxlength="2000"><?= cas_e((string)($product['description'] ?? '')) ?></textarea></div>
+  <div class="full"><label class="admin-label" for="pComp">Thành phần</label><textarea id="pComp" class="admin-textarea" name="composition" rows="2" maxlength="1000"><?= cas_e((string)($product['composition'] ?? '')) ?></textarea></div>
   <div class="full"><label class="admin-label">Giấy gói cho phép chọn</label><div class="cas-admin-stack">
     <?php foreach ($wrappings as $w): ?><label class="admin-check"><input type="checkbox" name="wrapping[]" value="<?= (int)$w['color_id'] ?>" <?= in_array((int)$w['color_id'], $assigned, true) ? 'checked' : '' ?>>
       <span class="cas-swatch" style="background:<?= cas_e($w['hex_code']) ?>"></span> <?= cas_e($w['name']) ?><?= (float)$w['surcharge'] > 0 ? ' (+' . cas_money($w['surcharge']) . ')' : '' ?><?= $w['status'] !== 'active' ? ' — ngừng dùng' : '' ?></label><?php endforeach; ?>
@@ -500,7 +504,7 @@ function cas_quick_page(): void
     <tr><td><strong><?= cas_e($p['name']) ?></strong><div class="cas-muted"><?= cas_e($p['sku']) ?> · <?= cas_e($p['category_name'] ?? '—') ?></div></td>
       <td><?= cas_money($p['price']) ?></td><td><?= cas_status_badge(CAS_PRODUCT_STATUS[$p['status']] ?? $p['status'], $p['status'] === 'active' ? 'success' : '') ?></td>
       <?php if ($canEdit): ?><td><form class="cas-admin-table-form" method="post"><?= cas_csrf_form() ?><input type="hidden" name="action" value="quick_save"><input type="hidden" name="id" value="<?= (int)$p['product_id'] ?>">
-        <input class="admin-input" type="number" name="price" min="0" max="100000000" step="1000" value="<?= (int)$p['price'] ?>" required><?= cas_select('status', CAS_PRODUCT_STATUS, $p['status']) ?><button class="admin-btn-light" type="submit">Lưu</button></form></td><?php endif; ?></tr>
+        <input class="admin-input" type="number" name="price" min="0" max="100000000" step="1000" aria-label="Giá bán mới <?= cas_e($p['name']) ?>" value="<?= (int)$p['price'] ?>" required><?= cas_select('status', CAS_PRODUCT_STATUS, $p['status'], 'aria-label="Trạng thái ' . cas_e($p['name']) . '"') ?><button class="admin-btn-light" type="submit">Lưu</button></form></td><?php endif; ?></tr>
     <?php endforeach; ?>
     </tbody></table></div>
 </section>
@@ -529,7 +533,7 @@ function cas_taxonomy_page(): void
   <div class="cas-admin-stack justify-content-between"><h2 class="admin-card-title mb-0"><?= cas_e($label) ?></h2><span class="admin-badge"><?= count($rows) ?> mục</span></div>
   <?php if ($canEdit): ?>
   <form method="post" class="cas-admin-stack my-3"><?= cas_csrf_form() ?><input type="hidden" name="action" value="taxonomy_save"><input type="hidden" name="table" value="<?= $table ?>">
-    <input class="admin-input" name="name" maxlength="100" required placeholder="Tên <?= cas_e(mb_strtolower($label)) ?> mới"><?php if ($table === 'tones'): ?><input type="color" name="hex_code" value="#CCCCCC" title="Mã màu"><?php endif; ?><button class="admin-btn" type="submit">Thêm</button></form>
+    <input class="admin-input" name="name" maxlength="100" aria-label="Tên <?= cas_e(mb_strtolower($label)) ?> mới" required placeholder="Tên <?= cas_e(mb_strtolower($label)) ?> mới"><?php if ($table === 'tones'): ?><input type="color" name="hex_code" value="#CCCCCC" aria-label="Mã màu <?= cas_e(mb_strtolower($label)) ?> mới" title="Mã màu"><?php endif; ?><button class="admin-btn" type="submit">Thêm</button></form>
   <?php endif; ?>
   <div class="admin-table-wrap"><table class="admin-table">
     <thead><tr><th>Tên</th><?php if ($table === 'tones'): ?><th>Màu</th><?php endif; ?><th>Đang dùng</th><th>Trạng thái</th><?php if ($canEdit): ?><th>Sửa / xoá</th><?php endif; ?></tr></thead><tbody>
@@ -540,9 +544,9 @@ function cas_taxonomy_page(): void
       <td><?= cas_status_badge($r['status'] === 'active' ? 'Đang dùng' : 'Ngừng dùng', $r['status'] === 'active' ? 'success' : '') ?></td>
       <?php if ($canEdit): ?><td><div class="cas-admin-table-form">
         <form method="post" class="cas-admin-table-form"><?= cas_csrf_form() ?><input type="hidden" name="action" value="taxonomy_save"><input type="hidden" name="table" value="<?= $table ?>"><input type="hidden" name="id" value="<?= (int)$r[$pk] ?>">
-          <input class="admin-input" name="name" maxlength="100" value="<?= cas_e($r['name']) ?>" required><?php if ($table === 'tones'): ?><input type="color" name="hex_code" value="<?= cas_e($r['hex_code'] ?: '#CCCCCC') ?>"><?php endif; ?>
-          <?= cas_select('status', ['active' => 'Đang dùng', 'inactive' => 'Ngừng dùng'], $r['status']) ?><button class="admin-btn-light" type="submit">Lưu</button></form>
-        <form method="post" data-confirm="Xoá mục phân loại này? Chỉ xoá được khi chưa sản phẩm / nhóm khám phá nào dùng."><?= cas_csrf_form() ?><input type="hidden" name="action" value="taxonomy_delete"><input type="hidden" name="table" value="<?= $table ?>"><input type="hidden" name="id" value="<?= (int)$r[$pk] ?>"><button class="admin-btn-light text-danger" type="submit">Xoá</button></form>
+          <input class="admin-input" name="name" maxlength="100" aria-label="Sửa tên <?= cas_e($r['name']) ?>" value="<?= cas_e($r['name']) ?>" required><?php if ($table === 'tones'): ?><input type="color" name="hex_code" aria-label="Sửa mã màu <?= cas_e($r['name']) ?>" value="<?= cas_e($r['hex_code'] ?: '#CCCCCC') ?>"><?php endif; ?>
+          <?= cas_select('status', ['active' => 'Đang dùng', 'inactive' => 'Ngừng dùng'], $r['status'], 'aria-label="Trạng thái ' . cas_e($r['name']) . '"') ?><button class="admin-btn-light" type="submit">Lưu</button></form>
+        <form method="post" data-confirm="Xoá mục phân loại này? Chỉ xoá được khi chưa sản phẩm / nhóm khám phá nào dùng."><?= cas_csrf_form() ?><input type="hidden" name="action" value="taxonomy_delete"><input type="hidden" name="table" value="<?= $table ?>"><input type="hidden" name="id" value="<?= (int)$r[$pk] ?>"><button class="admin-btn-light admin-btn-danger" type="submit">Xoá</button></form>
       </div></td><?php endif; ?></tr>
     <?php endforeach; ?>
     </tbody></table></div>

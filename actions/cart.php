@@ -12,8 +12,9 @@ foreach($cart as $item){
  $qty=filter_var($item['quantity']??null,FILTER_VALIDATE_INT);
  if($qty===false||$qty<1||$qty>20)cas_json(422,['ok'=>false,'message'=>'Số lượng từ 1 đến 20.']);
  $id=$item['productId'];
- if(isset($seen[$id]))cas_json(422,['ok'=>false,'message'=>'Sản phẩm trong giỏ bị trùng.']);
- $seen[$id]=true;$stmt->execute([(int)substr($id,1)]);
+ $productId=(int)substr($id,1);
+ if(isset($seen[$productId]))cas_json(422,['ok'=>false,'message'=>'Sản phẩm trong giỏ bị trùng.']);
+ $seen[$productId]=true;$stmt->execute([$productId]);
  if(!$stmt->fetch())cas_json(422,['ok'=>false,'message'=>'Sản phẩm đã ngừng bán.']);
  $line=['productId'=>$id,'quantity'=>(int)$qty];
  if(isset($item['wrappingId'])) {

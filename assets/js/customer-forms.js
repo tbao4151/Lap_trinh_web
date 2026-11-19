@@ -20,7 +20,7 @@
         if(request){
           var csrf=request.querySelector('[name="csrf"]').value;
           request.id='recoveryVerifyForm';
-          request.innerHTML='<input type="hidden" name="csrf"><input type="hidden" name="action" value="reset"><input type="hidden" name="uid"><input type="hidden" name="token"><label class="form-label" for="newPassword">Mật khẩu mới</label><input id="newPassword" name="password" type="password" autocomplete="new-password" class="form-control cas-form-control" required><p class="password-policy">Từ 10 ký tự, tối đa 72 byte; gồm chữ hoa, thường, số và ký tự đặc biệt.</p><label class="form-label mt-3" for="confirmPassword">Xác nhận mật khẩu</label><input id="confirmPassword" name="confirm" type="password" autocomplete="new-password" class="form-control cas-form-control" required><button type="submit" class="btn-cas-primary w-100 mt-3">Đổi mật khẩu</button>';
+          request.innerHTML='<input type="hidden" name="csrf"><input type="hidden" name="action" value="reset"><input type="hidden" name="uid"><input type="hidden" name="token"><div class="mb-3"><label class="form-label" for="newPassword">Mật khẩu mới <span class="form-required">*</span></label><div class="auth-password-wrap"><input id="newPassword" name="password" type="password" autocomplete="new-password" class="form-control cas-form-control" required><button class="auth-password-toggle" type="button" data-toggle-password="newPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye"></i></button></div><p class="password-policy">Từ 10 ký tự, tối đa 72 byte; gồm chữ hoa, thường, số và ký tự đặc biệt.</p></div><div class="mb-3"><label class="form-label" for="confirmPassword">Xác nhận mật khẩu <span class="form-required">*</span></label><div class="auth-password-wrap"><input id="confirmPassword" name="confirm" type="password" autocomplete="new-password" class="form-control cas-form-control" required><button class="auth-password-toggle" type="button" data-toggle-password="confirmPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye"></i></button></div></div><button type="submit" class="btn-cas-primary w-100 mt-2">Đổi mật khẩu</button>';
           request.elements.csrf.value=csrf;request.elements.uid.value=uid;request.elements.token.value=token;
           document.querySelector('.auth-card h1').textContent='Đặt mật khẩu mới';
           document.querySelector('.auth-description').textContent='Liên kết có thời hạn 30 phút và chỉ sử dụng một lần.';
@@ -28,14 +28,23 @@
       }
     }
     document.querySelectorAll('[data-toggle-password]').forEach(function(button){
-      button.addEventListener('click',function(){var input=document.getElementById(button.dataset.togglePassword);var show=input.type==='password';input.type=show?'text':'password';button.setAttribute('aria-label',show?'Ẩn mật khẩu':'Hiện mật khẩu');button.setAttribute('aria-pressed',String(show));});
+      button.addEventListener('click',function(){
+        var input=document.getElementById(button.dataset.togglePassword);
+        if(!input)return;
+        var show=input.type==='password';
+        input.type=show?'text':'password';
+        button.setAttribute('aria-label',show?'Ẩn mật khẩu':'Hiện mật khẩu');
+        button.setAttribute('aria-pressed',String(show));
+        var icon=button.querySelector('i');
+        if(icon){icon.className=show?'bi bi-eye-slash':'bi bi-eye';}
+      });
     });
     document.querySelectorAll('form.auth-form,#profileForm').forEach(function(form){
       form.addEventListener('submit',function(event){
         if(!form.checkValidity()){event.preventDefault();form.classList.add('was-validated');form.reportValidity();return;}
-        var button=form.querySelector('[type="submit"]'); if(button){button.dataset.idleText=button.textContent;button.disabled=true;button.textContent='Đang xử lý…';}
+        var button=form.querySelector('[type="submit"]'); if(button){button.dataset.idleHtml=button.innerHTML;button.disabled=true;button.textContent='Đang xử lý…';}
       });
     });
-    window.addEventListener('pageshow',function(){document.querySelectorAll('form.auth-form [type="submit"],#profileForm [type="submit"]').forEach(function(button){button.disabled=false;if(button.dataset.idleText)button.textContent=button.dataset.idleText;});});
+    window.addEventListener('pageshow',function(){document.querySelectorAll('form.auth-form [type="submit"],#profileForm [type="submit"]').forEach(function(button){button.disabled=false;if(button.dataset.idleHtml)button.innerHTML=button.dataset.idleHtml;});});
   });
 })();

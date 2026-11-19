@@ -30,40 +30,17 @@ if(cas_post()){
     unset($_SESSION['cas_csrf']);cas_redirect('tai-khoan.php');
  }catch(Throwable $e){$error=($e instanceof PDOException)?'Dữ liệu tài khoản đã tồn tại hoặc MySQL chưa sẵn sàng.':$e->getMessage();}
 }
+cas_auth_start("Đăng ký | CÁ'S HOA", 'signup', "Tạo tài khoản khách hàng CÁ'S HOA.");
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Tạo tài khoản khách hàng CÁ'S HOA.">
-  <title>Đăng ký | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="signup" class="auth-page">
-  <main class="auth-main">
-    <div class="auth-shell"><div class="auth-grid">
-      <aside class="auth-story">
-  <p class="cas-eyebrow">CÁ'S HOA · FLOWERS & FEELINGS</p>
-  <h2>Những điều khó nói, gửi cùng một nhành hoa.</h2>
-  <p>Tài khoản giúp bạn lưu thông tin, theo dõi đơn và giữ lại những lựa chọn hoa dành cho người thương.</p>
-  <div class="d-flex align-items-center gap-3 mt-4 fw-semibold" style="color:var(--primary)"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span>Tiệm hoa tươi online</span></div>
-</aside>
-      <div><a href="index.php" class="auth-brand" aria-label="Về trang chủ CÁ'S HOA"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span class="cas-brand-name">CÁ'S HOA</span></a>
-        <section class="auth-card">
           <p class="cas-eyebrow">Tạo tài khoản khách hàng</p>
           <h1>Lưu lại những đơn hoa.</h1>
           <p class="auth-description">Dùng email để khôi phục tài khoản và số điện thoại để shop liên hệ khi cần.</p>
           <form id="signupForm" method="post" action="dang-ky.php" class="auth-form" novalidate>
-            <div class="mb-3"><label class="form-label" for="signupFullName">Họ và tên</label><input id="signupFullName" name="full_name" value="<?= cas_e($_POST['full_name']??'') ?>" class="form-control cas-form-control" autocomplete="name" minlength="2" maxlength="120" required></div>
-            <div class="mb-3"><label for="signupPhone" class="form-label">Số điện thoại <span style="color:var(--danger)">*</span></label><input id="signupPhone" name="phone" value="<?= cas_e($_POST['phone']??'') ?>" class="form-control cas-form-control" inputmode="numeric" maxlength="10" pattern="0[0-9]{9}" placeholder="0123456789" autocomplete="tel" required></div>
-            <div class="mb-3"><label for="signupEmail" class="form-label">Email <span style="color:var(--danger)">*</span></label><input id="signupEmail" name="email" value="<?= cas_e($_POST['email']??'') ?>" class="form-control cas-form-control" type="email" maxlength="150" placeholder="example@gmail.com" autocomplete="email" required></div>
-            <div class="mb-3"><label for="signupPassword" class="form-label">Mật khẩu <span style="color:var(--danger)">*</span></label><div class="auth-password-wrap"><input id="signupPassword" name="password" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupPassword" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div><div class="password-policy">Từ 10 ký tự, tối đa 72 byte; có chữ hoa, chữ thường, số và ký tự đặc biệt.</div></div>
-            <div class="mb-3"><label for="signupConfirm" class="form-label">Xác nhận mật khẩu <span style="color:var(--danger)">*</span></label><div class="auth-password-wrap"><input id="signupConfirm" name="confirm_password" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupConfirm" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button></div></div>
+            <div class="mb-3"><label class="form-label" for="signupFullName">Họ và tên <span class="form-required">*</span></label><input id="signupFullName" name="full_name" value="<?= cas_e($_POST['full_name']??'') ?>" class="form-control cas-form-control" autocomplete="name" minlength="2" maxlength="120" required></div>
+            <div class="mb-3"><label for="signupPhone" class="form-label">Số điện thoại <span class="form-required">*</span></label><input id="signupPhone" name="phone" value="<?= cas_e($_POST['phone']??'') ?>" class="form-control cas-form-control" inputmode="numeric" maxlength="10" pattern="0[0-9]{9}" placeholder="0123456789" autocomplete="tel" required></div>
+            <div class="mb-3"><label for="signupEmail" class="form-label">Email <span class="form-required">*</span></label><input id="signupEmail" name="email" value="<?= cas_e($_POST['email']??'') ?>" class="form-control cas-form-control" type="email" maxlength="150" placeholder="example@gmail.com" autocomplete="email" required></div>
+            <div class="mb-3"><label for="signupPassword" class="form-label">Mật khẩu <span class="form-required">*</span></label><div class="auth-password-wrap"><input id="signupPassword" name="password" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye"></i></button></div><div class="password-policy">Từ 10 ký tự, tối đa 72 byte; có chữ hoa, chữ thường, số và ký tự đặc biệt.</div></div>
+            <div class="mb-3"><label for="signupConfirm" class="form-label">Xác nhận mật khẩu <span class="form-required">*</span></label><div class="auth-password-wrap"><input id="signupConfirm" name="confirm_password" class="form-control cas-form-control" type="password" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="signupConfirm" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye"></i></button></div></div>
             <?= cas_csrf_form() ?>
 <?php if($error!==''): ?><div class="auth-message error" role="alert"><?= cas_e($error) ?></div><?php endif; ?>
             <button class="btn-cas-primary w-100 mt-2" type="submit"><i class="bi bi-person-plus"></i> Tạo tài khoản <i class="bi bi-arrow-right"></i></button>
@@ -71,11 +48,4 @@ if(cas_post()){
           
           
           <p class="auth-foot">Đã có tài khoản? <a href="dang-nhap.php">Đăng nhập</a></p>
-        </section>
-      </div>
-    </div></div>
-  </main>
-  
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_auth_end(); ?>

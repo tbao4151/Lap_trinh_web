@@ -1,25 +1,22 @@
-<?php require_once __DIR__.'/includes/storefront.php'; $discovery = cas_discovery_groups(); ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="CÁ'S HOA - Hoa tươi cho những ngày đáng nhớ và cả những ngày bình thường.">
-  <title>CÁ'S HOA — Hoa cho những điều khó nói</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="home" class="d-flex flex-column">
-  <div id="siteHeader"></div>
+<?php
+// Customer helpers may emit HTTP headers; load them before rendering any HTML.
+require_once __DIR__ . '/includes/customer.php';
+require_once __DIR__ . '/includes/storefront.php';
+$discovery = cas_discovery_groups();
+cas_page_start("CÁ'S HOA — Hoa cho những điều khó nói", 'home', "CÁ'S HOA - Hoa tươi cho những ngày đáng nhớ và cả những ngày bình thường.");
+?>
 
   <main class="cas-page">
     <section class="hero-section" aria-labelledby="featured-title">
       <div class="cas-container">
-        <p class="cas-eyebrow mb-3">Mẫu hoa nổi bật</p>
-        <h1 id="featured-title" class="visually-hidden">Mẫu hoa nổi bật của CÁ'S HOA</h1>
+        <div class="hero-header">
+          <div class="hero-header-copy">
+            <p class="cas-eyebrow">CÁ'S HOA · Flowers &amp; Feelings</p>
+            <h1 id="featured-title" class="cas-title">Hoa cho những điều khó nói.</h1>
+            <p class="cas-subtitle">Mỗi bó hoa được phối theo cảm xúc và dịp tặng, luôn kèm sẵn thiệp viết tay và túi giấy chỉn chu.</p>
+          </div>
+          <a href="tu-van-hoa.php" class="btn-cas-outline">Nhờ gợi ý mẫu hoa <i class="bi bi-stars" aria-hidden="true"></i></a>
+        </div>
 
         <div id="heroCarousel" class="carousel slide hero-slider" data-bs-ride="carousel" data-bs-interval="10000">
           <div class="carousel-inner" id="heroTrack"></div>
@@ -81,13 +78,4 @@
   </main>
 
   <div class="cas-container"><?php require __DIR__.'/includes/customer-recommendations.php'; ?></div>
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

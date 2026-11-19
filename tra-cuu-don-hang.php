@@ -1,19 +1,7 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Tra cứu trạng thái đơn hàng CÁ'S HOA bằng mã đơn và số điện thoại người nhận.">
-  <title>Tra cứu đơn hàng | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="lookup" class="d-flex flex-column">
-  <div id="siteHeader"></div>
+<?php
+require_once __DIR__ . '/includes/bootstrap.php';
+cas_page_start("Tra cứu đơn hàng | CÁ'S HOA", 'lookup', "Tra cứu trạng thái đơn hàng CÁ'S HOA bằng mã đơn và số điện thoại người nhận.");
+?>
   <main class="cas-page lookup-page">
     <div class="cas-container">
       <section class="lookup-card mx-auto" style="max-width:860px">
@@ -22,9 +10,9 @@
         <h1 class="cas-title" style="font-size:clamp(2rem,4vw,3rem)">Tra cứu đơn hàng.</h1>
         <p class="cas-subtitle">Nhập mã đơn và số điện thoại người nhận. Hai thông tin được dùng cùng nhau để tránh hiển thị nhầm dữ liệu đơn.</p>
         <form id="lookupForm" class="row g-3 align-items-end mt-2" novalidate>
-          <div class="col-md-5"><label for="lookupCode" class="form-label small fw-semibold">Mã đơn</label><input id="lookupCode" class="form-control cas-form-control text-uppercase" placeholder="CSH-2026-AB12CD34" autocomplete="off" required><div class="form-text">Mã được hiển thị sau khi đặt hoa.</div></div>
-          <div class="col-md-5"><label for="lookupPhone" class="form-label small fw-semibold">Số điện thoại người nhận</label><input id="lookupPhone" class="form-control cas-form-control" inputmode="numeric" maxlength="10" placeholder="0123456789" autocomplete="tel" required></div>
-          <div class="col-md-2"><button class="btn-cas-primary w-100" type="submit"><i class="bi bi-search"></i> Tra cứu</button></div>
+          <div class="col-md-5"><label for="lookupCode" class="form-label small fw-semibold">Mã đơn <span class="form-required">*</span></label><input id="lookupCode" class="form-control cas-form-control text-uppercase" placeholder="CSH-2026-AB12CD34" autocomplete="off" required><div class="invalid-feedback">Vui lòng nhập mã đơn hàng.</div></div>
+          <div class="col-md-4"><label for="lookupPhone" class="form-label small fw-semibold">Số điện thoại người nhận <span class="form-required">*</span></label><input id="lookupPhone" class="form-control cas-form-control" inputmode="numeric" maxlength="10" placeholder="0123456789" autocomplete="tel" required><div class="invalid-feedback">Vui lòng nhập số điện thoại người nhận.</div></div>
+          <div class="col-md-3"><button class="btn-cas-primary w-100" type="submit"><i class="bi bi-search"></i> Tra cứu</button></div>
         </form>
         <div class="demo-note mt-4">Mã đơn được hiển thị sau khi đặt hoa. Hãy nhập đúng mã đơn và số điện thoại người nhận để xem trạng thái.</div>
         <div id="lookupMessage" class="auth-message d-none" role="status"></div>
@@ -35,13 +23,4 @@
       </section>
     </div>
   </main>
-  <div id="siteFooter"></div>
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/r2-lookup.js" defer></script>
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF=<?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(['assets/js/r2-lookup.js']); ?>

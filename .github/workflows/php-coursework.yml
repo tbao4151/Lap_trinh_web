@@ -2,9 +2,13 @@ name: PHP coursework validation
 on:
   push:
     branches:
+      - main
+      - integration/cas-hoa-final-20261119
       - feature/requirement-2-php-mysql
   pull_request:
     branches:
+      - main
+      - integration/cas-hoa-final-20261119
       - feature/requirement-2-php-mysql
 jobs:
   syntax:
@@ -21,7 +25,8 @@ jobs:
           node --check assets/js/flower-advisor.js
           node --check assets/js/r2-contact.js
           node --check assets/js/r2-lookup.js
-          python3 -m py_compile tests/admin/test_admin_ops.py
+          python3 -m py_compile tests/admin/test_admin_ops.py tests/admin/test_admin_backend_final.py
+          node --check tests/customer/http.cjs
           bash -n scripts/verify-admin-ops.sh
       - name: Validate SQL and static page routes
         run: |
@@ -87,6 +92,21 @@ jobs:
           DB_USER: root
           DB_PASSWORD: localtestpass
         run: bash scripts/verify-admin-ops.sh
+
+      - name: Admin financial, delivery, and stock regression
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_NAME: cas_hoa
+          DB_USER: root
+          DB_PASSWORD: localtestpass
+          CAS_ALLOW_PORT_3306: '1'
+        run: |
+          PHP_CLI_SERVER_WORKERS=4 php -S 127.0.0.1:8036 >/tmp/cas-admin-final-http.log 2>&1 &
+          PID=$!
+          trap 'kill "$PID" 2>/dev/null || true' EXIT
+          sleep 2
+          CAS_BASE_URL=http://127.0.0.1:8036/ python3 tests/admin/test_admin_backend_final.py
 
       - name: Prepare Chrome screenshot environment
         run: |

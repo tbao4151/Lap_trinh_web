@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /** Inventory lifecycle bound to order state changes.
  * Called with a transaction open and the order row locked FOR UPDATE.
  * Quantities are computed in hundredths to avoid floating-point drift.

@@ -5,7 +5,7 @@ HOST="${DB_HOST:-127.0.0.1}"
 PORT="${DB_PORT:-3306}"
 USER="${DB_USER:-root}"
 PASS="${DB_PASSWORD:-}"
-MYSQL="mysql --host=$HOST --port=$PORT --user=$USER"
+MYSQL="mysql --default-character-set=utf8mb4 --host=$HOST --port=$PORT --user=$USER"
 export MYSQL_PWD="$PASS"
 $MYSQL < database/schema.sql
 $MYSQL < database/seed.sql
@@ -41,9 +41,10 @@ printf '%s' "$LOOKUP" | python3 -c 'import json,sys; x=json.load(sys.stdin); ass
 CONTACT="$(curl -sS -b /tmp/cas-r2-cookies -X POST -F "csrf=$TOKEN" -F 'name=Khach hang' -F 'phone=0900000000' -F 'subject=Tu van mau hoa' -F 'message=Toi can tu van mau hoa cho ngay ky niem' http://127.0.0.1:8033/actions/contact.php)"
 printf '%s' "$CONTACT" | python3 -c 'import json,sys; x=json.load(sys.stdin); assert x["ok"],x'
 curl -fsS http://127.0.0.1:8033/tin-tuc.php > /tmp/cas-r2-news.html
-grep -q 'Chọn hoa' /tmp/cas-r2-news.html
+grep -Fq 'chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau' /tmp/cas-r2-news.html
 curl -fsS 'http://127.0.0.1:8033/chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau' > /tmp/cas-r2-article.html
-grep -q 'Chọn hoa' /tmp/cas-r2-article.html
+grep -Fq 'id="articleHost"' /tmp/cas-r2-article.html
+grep -Fq 'class="article-cover' /tmp/cas-r2-article.html
 COUNT="$($MYSQL --batch --skip-column-names cas_hoa -e 'SELECT COUNT(*) FROM orders')"
 [ "$COUNT" -ge 1 ]
 echo "PASS: 17 SQL tables, 11 products, checkout $CODE, lookup, contact, news."

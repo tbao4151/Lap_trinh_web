@@ -20,10 +20,11 @@ if(cas_post()){
 <!doctype html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Đăng nhập quản trị | CÁ'S HOA Admin</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="../assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/admin.css"></head>
 <body data-admin-page="login"><main class="admin-login"><section class="admin-login-card">
-<a class="admin-brand" href="../index.php"><span><strong>CÁ'S HOA</strong><small>flowers & feelings</small></span></a>
+<a class="admin-brand" href="../index.php"><span class="admin-brand-mark"><i class="bi bi-flower1" aria-hidden="true"></i></span><span><strong>CÁ'S HOA</strong><small>flowers &amp; feelings</small></span></a>
 <h1>Trung tâm điều hành</h1>
 <p>Đăng nhập bằng tài khoản nhân viên hoặc quản trị viên được cấp trên hệ thống MySQL.</p>
 <form method="post" action="dang-nhap.php" class="mt-4">

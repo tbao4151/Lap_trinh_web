@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /** ADM-03 — Kho hoa, kho phụ kiện, kho tổng và lịch sử giao dịch kho. Dùng sau khi đã require admin/_ops.php. */
 
 const CAS_INV_CATEGORIES = [
@@ -229,9 +233,9 @@ function cas_inventory_page(string $scope): void
 
 <section class="admin-card admin-section">
   <form method="get" class="cas-admin-stack mb-3">
-    <input class="admin-input" name="q" value="<?= cas_e($search) ?>" placeholder="Tìm tên nguyên liệu">
-    <?= cas_select('category', ['' => 'Mọi nhóm'] + array_map(static fn($c) => $c[1], $categories), $category) ?>
-    <?= cas_select('status', ['active' => 'Đang dùng', 'inactive' => 'Ngừng dùng', 'all' => 'Tất cả'], $status) ?>
+    <input class="admin-input" name="q" value="<?= cas_e($search) ?>" aria-label="Tìm tên nguyên liệu" placeholder="Tìm tên nguyên liệu">
+    <?= cas_select('category', ['' => 'Mọi nhóm'] + array_map(static fn($c) => $c[1], $categories), $category, 'aria-label="Lọc theo nhóm nguyên liệu"') ?>
+    <?= cas_select('status', ['active' => 'Đang dùng', 'inactive' => 'Ngừng dùng', 'all' => 'Tất cả'], $status, 'aria-label="Lọc trạng thái"') ?>
     <label class="admin-check"><input type="checkbox" name="low" value="1" <?= $lowOnly ? 'checked' : '' ?>> Chỉ hàng sắp hết</label>
     <button class="admin-btn-light" type="submit">Lọc</button><span class="admin-badge"><?= count($items) ?> mặt hàng</span>
   </form>
@@ -254,13 +258,13 @@ function cas_inventory_page(string $scope): void
   <h2 class="admin-card-title"><?= $edit ? 'Sửa mặt hàng #' . (int)$edit['item_id'] : 'Thêm nguyên liệu mới' ?></h2>
   <form method="post" class="admin-form-grid mt-3">
     <?= cas_csrf_form() ?><input type="hidden" name="action" value="item_save"><?php if ($edit): ?><input type="hidden" name="item_id" value="<?= (int)$edit['item_id'] ?>"><?php endif; ?>
-    <div><label class="admin-label">Tên mặt hàng</label><input class="admin-input" name="name" maxlength="150" required value="<?= cas_e($edit['name'] ?? '') ?>"></div>
-    <div><label class="admin-label">Nhóm</label><?= cas_select('category', array_map(static fn($c) => $c[1], $categories), (string)($edit['category'] ?? array_key_first($categories))) ?></div>
-    <div><label class="admin-label">Đơn vị tính</label><?= cas_select('unit', array_combine(CAS_INV_UNITS, CAS_INV_UNITS), (string)($edit['unit'] ?? 'cành')) ?></div>
-    <div><label class="admin-label">Mức tồn tối thiểu</label><input class="admin-input" name="min_quantity" type="number" min="0" step="0.01" required value="<?= cas_e(isset($edit) && $edit ? (string)(float)$edit['min_quantity'] : '0') ?>"></div>
-    <div><label class="admin-label">Giá nhập (VND)</label><input class="admin-input" name="unit_cost" type="number" min="0" max="100000000" step="500" required value="<?= cas_e(isset($edit) && $edit ? (string)(int)$edit['unit_cost'] : '0') ?>"></div>
-    <div><label class="admin-label">Trạng thái</label><?= cas_select('status', ['active' => 'Đang dùng', 'inactive' => 'Ngừng dùng'], (string)($edit['status'] ?? 'active')) ?></div>
-    <?php if (!$edit): ?><div><label class="admin-label">Tồn đầu kỳ (ghi thành phiếu nhập)</label><input class="admin-input" name="opening_quantity" type="number" min="0" step="0.01" value="0"></div><?php endif; ?>
+    <div><label class="admin-label" for="invName">Tên mặt hàng</label><input id="invName" class="admin-input" name="name" maxlength="150" required value="<?= cas_e($edit['name'] ?? '') ?>"></div>
+    <div><label class="admin-label" for="invCategory">Nhóm</label><?= cas_select('category', array_map(static fn($c) => $c[1], $categories), (string)($edit['category'] ?? array_key_first($categories)), 'id="invCategory"') ?></div>
+    <div><label class="admin-label" for="invUnit">Đơn vị tính</label><?= cas_select('unit', array_combine(CAS_INV_UNITS, CAS_INV_UNITS), (string)($edit['unit'] ?? 'cành'), 'id="invUnit"') ?></div>
+    <div><label class="admin-label" for="invMin">Mức tồn tối thiểu</label><input id="invMin" class="admin-input" name="min_quantity" type="number" min="0" step="0.01" required value="<?= cas_e(isset($edit) && $edit ? (string)(float)$edit['min_quantity'] : '0') ?>"></div>
+    <div><label class="admin-label" for="invCost">Giá nhập (VND)</label><input id="invCost" class="admin-input" name="unit_cost" type="number" min="0" max="100000000" step="500" required value="<?= cas_e(isset($edit) && $edit ? (string)(int)$edit['unit_cost'] : '0') ?>"></div>
+    <div><label class="admin-label" for="invStatus">Trạng thái</label><?= cas_select('status', ['active' => 'Đang dùng', 'inactive' => 'Ngừng dùng'], (string)($edit['status'] ?? 'active'), 'id="invStatus"') ?></div>
+    <?php if (!$edit): ?><div><label class="admin-label" for="invOpening">Tồn đầu kỳ (ghi thành phiếu nhập)</label><input id="invOpening" class="admin-input" name="opening_quantity" type="number" min="0" step="0.01" value="0"></div><?php endif; ?>
     <div class="full"><button class="admin-btn" type="submit"><?= $edit ? 'Lưu mặt hàng' : 'Thêm mặt hàng' ?></button><?php if ($edit): ?> <a class="admin-btn-light" href="?">Huỷ</a><?php endif; ?>
       <p class="cas-muted mt-2 mb-0">Số tồn chỉ thay đổi qua phiếu kho để luôn có lịch sử; mặt hàng đã có phiếu không xoá được, chỉ chuyển "Ngừng dùng".</p></div>
   </form>
@@ -316,9 +320,9 @@ function cas_inventory_history_page(): void
   <form method="get" class="cas-admin-stack">
     <label>Từ <input class="admin-input" type="date" name="from" value="<?= cas_e($from) ?>"></label>
     <label>đến <input class="admin-input" type="date" name="to" value="<?= cas_e($to) ?>"></label>
-    <select class="admin-select" name="item"><option value="">Mọi nguyên liệu</option><?php foreach ($items as $i): ?><option value="<?= (int)$i['item_id'] ?>" <?= $itemId === (int)$i['item_id'] ? 'selected' : '' ?>><?= cas_e($i['name']) ?></option><?php endforeach; ?></select>
-    <?= cas_select('type', ['' => 'Mọi loại phiếu'] + CAS_INV_TYPES, $type) ?>
-    <select class="admin-select" name="actor"><option value="">Mọi người thao tác</option><?php foreach ($actors as $a): ?><option value="<?= (int)$a['user_id'] ?>" <?= $actor === (int)$a['user_id'] ? 'selected' : '' ?>><?= cas_e($a['full_name']) ?></option><?php endforeach; ?></select>
+    <select class="admin-select" name="item" aria-label="Lọc theo nguyên liệu"><option value="">Mọi nguyên liệu</option><?php foreach ($items as $i): ?><option value="<?= (int)$i['item_id'] ?>" <?= $itemId === (int)$i['item_id'] ? 'selected' : '' ?>><?= cas_e($i['name']) ?></option><?php endforeach; ?></select>
+    <?= cas_select('type', ['' => 'Mọi loại phiếu'] + CAS_INV_TYPES, $type, 'aria-label="Lọc theo loại phiếu"') ?>
+    <select class="admin-select" name="actor" aria-label="Lọc theo người thao tác"><option value="">Mọi người thao tác</option><?php foreach ($actors as $a): ?><option value="<?= (int)$a['user_id'] ?>" <?= $actor === (int)$a['user_id'] ? 'selected' : '' ?>><?= cas_e($a['full_name']) ?></option><?php endforeach; ?></select>
     <button class="admin-btn-light" type="submit">Lọc lịch sử</button>
   </form>
 </section>

@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /**
  * ADM-04 — Hoàn tiền: yêu cầu → duyệt / từ chối → ghi nhận đã hoàn thủ công, có lịch sử từng bước.
  * Không chuyển tiền thật. Khi admin ghi nhận chứng từ hoàn tiền, trạng thái thanh toán cập nhật trong cùng transaction.
@@ -147,10 +151,10 @@ function cas_refunds_page(): void
   <p class="admin-card-subtitle">Đơn đã thu đủ hoặc hoàn một phần; tổng yêu cầu không vượt giá trị đơn.</p>
   <form method="post" class="admin-form-grid mt-3">
     <?= cas_csrf_form() ?><input type="hidden" name="action" value="refund_create"><input type="hidden" name="request_token" value="<?= cas_form_token() ?>">
-    <div><label class="admin-label">Mã đơn</label><input class="admin-input" name="order_code" list="paidOrders" required maxlength="40" placeholder="CSH-2026-...">
+    <div><label class="admin-label" for="rfCode">Mã đơn</label><input id="rfCode" class="admin-input" name="order_code" list="paidOrders" required maxlength="40" placeholder="CSH-2026-...">
       <datalist id="paidOrders"><?php foreach ($paidOrders as $o): ?><option value="<?= cas_e($o['order_code']) ?>"><?= cas_money($o['total_amount']) ?></option><?php endforeach; ?></datalist></div>
-    <div><label class="admin-label">Số tiền hoàn (VND)</label><input class="admin-input" name="amount" type="number" min="1000" step="1000" required></div>
-    <div class="full"><label class="admin-label">Lý do</label><input class="admin-input" name="reason" minlength="5" maxlength="255" required placeholder="Khách huỷ trước khi chuẩn bị hoa, hoa không đúng mẫu..."></div>
+    <div><label class="admin-label" for="rfAmount">Số tiền hoàn (VND)</label><input id="rfAmount" class="admin-input" name="amount" type="number" min="1000" step="1000" required></div>
+    <div class="full"><label class="admin-label" for="rfReason">Lý do</label><input id="rfReason" class="admin-input" name="reason" minlength="5" maxlength="255" required placeholder="Khách huỷ trước khi chuẩn bị hoa, hoa không đúng mẫu..."></div>
     <div class="full"><button class="admin-btn" type="submit">Gửi yêu cầu</button></div>
   </form>
 </article>
@@ -164,7 +168,7 @@ function cas_refunds_page(): void
 </article>
 </section>
 <section class="admin-card admin-section">
-  <form method="get" class="cas-admin-stack mb-3"><?= cas_select('status', ['' => 'Mọi trạng thái'] + CAS_REFUND_LABELS, $status) ?><button class="admin-btn-light" type="submit">Lọc</button><span class="admin-badge"><?= count($rows) ?> yêu cầu</span></form>
+  <form method="get" class="cas-admin-stack mb-3"><?= cas_select('status', ['' => 'Mọi trạng thái'] + CAS_REFUND_LABELS, $status, 'aria-label="Lọc trạng thái hoàn tiền"') ?><button class="admin-btn-light" type="submit">Lọc</button><span class="admin-badge"><?= count($rows) ?> yêu cầu</span></form>
   <div class="admin-table-wrap"><table class="admin-table">
     <thead><tr><th>Mã</th><th>Đơn / khách</th><th>Số tiền</th><th>Lý do</th><th>Trạng thái</th><th>Người tạo / duyệt</th><th>Thao tác</th></tr></thead><tbody>
     <?php foreach ($rows as $r): $next = CAS_REFUND_FLOW[$r['status']] ?? []; ?>
@@ -175,8 +179,8 @@ function cas_refunds_page(): void
       <td><?= cas_e($r['requester'] ?? '—') ?><div class="cas-muted"><?= $r['reviewer'] ? 'Duyệt: ' . cas_e($r['reviewer']) . ' · ' . cas_e($r['reviewed_at']) : 'Chưa duyệt' ?></div></td>
       <td><?php if ($canReview && $next): ?>
         <form method="post" class="cas-admin-table-form" data-confirm="Xác nhận cập nhật yêu cầu hoàn tiền này?"><?= cas_csrf_form() ?><input type="hidden" name="action" value="refund_transition"><input type="hidden" name="id" value="<?= (int)$r['refund_id'] ?>">
-          <?= cas_select('status', array_intersect_key(CAS_REFUND_LABELS, array_flip($next)), $next[0]) ?>
-          <input class="admin-input" name="<?= $r['status'] === 'approved' ? 'reference' : 'note' ?>" maxlength="120" placeholder="<?= $r['status'] === 'approved' ? 'Mã giao dịch hoàn' : 'Ghi chú / lý do' ?>">
+          <?= cas_select('status', array_intersect_key(CAS_REFUND_LABELS, array_flip($next)), $next[0], 'aria-label="Chuyển trạng thái hoàn tiền"') ?>
+          <input class="admin-input" name="<?= $r['status'] === 'approved' ? 'reference' : 'note' ?>" maxlength="120" aria-label="<?= $r['status'] === 'approved' ? 'Mã giao dịch hoàn' : 'Ghi chú hoặc lý do' ?>" placeholder="<?= $r['status'] === 'approved' ? 'Mã giao dịch hoàn' : 'Ghi chú / lý do' ?>">
           <?php if ($r['status'] === 'approved'): ?><input type="hidden" name="note" value=""><?php endif; ?><button class="admin-btn-light" type="submit">Lưu</button></form>
       <?php else: ?><span class="cas-muted"><?= $next ? 'Chờ quản trị viên duyệt' : 'Đã đóng' ?></span><?php endif; ?>
         <?php if (!empty($events[(int)$r['refund_id']])): ?><details class="mt-1"><summary class="cas-muted">Lịch sử (<?= count($events[(int)$r['refund_id']]) ?>)</summary>

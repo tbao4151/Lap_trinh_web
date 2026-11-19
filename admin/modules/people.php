@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /**
  * ADM-06 — Tài khoản nội bộ: nhân viên, hồ sơ cá nhân, chủ sở hữu và nhật ký quản trị.
  * Vai trò vẫn là roles.name của includes/auth.php (staff/admin/owner); không tạo vai trò mới, không xoá tài khoản (chỉ khoá).
@@ -203,9 +207,9 @@ function cas_staff_page(): void
 </section>
 <section class="admin-card admin-section">
   <form class="cas-admin-stack" method="get">
-    <input class="admin-input" name="q" value="<?= cas_e($q) ?>" placeholder="Tên, email hoặc SĐT">
-    <?= cas_select('role', ['' => 'Mọi vai trò'] + array_intersect_key(CAS_ROLE_LABELS, array_flip(CAS_INTERNAL_ROLES)), $role) ?>
-    <?= cas_select('status', ['' => 'Mọi trạng thái'] + CAS_ACCOUNT_STATUS, $status) ?>
+    <input class="admin-input" name="q" value="<?= cas_e($q) ?>" aria-label="Tìm nhân viên theo tên, email hoặc SĐT" placeholder="Tên, email hoặc SĐT">
+    <?= cas_select('role', ['' => 'Mọi vai trò'] + array_intersect_key(CAS_ROLE_LABELS, array_flip(CAS_INTERNAL_ROLES)), $role, 'aria-label="Lọc theo vai trò"') ?>
+    <?= cas_select('status', ['' => 'Mọi trạng thái'] + CAS_ACCOUNT_STATUS, $status, 'aria-label="Lọc theo trạng thái"') ?>
     <button class="admin-btn" type="submit">Lọc</button><a class="admin-btn-light" href="nhan-vien.php">Bỏ lọc</a>
   </form>
   <div class="admin-table-wrap mt-3"><table class="admin-table">
@@ -216,7 +220,7 @@ function cas_staff_page(): void
       <td><?= cas_status_badge(CAS_ACCOUNT_STATUS[$row['status']] ?? $row['status'], $row['status'] === 'active' ? 'success' : 'danger') ?></td>
       <td class="cas-muted"><?= cas_e($row['last_action'] ?? '—') ?><div>Tạo <?= cas_e(substr((string)$row['created_at'], 0, 10)) ?></div></td>
       <td><?php if ($canManage($row)): ?><div class="cas-admin-table-form">
-        <form method="post" data-confirm="<?= $row['status'] === 'active' ? 'Khoá tài khoản này? Người dùng sẽ mất quyền truy cập ngay.' : 'Mở khoá tài khoản này?' ?>"><?= cas_csrf_form() ?><input type="hidden" name="action" value="staff_status"><input type="hidden" name="id" value="<?= (int)$row['user_id'] ?>"><input type="hidden" name="status" value="<?= $row['status'] === 'active' ? 'locked' : 'active' ?>"><button class="admin-btn-light<?= $row['status'] === 'active' ? ' text-danger' : '' ?>" type="submit"><?= $row['status'] === 'active' ? 'Khoá' : 'Mở khoá' ?></button></form>
+        <form method="post" data-confirm="<?= $row['status'] === 'active' ? 'Khoá tài khoản này? Người dùng sẽ mất quyền truy cập ngay.' : 'Mở khoá tài khoản này?' ?>"><?= cas_csrf_form() ?><input type="hidden" name="action" value="staff_status"><input type="hidden" name="id" value="<?= (int)$row['user_id'] ?>"><input type="hidden" name="status" value="<?= $row['status'] === 'active' ? 'locked' : 'active' ?>"><button class="admin-btn-light<?= $row['status'] === 'active' ? ' admin-btn-danger' : '' ?>" type="submit"><?= $row['status'] === 'active' ? 'Khoá' : 'Mở khoá' ?></button></form>
         <?php if ($isOwner): ?><form method="post" data-confirm="Đổi vai trò tài khoản này?"><?= cas_csrf_form() ?><input type="hidden" name="action" value="staff_role"><input type="hidden" name="id" value="<?= (int)$row['user_id'] ?>"><input type="hidden" name="role" value="<?= $row['role'] === 'staff' ? 'admin' : 'staff' ?>"><button class="admin-btn-light" type="submit"><?= $row['role'] === 'staff' ? 'Nâng lên Quản trị viên' : 'Hạ xuống Nhân viên' ?></button></form><?php endif; ?>
         <a class="admin-btn-light" href="?reset=<?= (int)$row['user_id'] ?>#resetForm">Đặt mật khẩu tạm</a>
       </div><?php elseif ($row['role'] === 'owner' && $isOwner): ?><a class="admin-btn-light" href="chu-so-huu.php">Quản lý ở trang Chủ sở hữu</a><?php else: ?><span class="cas-muted">—</span><?php endif; ?></td></tr>
@@ -228,13 +232,13 @@ function cas_staff_page(): void
 <article class="admin-card">
   <h2 class="admin-card-title">Tạo tài khoản nội bộ</h2>
   <form method="post" class="admin-form-grid mt-3" autocomplete="off"><?= cas_csrf_form() ?><input type="hidden" name="action" value="staff_create">
-    <div class="full"><label class="admin-label">Họ tên</label><input class="admin-input" name="full_name" maxlength="120" required></div>
-    <div><label class="admin-label">Email đăng nhập</label><input class="admin-input" name="email" type="email" maxlength="150" required></div>
-    <div><label class="admin-label">Số điện thoại</label><input class="admin-input" name="phone" inputmode="tel" maxlength="12"></div>
-    <div><label class="admin-label">Vai trò</label><?= cas_select('role', $isOwner ? ['staff' => 'Nhân viên', 'admin' => 'Quản trị viên'] : ['staff' => 'Nhân viên'], 'staff') ?></div>
+    <div class="full"><label class="admin-label" for="stName">Họ tên</label><input id="stName" class="admin-input" name="full_name" maxlength="120" required></div>
+    <div><label class="admin-label" for="stEmail">Email đăng nhập</label><input id="stEmail" class="admin-input" name="email" type="email" maxlength="150" required></div>
+    <div><label class="admin-label" for="stPhone">Số điện thoại</label><input id="stPhone" class="admin-input" name="phone" inputmode="tel" maxlength="12"></div>
+    <div><label class="admin-label" for="stRole">Vai trò</label><?= cas_select('role', $isOwner ? ['staff' => 'Nhân viên', 'admin' => 'Quản trị viên'] : ['staff' => 'Nhân viên'], 'staff', 'id="stRole"') ?></div>
     <div></div>
-    <div><label class="admin-label">Mật khẩu tạm</label><input class="admin-input" name="password" type="password" autocomplete="new-password" required></div>
-    <div><label class="admin-label">Nhập lại mật khẩu</label><input class="admin-input" name="password_confirm" type="password" autocomplete="new-password" required></div>
+    <div><label class="admin-label" for="stPass">Mật khẩu tạm</label><input id="stPass" class="admin-input" name="password" type="password" autocomplete="new-password" required></div>
+    <div><label class="admin-label" for="stPassConfirm">Nhập lại mật khẩu</label><input id="stPassConfirm" class="admin-input" name="password_confirm" type="password" autocomplete="new-password" required></div>
     <div class="full"><button class="admin-btn" type="submit">Tạo tài khoản</button><p class="cas-muted mt-2 mb-0">Mật khẩu ≥ 10 ký tự, có chữ hoa, chữ thường, số, ký tự đặc biệt. Hệ thống chỉ lưu bản băm (password_hash).</p></div>
   </form>
 </article>
@@ -242,9 +246,9 @@ function cas_staff_page(): void
   <?php if ($resetTarget && $canManage($resetTarget)): ?>
   <h2 class="admin-card-title">Đặt mật khẩu tạm cho <?= cas_e($resetTarget['email']) ?></h2>
   <form method="post" class="admin-form-grid mt-3" autocomplete="off" data-confirm="Đặt mật khẩu tạm cho tài khoản này?"><?= cas_csrf_form() ?><input type="hidden" name="action" value="staff_reset_password"><input type="hidden" name="id" value="<?= (int)$resetTarget['user_id'] ?>">
-    <div><label class="admin-label">Mật khẩu tạm mới</label><input class="admin-input" name="new_password" type="password" autocomplete="new-password" required></div>
-    <div><label class="admin-label">Nhập lại</label><input class="admin-input" name="new_password_confirm" type="password" autocomplete="new-password" required></div>
-    <div class="full"><label class="admin-label">Mật khẩu của bạn (xác nhận)</label><input class="admin-input" name="confirm_password" type="password" autocomplete="current-password" required></div>
+    <div><label class="admin-label" for="rstNew">Mật khẩu tạm mới</label><input id="rstNew" class="admin-input" name="new_password" type="password" autocomplete="new-password" required></div>
+    <div><label class="admin-label" for="rstConfirm">Nhập lại</label><input id="rstConfirm" class="admin-input" name="new_password_confirm" type="password" autocomplete="new-password" required></div>
+    <div class="full"><label class="admin-label" for="rstActorPass">Mật khẩu của bạn (xác nhận)</label><input id="rstActorPass" class="admin-input" name="confirm_password" type="password" autocomplete="current-password" required></div>
     <div class="full"><button class="admin-btn" type="submit">Đặt mật khẩu tạm</button> <a class="admin-btn-light" href="nhan-vien.php">Huỷ</a></div>
   </form>
   <?php else: ?>
@@ -308,17 +312,17 @@ function cas_profile_page(): void
   <h2 class="admin-card-title">Hồ sơ</h2>
   <p class="cas-muted">Email đăng nhập: <strong><?= cas_e($user['email']) ?></strong> · Vai trò: <?= cas_status_badge(CAS_ROLE_LABELS[$user['role']] ?? $user['role'], 'success') ?> · Tạo ngày <?= cas_e(substr((string)($me['created_at'] ?? ''), 0, 10)) ?></p>
   <form method="post" class="admin-form-grid"><?= cas_csrf_form() ?><input type="hidden" name="action" value="profile_save">
-    <div class="full"><label class="admin-label">Họ tên</label><input class="admin-input" name="full_name" maxlength="120" required value="<?= cas_e(cas_post() && ($_POST['action'] ?? '') === 'profile_save' ? (string)($_POST['full_name'] ?? '') : $user['full_name']) ?>"></div>
-    <div class="full"><label class="admin-label">Số điện thoại</label><input class="admin-input" name="phone" inputmode="tel" maxlength="12" value="<?= cas_e(cas_post() && ($_POST['action'] ?? '') === 'profile_save' ? (string)($_POST['phone'] ?? '') : (string)$user['phone']) ?>"></div>
+    <div class="full"><label class="admin-label" for="profName">Họ tên</label><input id="profName" class="admin-input" name="full_name" maxlength="120" required value="<?= cas_e(cas_post() && ($_POST['action'] ?? '') === 'profile_save' ? (string)($_POST['full_name'] ?? '') : $user['full_name']) ?>"></div>
+    <div class="full"><label class="admin-label" for="profPhone">Số điện thoại</label><input id="profPhone" class="admin-input" name="phone" inputmode="tel" maxlength="12" value="<?= cas_e(cas_post() && ($_POST['action'] ?? '') === 'profile_save' ? (string)($_POST['phone'] ?? '') : (string)$user['phone']) ?>"></div>
     <div class="full"><button class="admin-btn" type="submit">Lưu hồ sơ</button></div>
   </form>
 </article>
 <article class="admin-card">
   <h2 class="admin-card-title">Đổi mật khẩu</h2>
   <form method="post" class="admin-form-grid mt-3" autocomplete="off"><?= cas_csrf_form() ?><input type="hidden" name="action" value="password_change">
-    <div class="full"><label class="admin-label">Mật khẩu hiện tại</label><input class="admin-input" name="current_password" type="password" autocomplete="current-password" required></div>
-    <div><label class="admin-label">Mật khẩu mới</label><input class="admin-input" name="new_password" type="password" autocomplete="new-password" required></div>
-    <div><label class="admin-label">Nhập lại</label><input class="admin-input" name="new_password_confirm" type="password" autocomplete="new-password" required></div>
+    <div class="full"><label class="admin-label" for="curPass">Mật khẩu hiện tại</label><input id="curPass" class="admin-input" name="current_password" type="password" autocomplete="current-password" required></div>
+    <div><label class="admin-label" for="newPass">Mật khẩu mới</label><input id="newPass" class="admin-input" name="new_password" type="password" autocomplete="new-password" required></div>
+    <div><label class="admin-label" for="newPassConfirm">Nhập lại</label><input id="newPassConfirm" class="admin-input" name="new_password_confirm" type="password" autocomplete="new-password" required></div>
     <div class="full"><button class="admin-btn" type="submit">Đổi mật khẩu</button></div>
   </form>
 </article>
@@ -459,16 +463,16 @@ function cas_owner_page(): void
       <td><?= cas_status_badge(CAS_ROLE_LABELS[$row['role']], $row['role'] === 'owner' ? 'warning' : 'success') ?></td>
       <td><?= cas_status_badge(CAS_ACCOUNT_STATUS[$row['status']] ?? $row['status'], $row['status'] === 'active' ? 'success' : 'danger') ?><?= $lastOwner ? '<div class="cas-muted">Chủ sở hữu cuối — được bảo vệ</div>' : '' ?></td>
       <td><?php if ($ops): ?><form method="post" class="cas-admin-table-form" data-confirm="Xác nhận thay đổi quyền / trạng thái của tài khoản này?"><?= cas_csrf_form() ?><input type="hidden" name="action" value="owner_change"><input type="hidden" name="id" value="<?= (int)$row['user_id'] ?>">
-        <?= cas_select('op', $ops, (string)array_key_first($ops)) ?><input class="admin-input" type="password" name="confirm_password" placeholder="Mật khẩu của bạn" autocomplete="current-password" required><button class="admin-btn-light" type="submit">Thực hiện</button></form><?php else: ?><span class="cas-muted">—</span><?php endif; ?></td></tr>
+        <?= cas_select('op', $ops, (string)array_key_first($ops), 'aria-label="Thao tác với ' . cas_e($row['email']) . '"') ?><input class="admin-input" type="password" name="confirm_password" aria-label="Mật khẩu xác nhận" placeholder="Mật khẩu của bạn" autocomplete="current-password" required><button class="admin-btn-light" type="submit">Thực hiện</button></form><?php else: ?><span class="cas-muted">—</span><?php endif; ?></td></tr>
   <?php endforeach; ?>
   </tbody></table></div>
 </section>
 <section class="admin-card admin-section">
   <h2 class="admin-card-title">Nhật ký quản trị (<?= $total ?> bản ghi)</h2>
   <form class="cas-admin-stack" method="get">
-    <select class="admin-select" name="log_action"><option value="">Mọi thao tác</option><?php foreach ($actions as $a): ?><option <?= $a['action'] === $action ? 'selected' : '' ?>><?= cas_e($a['action']) ?></option><?php endforeach; ?></select>
-    <?= cas_select('outcome', ['' => 'Mọi kết quả', 'ok' => 'Thành công', 'denied' => 'Bị chặn'], $outcome) ?>
-    <select class="admin-select" name="actor"><option value="">Mọi người dùng</option><?php foreach ($actors as $a): ?><option value="<?= (int)$a['user_id'] ?>" <?= (int)$a['user_id'] === $actor ? 'selected' : '' ?>><?= cas_e($a['full_name']) ?></option><?php endforeach; ?></select>
+    <select class="admin-select" name="log_action" aria-label="Lọc theo thao tác"><option value="">Mọi thao tác</option><?php foreach ($actions as $a): ?><option <?= $a['action'] === $action ? 'selected' : '' ?>><?= cas_e($a['action']) ?></option><?php endforeach; ?></select>
+    <?= cas_select('outcome', ['' => 'Mọi kết quả', 'ok' => 'Thành công', 'denied' => 'Bị chặn'], $outcome, 'aria-label="Lọc theo kết quả"') ?>
+    <select class="admin-select" name="actor" aria-label="Lọc theo người dùng"><option value="">Mọi người dùng</option><?php foreach ($actors as $a): ?><option value="<?= (int)$a['user_id'] ?>" <?= (int)$a['user_id'] === $actor ? 'selected' : '' ?>><?= cas_e($a['full_name']) ?></option><?php endforeach; ?></select>
     <button class="admin-btn" type="submit">Lọc</button><a class="admin-btn-light" href="chu-so-huu.php">Bỏ lọc</a>
   </form>
   <div class="admin-table-wrap mt-3"><table class="admin-table"><thead><tr><th>Thời gian</th><th>Người thao tác</th><th>Thao tác</th><th>Đối tượng</th><th>Kết quả</th><th>Chi tiết</th></tr></thead><tbody>
