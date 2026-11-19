@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-14T23:49:24.0604754+07:00",
+  "results": [
+    {
+      "file": "assets/js/main-r2.js",
+      "status": "PASS"
+    },
+    {
+      "file": "assets/js/customer-catalog.js",
+      "status": "PASS"
+    },
+    {
+      "file": "assets/js/customer-forms.js",
+      "status": "PASS"
+    },
+    {
+      "file": "assets/js/r2-contact.js",
+      "status": "PASS"
+    },
+    {
+      "file": "assets/js/r2-lookup.js",
+      "status": "PASS"
+    },
+    {
+      "file": "tests/customer/http.cjs",
+      "status": "PASS"
+    },
+    {
+      "file": "tests/customer/browser.cjs",
+      "status": "PASS"
+    },
+    {
+      "file": "tests/customer/completion.cjs",
+      "status": "PASS"
+    }
+  ]
+}

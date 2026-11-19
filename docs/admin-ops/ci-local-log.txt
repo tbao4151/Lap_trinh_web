@@ -1,0 +1,245 @@
+### verify-r2.sh
+PASS: 17 SQL tables, 11 products, checkout CSH-2026-F26A8C16, lookup, contact, news.
+### verify-r2-auth-admin.sh
+Đã tạo tài khoản Quản trị viên: admin-coursework@example.test
+PASS: Admin login/RBAC, 11 pages, product SQL CRUD, order update, customer registration/profile/history.
+### verify-admin-ops.sh
+== Migration tăng dần (001, 002, 003 x2)
+Migration 003 idempotent: 12,4,4,9,12,10
+== Tài khoản kiểm thử qua CLI (mật khẩu ngẫu nhiên)
+Đã tạo tài khoản Chủ sở hữu: owner-ops-6cd6c8@example.test
+Đã tạo tài khoản Quản trị viên: admin-ops-6cd6c8@example.test
+Đã tạo tài khoản Nhân viên: staff-ops-6cd6c8@example.test
+== HTTP + MySQL
+## Ma trận quyền 22 route x 5 vai trò
+PASS GET dang-nhap as guest -> 200
+PASS GET dang-nhap as customer -> 200
+PASS GET dang-nhap as staff -> 303
+PASS GET dang-nhap as admin -> 303
+PASS GET dang-nhap as owner -> 303
+PASS GET index as guest -> 303
+PASS GET index as customer -> 303
+PASS GET index as staff -> 200
+PASS GET index as admin -> 200
+PASS GET index as owner -> 200
+PASS GET don-hang as guest -> 303
+PASS GET don-hang as customer -> 303
+PASS GET don-hang as staff -> 200
+PASS GET don-hang as admin -> 200
+PASS GET don-hang as owner -> 200
+PASS GET giao-hang as guest -> 303
+PASS GET giao-hang as customer -> 303
+PASS GET giao-hang as staff -> 200
+PASS GET giao-hang as admin -> 200
+PASS GET giao-hang as owner -> 200
+PASS GET khach-hang as guest -> 303
+PASS GET khach-hang as customer -> 303
+PASS GET khach-hang as staff -> 200
+PASS GET khach-hang as admin -> 200
+PASS GET khach-hang as owner -> 200
+PASS GET san-pham as guest -> 303
+PASS GET san-pham as customer -> 303
+PASS GET san-pham as staff -> 200
+PASS GET san-pham as admin -> 200
+PASS GET san-pham as owner -> 200
+PASS GET them-san-pham as guest -> 303
+PASS GET them-san-pham as customer -> 303
+PASS GET them-san-pham as staff -> 403
+PASS GET them-san-pham as admin -> 200
+PASS GET them-san-pham as owner -> 200
+PASS GET sua-san-pham?id=1 as guest -> 303
+PASS GET sua-san-pham?id=1 as customer -> 303
+PASS GET sua-san-pham?id=1 as staff -> 403
+PASS GET sua-san-pham?id=1 as admin -> 200
+PASS GET sua-san-pham?id=1 as owner -> 200
+PASS GET quan-ly-nhanh as guest -> 303
+PASS GET quan-ly-nhanh as customer -> 303
+PASS GET quan-ly-nhanh as staff -> 200
+PASS GET quan-ly-nhanh as admin -> 200
+PASS GET quan-ly-nhanh as owner -> 200
+PASS GET phan-loai-bo-loc as guest -> 303
+PASS GET phan-loai-bo-loc as customer -> 303
+PASS GET phan-loai-bo-loc as staff -> 200
+PASS GET phan-loai-bo-loc as admin -> 200
+PASS GET phan-loai-bo-loc as owner -> 200
+PASS GET kho-tong as guest -> 303
+PASS GET kho-tong as customer -> 303
+PASS GET kho-tong as staff -> 200
+PASS GET kho-tong as admin -> 200
+PASS GET kho-tong as owner -> 200
+PASS GET bao-cao as guest -> 303
+PASS GET bao-cao as customer -> 303
+PASS GET bao-cao as staff -> 200
+PASS GET bao-cao as admin -> 200
+PASS GET bao-cao as owner -> 200
+PASS GET hoan-tien as guest -> 303
+PASS GET hoan-tien as customer -> 303
+PASS GET hoan-tien as staff -> 200
+PASS GET hoan-tien as admin -> 200
+PASS GET hoan-tien as owner -> 200
+PASS GET giay-goi as guest -> 303
+PASS GET giay-goi as customer -> 303
+PASS GET giay-goi as staff -> 200
+PASS GET giay-goi as admin -> 200
+PASS GET giay-goi as owner -> 200
+PASS GET kham-pha as guest -> 303
+PASS GET kham-pha as customer -> 303
+PASS GET kham-pha as staff -> 200
+PASS GET kham-pha as admin -> 200
+PASS GET kham-pha as owner -> 200
+PASS GET kho-hoa as guest -> 303
+PASS GET kho-hoa as customer -> 303
+PASS GET kho-hoa as staff -> 200
+PASS GET kho-hoa as admin -> 200
+PASS GET kho-hoa as owner -> 200
+PASS GET kho-phu-kien as guest -> 303
+PASS GET kho-phu-kien as customer -> 303
+PASS GET kho-phu-kien as staff -> 200
+PASS GET kho-phu-kien as admin -> 200
+PASS GET kho-phu-kien as owner -> 200
+PASS GET lich-su-kho as guest -> 303
+PASS GET lich-su-kho as customer -> 303
+PASS GET lich-su-kho as staff -> 200
+PASS GET lich-su-kho as admin -> 200
+PASS GET lich-su-kho as owner -> 200
+PASS GET nhan-vien as guest -> 303
+PASS GET nhan-vien as customer -> 303
+PASS GET nhan-vien as staff -> 403
+PASS GET nhan-vien as admin -> 200
+PASS GET nhan-vien as owner -> 200
+PASS GET cai-dat as guest -> 303
+PASS GET cai-dat as customer -> 303
+PASS GET cai-dat as staff -> 403
+PASS GET cai-dat as admin -> 200
+PASS GET cai-dat as owner -> 200
+PASS GET tai-khoan as guest -> 303
+PASS GET tai-khoan as customer -> 303
+PASS GET tai-khoan as staff -> 200
+PASS GET tai-khoan as admin -> 200
+PASS GET tai-khoan as owner -> 200
+PASS GET chu-so-huu as guest -> 303
+PASS GET chu-so-huu as customer -> 303
+PASS GET chu-so-huu as staff -> 403
+PASS GET chu-so-huu as admin -> 403
+PASS GET chu-so-huu as owner -> 200
+## Chặn POST trái phép / thiếu CSRF
+PASS POST kho as guest bị chuyển về đăng nhập
+PASS POST kho as customer bị chuyển về đăng nhập
+PASS POST thiếu CSRF bị chặn 403
+PASS Không có giao dịch kho nào được tạo từ POST trái phép
+## ADM-02 Sản phẩm, ảnh, giá nhanh
+PASS Tạo sản phẩm + 2 ảnh tải lên (multipart) -> 303 sang trang sửa
+PASS product_images lưu 2 ảnh, đúng 1 ảnh đại diện
+PASS Ảnh được lưu thật dưới assets/uploads/products
+PASS Slug tự sinh từ tên tiếng Việt
+PASS Gán giấy gói 1, 2 cho sản phẩm
+PASS Từ chối file giả ảnh (PHP đổi đuôi .png) -> 422
+PASS File giả không được lưu, sản phẩm không đổi
+PASS SKU trùng (không phân biệt hoa thường) -> 422
+PASS Giá âm -> 422
+PASS Nhân viên POST tạo sản phẩm -> 403
+PASS Sửa sản phẩm không tồn tại -> 404
+PASS Đổi ảnh đại diện cập nhật products.image
+PASS Quản lý nhanh đổi giá -> 303, products.price = 777000
+PASS Giá trong order_items cũ không đổi (price snapshot)
+PASS Feed khách hàng nhận giá mới
+PASS Ẩn sản phẩm -> không còn trong feed khách hàng
+PASS Không xoá sản phẩm đã có đơn hàng -> 422
+PASS Xoá thiếu xác nhận -> 422
+PASS Xoá sản phẩm chưa có đơn (kèm ảnh) -> 303
+## ADM-02 Phân loại
+PASS Thêm tông màu mới -> 303
+PASS Tên phân loại trùng (khác hoa thường) -> 422
+PASS Nhân viên sửa phân loại -> 403
+PASS Xoá tông màu đang dùng -> 422
+PASS Ngừng dùng loại hoa -> sản phẩm vẫn giữ category_id
+PASS Loại hoa ngừng dùng không còn trong bộ lọc trang khách
+PASS Bật lại loại hoa -> xuất hiện lại trong bộ lọc
+PASS Xoá tông màu chưa dùng -> 303
+## ADM-03 Kho
+PASS Tạo nguyên liệu kèm tồn đầu 10 (1 transaction) -> 303
+PASS Tồn đầu được ghi phiếu nhập
+PASS Nhân viên nhập 15 -> 303, before 10 / after 25, ghi người thực hiện
+PASS Gửi lại cùng mã phiếu (double submit) -> 422, không cộng tồn lần 2
+PASS Xuất vượt tồn -> 422, tồn giữ nguyên 25
+PASS Nhân viên kiểm kê (adjustment) -> 403
+PASS Số lượng 0 -> 422
+PASS Xuất đồng thời: đúng 1 phiếu thành công, tồn = 5 (không âm)
+PASS Admin kiểm kê đặt tồn = 8 -> 303
+PASS Lịch sử kho hiển thị phiếu theo bộ lọc nguyên liệu
+PASS Tổng phiếu của nguyên liệu = 4 (tồn đầu, nhập, xuất, kiểm kê)
+PASS Kho phụ kiện không lẫn nguyên liệu hoa
+## ADM-04 Giao hàng
+PASS Nhảy cóc Chưa giao -> Đã giao bị chặn 422
+PASS Nhân viên chuyển sang Đang giao -> 303
+PASS Giao thất bại không ghi lý do -> 422
+PASS Đang giao -> Đã giao -> 303
+PASS Đã giao là trạng thái cuối -> 422
+PASS delivery_events lưu đủ 4 bước có người thực hiện
+PASS Lịch giao theo ngày (SQL) hiển thị đơn
+## ADM-04 Hoàn tiền
+PASS Không tạo hoàn tiền cho đơn chưa thanh toán -> 422
+PASS Hoàn vượt số đã thanh toán -> 422
+PASS Nhân viên tạo yêu cầu hoàn 50.000 -> 303
+PASS Gửi trùng yêu cầu hoàn -> 422, chỉ 1 bản ghi
+PASS Nhân viên tự duyệt hoàn tiền -> 403
+PASS Không ghi nhận khi chưa duyệt (nhảy bước) -> 422
+PASS Admin duyệt -> 303
+PASS Ghi nhận đã hoàn thiếu mã giao dịch -> 422
+PASS Ghi nhận đã hoàn có mã giao dịch -> 303
+PASS Hoàn tiền KHÔNG tự đổi orders.payment_status (contract của lead)
+PASS refund_events có đủ 3 bước
+## ADM-05 Giấy gói
+PASS Thêm giấy gói kèm ảnh, phụ thu -> 303
+PASS Nhân viên sửa giấy gói -> 403
+PASS Mã màu sai định dạng -> 422
+PASS Gán cho sản phẩm 1 -> feed khách có giấy gói + phụ thu
+PASS Xoá giấy gói đang gán -> 422
+PASS Giấy gói "ngừng dùng" không còn hiển thị cho khách
+PASS Bỏ gán rồi xoá -> 303
+## ADM-05 Khám phá
+PASS Thêm nhóm khám phá theo tông màu -> 303
+PASS Trang chủ hiển thị thẻ mới với liên kết lọc đúng
+PASS Liên kết dẫn tới trang Sản phẩm có bộ lọc tông màu tương ứng
+PASS Nhân viên xoá nhóm khám phá -> 403
+PASS Nhóm không có ảnh -> 422
+PASS Tông màu ngừng dùng -> thẻ tự ẩn ở trang chủ
+PASS Admin thấy trạng thái không hợp lệ của thẻ
+PASS Không gắn nhóm vào phân loại đang ngừng dùng -> 422
+PASS Xoá nhóm khám phá -> 303
+## ADM-06 Cài đặt
+PASS Hotline sai -> 422
+PASS Email sai -> 422
+PASS Nhân viên lưu cài đặt -> 403
+PASS Admin lưu cài đặt -> 303 và MySQL cập nhật
+PASS Trang Liên hệ dùng địa chỉ mới
+PASS Header / footer nhận thông báo + địa chỉ mới qua CAS_SETTINGS
+## ADM-06 Nhân viên / chủ sở hữu
+PASS Nhân viên tự nâng quyền -> 403, vai trò giữ nguyên
+PASS Nhân viên POST trang chủ sở hữu -> 403
+PASS Admin tạo tài khoản Quản trị viên -> 403
+PASS Mật khẩu yếu -> 422
+PASS Admin tạo nhân viên -> 303, mật khẩu lưu dạng băm
+PASS Admin khoá nhân viên -> 303
+PASS Phiên đang mở của nhân viên bị khoá mất quyền ngay
+PASS Admin khoá chủ sở hữu -> 403
+PASS Không tự khoá chính mình -> 403
+PASS Admin đổi vai trò -> 403 (chỉ chủ sở hữu)
+PASS Chủ sở hữu nâng nhân viên lên quản trị viên -> 303
+PASS Không hạ cấp chủ sở hữu cuối cùng -> 422
+PASS Sai mật khẩu xác nhận -> 422, không đổi vai trò
+PASS Chủ sở hữu nâng admin lên chủ sở hữu (nhập lại mật khẩu) -> 303
+PASS Còn 2 chủ sở hữu -> hạ một người về quản trị viên -> 303
+PASS Luôn còn ít nhất 1 chủ sở hữu hoạt động
+PASS Nhân viên tự sửa hồ sơ -> 303
+PASS Đổi mật khẩu sai mật khẩu hiện tại -> 422
+PASS Nhật ký chủ sở hữu liệt kê các lần bị chặn
+## Đăng xuất thu hồi quyền
+PASS Sau đăng xuất, POST admin bằng cookie cũ bị chuyển về đăng nhập
+## Nhật ký quản trị
+PASS admin_audit_log ghi thao tác thành công
+PASS admin_audit_log ghi các lần bị chặn quyền
+PASS Nhật ký không chứa mật khẩu
+
+TỔNG: 216/216 kiểm tra đạt.
+PASS: Admin Operations — migration 003, 22 route x 5 vai trò, sản phẩm/ảnh, phân loại, kho, giao hàng, hoàn tiền, giấy gói, khám phá, cài đặt, nhân viên/chủ sở hữu, audit.

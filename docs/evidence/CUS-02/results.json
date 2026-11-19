@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-15T00:02:23.156Z",
+  "base": "http://127.0.0.1:8033",
+  "task": "CUS-02",
+  "results": [
+    {
+      "name": "Từng bộ lọc khớp SQL",
+      "expected": "Mỗi bộ lọc loại, tone, dịp, giá và tìm kiếm trả đúng danh sách ID trong DB",
+      "actual": "6 bộ lọc riêng lẻ khớp tập ID SQL",
+      "status": "PASS"
+    },
+    {
+      "name": "Giá và trạng thái sản phẩm cập nhật từ DB",
+      "expected": "Đổi giá phản ánh ở catalog/detail; hidden không xuất hiện và detail trả 404",
+      "actual": "Giá 456000 đã hiển thị; hidden bị loại và trả 404; khôi phục dữ liệu thử",
+      "status": "PASS"
+    },
+    {
+      "name": "Khoảng giá đảo hiển thị lỗi có liên kết",
+      "expected": "Lỗi inline và aria-invalid khi min > max; đặt lại xóa lỗi",
+      "actual": "Thông báo xuất hiện, aria-invalid=true và đặt lại xóa lỗi",
+      "status": "PASS"
+    }
+  ],
+  "queries": [
+    {
+      "sql": "SELECT p.product_id FROM products p LEFT JOIN categories c ON c.category_id=p.category_id LEFT JOIN tones t ON t.tone_id=p.tone_id LEFT JOIN occasions o ON o.occasion_id=p.occasion_id WHERE p.status='active' AND p.product_type='basket'",
+      "rows": 2
+    },
+    {
+      "sql": "SELECT p.product_id FROM products p LEFT JOIN categories c ON c.category_id=p.category_id LEFT JOIN tones t ON t.tone_id=p.tone_id LEFT JOIN occasions o ON o.occasion_id=p.occasion_id WHERE p.status='active' AND c.name='Hoa ly'",
+      "rows": 5
+    },
+    {
+      "sql": "SELECT p.product_id FROM products p LEFT JOIN categories c ON c.category_id=p.category_id LEFT JOIN tones t ON t.tone_id=p.tone_id LEFT JOIN occasions o ON o.occasion_id=p.occasion_id WHERE p.status='active' AND t.name='Xanh'",
+      "rows": 5
+    },
+    {
+      "sql": "SELECT p.product_id FROM products p LEFT JOIN categories c ON c.category_id=p.category_id LEFT JOIN tones t ON t.tone_id=p.tone_id LEFT JOIN occasions o ON o.occasion_id=p.occasion_id WHERE p.status='active' AND o.name='Sinh nhật'",
+      "rows": 3
+    },
+    {
+      "sql": "SELECT p.product_id FROM products p LEFT JOIN categories c ON c.category_id=p.category_id LEFT JOIN tones t ON t.tone_id=p.tone_id LEFT JOIN occasions o ON o.occasion_id=p.occasion_id WHERE p.status='active' AND p.price BETWEEN 300000 AND 400000",
+      "rows": 8
+    },
+    {
+      "sql": "SELECT p.product_id FROM products p LEFT JOIN categories c ON c.category_id=p.category_id LEFT JOIN tones t ON t.tone_id=p.tone_id LEFT JOIN occasions o ON o.occasion_id=p.occasion_id WHERE p.status='active' AND p.slug='lam-tinh'",
+      "rows": 1
+    },
+    {
+      "sql": "SELECT price,status FROM products WHERE product_id=1",
+      "rows": 1
+    },
+    {
+      "sql": "UPDATE products SET price=? WHERE product_id=1",
+      "rows": null,
+      "affected": 1
+    },
+    {
+      "sql": "UPDATE products SET status='hidden' WHERE product_id=1",
+      "rows": null,
+      "affected": 1
+    },
+    {
+      "sql": "UPDATE products SET price=?,status=? WHERE product_id=1",
+      "rows": null,
+      "affected": 1
+    }
+  ]
+}

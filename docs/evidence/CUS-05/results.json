@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-15T00:02:51.762Z",
+  "base": "http://127.0.0.1:8033",
+  "task": "CUS-05",
+  "results": [
+    {
+      "name": "Tương phản nút và bàn phím bộ lọc",
+      "expected": "Chữ nút chính đạt tỷ lệ >=4.5; mở lọc bằng Enter và có focus visible",
+      "actual": "Tỷ lệ nút 6.32:1; Enter/focus đạt",
+      "status": "PASS"
+    }
+  ],
+  "queries": []
+}

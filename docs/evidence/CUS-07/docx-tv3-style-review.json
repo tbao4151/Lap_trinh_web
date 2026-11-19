@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-15",
+  "status": "PASS",
+  "document": "BAO_CAO_TONG_HOP_TV2_CUSTOMER.docx",
+  "pagesReviewed": 29,
+  "images": 13,
+  "tables": 17,
+  "renderer": "Microsoft Word with TOC and PAGE refresh; Poppler PNG",
+  "reference": "BAO_CAO_TONG_HOP_TV3_ADMIN_OPERATIONS.docx",
+  "referenceUnchanged": true,
+  "checks": [
+    "All 29 final pages visually inspected",
+    "Cover and metadata on one page",
+    "TOC page numbers verified",
+    "Tables and captions do not clip or overlap",
+    "13 real Customer screenshots; no retained Admin images",
+    "Same A4 portrait page geometry and template styles"
+  ],
+  "sha256": "F3835C885B69827192253ECC4C7566BBF2EBE698E2859FEF98E3F88FBC4EC154",
+  "git": "One local commit f36a1bc; no push, no remote Customer branch, no PR; Git paused by user until report shown",
+  "limitation": "Screenshots show page content without browser address bar"
+}

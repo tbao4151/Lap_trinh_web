@@ -1,0 +1,147 @@
+{
+  "date": "2026-10-14T16:47:49.016Z",
+  "base": "http://127.0.0.1:8033",
+  "results": [
+    {
+      "name": "Reject CSRF and malformed arrays",
+      "status": "PASS"
+    },
+    {
+      "name": "Cart validation and persistence",
+      "status": "PASS"
+    },
+    {
+      "name": "Checkout rejects invalid date, phone and missing address",
+      "status": "PASS"
+    },
+    {
+      "name": "Server prices, transaction and replay protection",
+      "status": "PASS"
+    },
+    {
+      "name": "Guest lookup correct phone, wrong phone and limited fields",
+      "status": "PASS"
+    },
+    {
+      "name": "Success page reflects current database order status",
+      "status": "PASS"
+    },
+    {
+      "name": "Wrapping validates mapping, state and canonical name",
+      "status": "PASS"
+    },
+    {
+      "name": "Wrapping snapshot survives later rename and has no surcharge",
+      "status": "PASS"
+    },
+    {
+      "name": "Product 404 and admin visibility reflects database",
+      "status": "PASS"
+    },
+    {
+      "name": "Register customer A and reject duplicates",
+      "status": "PASS"
+    },
+    {
+      "name": "Profile update and authenticated order association",
+      "status": "PASS"
+    },
+    {
+      "name": "Signed-in checkout preserves submitted buyer name and phone snapshot",
+      "status": "PASS"
+    },
+    {
+      "name": "Customer isolation and direct admin access",
+      "status": "PASS"
+    },
+    {
+      "name": "History pagination includes older orders",
+      "status": "PASS"
+    },
+    {
+      "name": "Local SMTP delivers reset link; token is single-use and expires",
+      "status": "FAIL",
+      "message": "Cannot access 'crypto' before initialization"
+    },
+    {
+      "name": "Contact persisted and rate limited",
+      "status": "PASS"
+    },
+    {
+      "name": "Non-scalar GET inputs do not produce PHP warnings or expose private orders",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page index.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page san-pham.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page chi-tiet-san-pham.php?slug=lam-tinh",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page gio-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page thanh-toan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page dat-hang-thanh-cong.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page dang-nhap.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page dang-ky.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page quen-mat-khau.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page tai-khoan.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page lich-su-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page tra-cuu-don-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page tin-tuc.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page lien-he.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page gioi-thieu.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page chinh-sach-giao-hang.php",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP page chinh-sach-doi-tra.php",
+      "status": "PASS"
+    }
+  ]
+}

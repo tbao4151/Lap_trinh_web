@@ -1,0 +1,250 @@
+{
+  "date": "2026-10-14T18:46:46.4567029+07:00",
+  "results": [
+    {
+      "file": "chi-tiet-san-pham.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\chi-tiet-san-pham.php"
+    },
+    {
+      "file": "chi-tiet-tin-tuc.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\chi-tiet-tin-tuc.php"
+    },
+    {
+      "file": "chinh-sach-doi-tra.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\chinh-sach-doi-tra.php"
+    },
+    {
+      "file": "chinh-sach-giao-hang.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\chinh-sach-giao-hang.php"
+    },
+    {
+      "file": "dang-ky.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\dang-ky.php"
+    },
+    {
+      "file": "dang-nhap.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\dang-nhap.php"
+    },
+    {
+      "file": "dang-xuat.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\dang-xuat.php"
+    },
+    {
+      "file": "dat-hang-thanh-cong.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\dat-hang-thanh-cong.php"
+    },
+    {
+      "file": "gio-hang.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\gio-hang.php"
+    },
+    {
+      "file": "gioi-thieu.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\gioi-thieu.php"
+    },
+    {
+      "file": "index.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\index.php"
+    },
+    {
+      "file": "lich-su-don-hang.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\lich-su-don-hang.php"
+    },
+    {
+      "file": "lien-he.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\lien-he.php"
+    },
+    {
+      "file": "quen-mat-khau.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\quen-mat-khau.php"
+    },
+    {
+      "file": "san-pham.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\san-pham.php"
+    },
+    {
+      "file": "tai-khoan.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\tai-khoan.php"
+    },
+    {
+      "file": "thanh-toan.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\thanh-toan.php"
+    },
+    {
+      "file": "tin-tuc.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\tin-tuc.php"
+    },
+    {
+      "file": "tra-cuu-don-hang.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\tra-cuu-don-hang.php"
+    },
+    {
+      "file": "actions\\cart.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\actions\\cart.php"
+    },
+    {
+      "file": "actions\\checkout.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\actions\\checkout.php"
+    },
+    {
+      "file": "actions\\contact.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\actions\\contact.php"
+    },
+    {
+      "file": "actions\\lookup.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\actions\\lookup.php"
+    },
+    {
+      "file": "admin\\_actions.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\_actions.php"
+    },
+    {
+      "file": "admin\\_app.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\_app.php"
+    },
+    {
+      "file": "admin\\bao-cao.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\bao-cao.php"
+    },
+    {
+      "file": "admin\\dang-nhap.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\dang-nhap.php"
+    },
+    {
+      "file": "admin\\don-hang.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\don-hang.php"
+    },
+    {
+      "file": "admin\\giao-hang.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\giao-hang.php"
+    },
+    {
+      "file": "admin\\index.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\index.php"
+    },
+    {
+      "file": "admin\\khach-hang.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\khach-hang.php"
+    },
+    {
+      "file": "admin\\kho-tong.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\kho-tong.php"
+    },
+    {
+      "file": "admin\\phan-loai-bo-loc.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\phan-loai-bo-loc.php"
+    },
+    {
+      "file": "admin\\quan-ly-nhanh.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\quan-ly-nhanh.php"
+    },
+    {
+      "file": "admin\\san-pham.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\san-pham.php"
+    },
+    {
+      "file": "admin\\sua-san-pham.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\sua-san-pham.php"
+    },
+    {
+      "file": "admin\\them-san-pham.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\admin\\them-san-pham.php"
+    },
+    {
+      "file": "assets\\js\\cart-r2.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\assets\\js\\cart-r2.php"
+    },
+    {
+      "file": "assets\\js\\products.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\assets\\js\\products.php"
+    },
+    {
+      "file": "config\\database.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\config\\database.php"
+    },
+    {
+      "file": "includes\\auth.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\includes\\auth.php"
+    },
+    {
+      "file": "includes\\bootstrap.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\includes\\bootstrap.php"
+    },
+    {
+      "file": "includes\\customer-recommendations.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\includes\\customer-recommendations.php"
+    },
+    {
+      "file": "includes\\customer.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\includes\\customer.php"
+    },
+    {
+      "file": "includes\\r2-status.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\includes\\r2-status.php"
+    },
+    {
+      "file": "scripts\\create-admin.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\scripts\\create-admin.php"
+    },
+    {
+      "file": "scripts\\customer-router.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\scripts\\customer-router.php"
+    },
+    {
+      "file": "scripts\\customer-setup.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\scripts\\customer-setup.php"
+    },
+    {
+      "file": "tests\\customer\\db.php",
+      "status": "PASS",
+      "actual": "No syntax errors detected in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\tests\\customer\\db.php"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "tables": 13,
+  "images": 7,
+  "audit_pages": 18,
+  "status": "PASS",
+  "note": "Đã mở lại bằng python-docx; hình thức cần kiểm tra bản render."
+}

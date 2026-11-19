@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-15T00:01:09.100Z",
+  "base": "http://127.0.0.1:8033",
+  "task": "CUS-02",
+  "results": [
+    {
+      "name": "Từng bộ lọc khớp SQL",
+      "expected": "Mỗi bộ lọc loại, tone, dịp, giá và tìm kiếm trả đúng danh sách ID trong DB",
+      "actual": "Command failed: C:/xampp/php/php.exe C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\tests\\customer\\db.php\nPHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\config\\database.php:17\nStack trace:\n#0 C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\config\\database.php(17): PDO->__construct('mysql:host=127....', 'root', Object(SensitiveParameterValue), Array)\n#1 C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\tests\\customer\\db.php(7): cas_db()\n#2 {main}\n  thrown in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\config\\database.php on line 17\n",
+      "status": "FAIL"
+    },
+    {
+      "name": "Giá và trạng thái sản phẩm cập nhật từ DB",
+      "expected": "Đổi giá phản ánh ở catalog/detail; hidden không xuất hiện và detail trả 404",
+      "actual": "Command failed: C:/xampp/php/php.exe C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\tests\\customer\\db.php\nPHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\config\\database.php:17\nStack trace:\n#0 C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\config\\database.php(17): PDO->__construct('mysql:host=127....', 'root', Object(SensitiveParameterValue), Array)\n#1 C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\tests\\customer\\db.php(7): cas_db()\n#2 {main}\n  thrown in C:\\Users\\Tran Hung\\Desktop\\File Các Môn Học\\Web\\Cuối kì\\Lap_trinh_web-main\\customer-preview\\config\\database.php on line 17\n",
+      "status": "FAIL"
+    },
+    {
+      "name": "Khoảng giá đảo hiển thị lỗi có liên kết",
+      "expected": "Lỗi inline và aria-invalid khi min > max; đặt lại xóa lỗi",
+      "actual": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8033/san-pham.php?min=500000&max=100000\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:8033/san-pham.php?min=500000&max=100000\", waiting until \"networkidle\"\u001b[22m\n",
+      "status": "FAIL"
+    }
+  ],
+  "queries": []
+}
