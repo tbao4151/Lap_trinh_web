@@ -8,6 +8,8 @@ if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_S
 /**
  * Core Admin views: dashboard, orders (including order_update state machine & inventory sync), customers, reports.
  */
+// Định nghĩa doanh thu thuần dùng chung với trang Lợi nhuận gộp (chỉ khai báo hàm, không render).
+require_once __DIR__ . '/analytics.php';
 
 function cas_admin_number(string $field): int
 {
@@ -146,6 +148,17 @@ function cas_admin_handle_order_post(PDO $db, array $user, string $cas_page, str
                 if ($status !== $from && $status === 'cancelled') {
                     cas_order_restore_inventory($db, $id, (int)$user['user_id']);
                 }
+                if ($from === 'delivering' && $status === 'ready') {
+                    // Quay lại "Sẵn sàng" = chuyến giao không thành công: đưa lịch giao về "Chưa giao" trong cùng transaction,
+                    // nếu không đơn bị kẹt (Giao hàng chỉ cho xuất giao từ "Chưa giao" và xác nhận đã giao khi đơn "Đang giao").
+                    $q = $db->prepare("SELECT delivery_id FROM deliveries WHERE order_id=? AND delivery_status='out_for_delivery' FOR UPDATE");
+                    $q->execute([$id]);
+                    foreach ($q->fetchAll(PDO::FETCH_COLUMN) as $deliveryId) {
+                        $db->prepare("UPDATE deliveries SET delivery_status='not_delivered', note=? WHERE delivery_id=?")->execute([$reason, $deliveryId]);
+                        $db->prepare("INSERT INTO delivery_events(delivery_id,from_status,to_status,actor_id,note) VALUES(?,'out_for_delivery','not_delivered',?,?)")
+                           ->execute([$deliveryId, $user['user_id'], 'Trang Đơn hàng: ' . $reason]);
+                    }
+                }
                 $q = $db->prepare('UPDATE orders SET order_status=?,payment_status=? WHERE order_id=?');
                 $q->execute([$status, $payment, $id]);
                 $db->commit();
@@ -215,12 +228,14 @@ function cas_admin_render_core_page(PDO $db, array $user, string $cas_page): voi
                 'Giao hôm nay' => (int)$db->query('SELECT COUNT(*) FROM deliveries WHERE DATE(scheduled_at)=CURDATE()')->fetchColumn(),
                 'Đơn đã thanh toán' => (int)$db->query("SELECT COUNT(*) FROM orders WHERE payment_status='paid'")->fetchColumn(),
                 'Nguyên liệu sắp hết' => (int)$db->query("SELECT COUNT(*) FROM inventory_items WHERE quantity<=min_quantity AND status='active'")->fetchColumn(),
-                'Doanh thu hoàn tất' => (int)$db->query("SELECT COALESCE(SUM(total_amount),0) FROM orders WHERE order_status='completed' AND payment_status='paid'")->fetchColumn(),
+                // Trước đây: SUM(total_amount) chỉ với payment_status='paid' => bỏ sót phần còn lại của đơn hoàn một phần,
+                // lệch với Báo cáo doanh thu và Lợi nhuận gộp. Nay dùng chung định nghĩa doanh thu thuần (toàn thời gian).
+                CAS_REVENUE_NET_LABEL => (int)round(cas_revenue_net_total($db)),
             ];
             $latest = cas_admin_rows($db, "SELECT o.order_code,o.total_amount,o.order_status,o.created_at,c.full_name FROM orders o JOIN customers c ON c.customer_id=o.customer_id ORDER BY o.order_id DESC LIMIT 10");
             ?>
 <div class="cas-admin-metrics admin-section">
-<?php foreach ($kpis as $label => $count): ?><article class="cas-admin-metric"><span><?= cas_e($label) ?></span><strong><?= number_format($count, 0, ',', '.') ?><?= $label === 'Doanh thu hoàn tất' ? ' ₫' : '' ?></strong></article><?php endforeach; ?>
+<?php foreach ($kpis as $label => $count): ?><article class="cas-admin-metric"><span><?= cas_e($label) ?></span><strong><?= number_format($count, 0, ',', '.') ?><?= $label === CAS_REVENUE_NET_LABEL ? ' ₫' : '' ?></strong></article><?php endforeach; ?>
 </div>
 <section class="admin-card admin-section">
 <div class="cas-admin-stack justify-content-between mb-2"><h2 class="admin-card-title mb-0">Đơn gần đây</h2><a class="admin-btn-light" href="don-hang.php">Quản lý đơn hàng</a></div>
@@ -288,10 +303,8 @@ function cas_admin_render_core_page(PDO $db, array $user, string $cas_page): voi
                 $end = date('Y-m-d');
             }
             $q = $db->prepare("SELECT DATE(o.created_at) day,COUNT(*) order_count, SUM(o.total_amount) gross_sales,
-    SUM(CASE WHEN o.order_status='completed' AND o.payment_status IN ('paid','partially_refunded','refunded')
-      THEN GREATEST(0,o.total_amount-COALESCE(r.amount,0)) ELSE 0 END) confirmed_revenue
-    FROM orders o LEFT JOIN (SELECT order_id,SUM(amount) amount FROM refunds WHERE status='recorded' GROUP BY order_id) r
-      ON r.order_id=o.order_id
+    SUM(CASE WHEN " . cas_revenue_eligible_sql() . " THEN " . cas_revenue_net_sql() . " ELSE 0 END) confirmed_revenue
+    FROM orders o " . cas_revenue_refund_join() . "
     WHERE DATE(o.created_at) BETWEEN ? AND ? GROUP BY DATE(o.created_at) ORDER BY day DESC");
             $q->execute([$start, $end]);
             $rows = $q->fetchAll();
@@ -307,8 +320,8 @@ function cas_admin_render_core_page(PDO $db, array $user, string $cas_page): voi
   <form method="get" class="cas-admin-stack"><label class="admin-label mb-0" for="reportStart">Từ</label><input id="reportStart" name="start" type="date" class="admin-input" value="<?= cas_e($start) ?>"><label class="admin-label mb-0" for="reportEnd">đến</label><input id="reportEnd" name="end" type="date" class="admin-input" value="<?= cas_e($end) ?>"><button class="admin-btn-light" type="submit">Xem báo cáo</button></form>
   <?php if (in_array($user['role'], ['admin', 'owner'], true)): ?><a class="admin-btn-light" href="loi-nhuan.php">Biểu đồ lợi nhuận gộp <i class="bi bi-arrow-right" aria-hidden="true"></i></a><?php endif; ?>
 </div>
-<div class="cas-admin-metrics mb-4"><article class="cas-admin-metric"><span>Tổng đơn</span><strong><?= $totals['orders'] ?></strong></article><article class="cas-admin-metric"><span>Giá trị đơn</span><strong><?= cas_money($totals['gross']) ?></strong></article><article class="cas-admin-metric"><span>Doanh thu đã hoàn tất và thanh toán</span><strong><?= cas_money($totals['revenue']) ?></strong></article></div>
-<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Ngày</th><th>Số đơn</th><th>Giá trị tạo đơn</th><th>Doanh thu hợp lệ</th></tr></thead><tbody>
+<div class="cas-admin-metrics mb-4"><article class="cas-admin-metric"><span>Tổng đơn</span><strong><?= $totals['orders'] ?></strong></article><article class="cas-admin-metric"><span>Giá trị đơn</span><strong><?= cas_money($totals['gross']) ?></strong></article><article class="cas-admin-metric"><span><?= cas_e(CAS_REVENUE_NET_LABEL) ?></span><strong><?= cas_money($totals['revenue']) ?></strong></article></div>
+<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Ngày</th><th>Số đơn</th><th>Giá trị tạo đơn</th><th><?= cas_e(CAS_REVENUE_NET_LABEL) ?></th></tr></thead><tbody>
 <?php foreach ($rows as $r): ?><tr><td><?= cas_e($r['day']) ?></td><td><?= (int)$r['order_count'] ?></td><td><?= cas_money($r['gross_sales']) ?></td><td><strong><?= cas_money($r['confirmed_revenue']) ?></strong></td></tr><?php endforeach; ?>
 <?php if (!$rows): ?><tr><td colspan="4"><div class="admin-empty">Chưa có đơn hàng trong khoảng thời gian đã chọn.</div></td></tr><?php endif; ?>
 </tbody></table></div></section>
