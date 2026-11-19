@@ -7,7 +7,45 @@ if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_S
 
 /**
  * Gross profit and cost-snapshot analytics module (admin/loi-nhuan.php).
+ *
+ * ĐỊNH NGHĨA DOANH THU DÙNG CHUNG cho Dashboard, Báo cáo doanh thu và Lợi nhuận gộp:
+ *  - chỉ đơn order_status='completed' VÀ payment_status IN ('paid','partially_refunded','refunded');
+ *    đơn chưa thu / mới cọc / chưa hoàn tất / đã hủy không phải doanh thu;
+ *  - tiền đã hoàn = tổng refunds.status='recorded' của đơn, được GỘP THEO ĐƠN trước khi JOIN
+ *    nên nhiều lần hoàn của cùng một đơn không nhân đôi tiền đơn;
+ *  - doanh thu thuần (sau hoàn) = GREATEST(total_amount − tiền đã hoàn, 0): hoàn đủ = 0, không âm;
+ *  - yêu cầu hoàn đang chờ duyệt / đã duyệt / bị từ chối KHÔNG trừ doanh thu cho tới khi được ghi nhận.
  */
+const CAS_REVENUE_NET_LABEL = 'Doanh thu thuần (sau hoàn)';
+
+function cas_revenue_eligible_sql(string $order = 'o'): string
+{
+    return "$order.order_status='completed' AND $order.payment_status IN ('paid','partially_refunded','refunded')";
+}
+
+function cas_revenue_refund_join(string $order = 'o', string $alias = 'r'): string
+{
+    return "LEFT JOIN (SELECT order_id,SUM(amount) refunded FROM refunds WHERE status='recorded' GROUP BY order_id) $alias ON $alias.order_id=$order.order_id";
+}
+
+function cas_revenue_net_sql(string $order = 'o', string $alias = 'r'): string
+{
+    return "GREATEST($order.total_amount-COALESCE($alias.refunded,0),0)";
+}
+
+/** Tổng doanh thu thuần của các đơn hợp lệ (toàn thời gian, hoặc theo ngày tạo đơn khi truyền $from/$to dạng Y-m-d). */
+function cas_revenue_net_total(PDO $db, ?string $from = null, ?string $to = null): float
+{
+    $sql = 'SELECT COALESCE(SUM(' . cas_revenue_net_sql() . '),0) FROM orders o ' . cas_revenue_refund_join() . ' WHERE ' . cas_revenue_eligible_sql();
+    $args = [];
+    if ($from !== null && $to !== null) {
+        $sql .= ' AND o.created_at >= ? AND o.created_at < DATE_ADD(?, INTERVAL 1 DAY)';
+        $args = [$from, $to];
+    }
+    $q = $db->prepare($sql);
+    $q->execute($args);
+    return (float)$q->fetchColumn();
+}
 
 function cas_profit_page(): void
 {
@@ -33,27 +71,29 @@ function cas_profit_page(): void
     $format = $group === 'month' ? '%Y-%m' : '%Y-%m-%d';
     // Cost snapshot is frozen when preparing the order, NEVER based on today's material prices.
     // Legacy orders without a complete cost snapshot are excluded from profit, but counted.
+    $net = cas_revenue_net_sql();
     $sql = "SELECT DATE_FORMAT(o.created_at, '$format') bucket,
  COUNT(*) order_count,
- COALESCE(SUM(GREATEST(o.total_amount-COALESCE(r.refunded,0),0)),0) net_all,
+ COALESCE(SUM($net),0) net_all,
  COALESCE(SUM(COALESCE(r.refunded,0)),0) refunded,
- COALESCE(SUM(CASE WHEN u.material_count>0 AND u.missing_cost=0 THEN GREATEST(o.total_amount-COALESCE(r.refunded,0),0) ELSE 0 END),0) known_revenue,
+ COALESCE(SUM(CASE WHEN u.material_count>0 AND u.missing_cost=0 THEN $net ELSE 0 END),0) known_revenue,
  COALESCE(SUM(CASE WHEN u.material_count>0 AND u.missing_cost=0 THEN u.cost_total ELSE 0 END),0) material_cost,
- COALESCE(SUM(CASE WHEN u.material_count>0 AND u.missing_cost=0 THEN GREATEST(o.total_amount-COALESCE(r.refunded,0),0)-u.cost_total ELSE 0 END),0) gross_profit,
+ COALESCE(SUM(CASE WHEN u.material_count>0 AND u.missing_cost=0 THEN $net-u.cost_total ELSE 0 END),0) gross_profit,
  COALESCE(SUM(CASE WHEN u.material_count IS NULL OR u.missing_cost>0 THEN 1 ELSE 0 END),0) unknown_count
  FROM orders o
- LEFT JOIN (SELECT order_id,SUM(amount) refunded FROM refunds WHERE status='recorded' GROUP BY order_id) r ON r.order_id=o.order_id
+ " . cas_revenue_refund_join() . "
  LEFT JOIN (SELECT order_id,COUNT(*) material_count,
    SUM(CASE WHEN cost_amount_snapshot IS NULL THEN 1 ELSE 0 END) missing_cost,
    SUM(COALESCE(cost_amount_snapshot,0)) cost_total
    FROM order_inventory_usage WHERE restored_at IS NULL GROUP BY order_id) u ON u.order_id=o.order_id
- WHERE o.order_status='completed' AND o.payment_status IN ('paid','partially_refunded','refunded')
+ WHERE " . cas_revenue_eligible_sql() . "
  AND o.created_at >= ? AND o.created_at < DATE_ADD(?,INTERVAL 1 DAY)
  GROUP BY DATE_FORMAT(o.created_at, '$format') ORDER BY bucket ASC";
     $q = $db->prepare($sql);
     $q->execute([$from, $to]);
     $rows = $q->fetchAll();
-    $totals = ['orders' => 0, 'net_all' => 0.0, 'refunded' => 0.0, 'known_revenue' => 0.0, 'material_cost' => 0.0, 'gross_profit' => 0.0, 'unknown_count' => 0];
+    // Khóa trùng tên cột SQL (order_count): trước đây dùng 'orders' nên ô "Số đơn" luôn bằng 0 và PHP báo Undefined array key.
+    $totals = ['order_count' => 0, 'net_all' => 0.0, 'refunded' => 0.0, 'known_revenue' => 0.0, 'material_cost' => 0.0, 'gross_profit' => 0.0, 'unknown_count' => 0];
     foreach ($rows as $r) {
         foreach ($totals as $k => $v) {
             $totals[$k] += (float)$r[$k];
@@ -90,8 +130,8 @@ function cas_profit_page(): void
 </select><button class="admin-btn" type="submit">Xem báo cáo</button></form>
 <p class="cas-profit-note">Chỉ tính đơn <strong>hoàn tất và đã thanh toán</strong>; số tiền hoàn đã ghi nhận được trừ khỏi doanh thu. Những đơn không có snapshot giá vốn nguyên liệu không được tính vào lợi nhuận.</p>
 <div class="cas-profit-metrics">
-<div class="cas-profit-metric">Số đơn hoàn tất / đã thanh toán<strong><?= (int)$totals['orders'] ?></strong></div>
-<div class="cas-profit-metric">Doanh thu thuần toàn bộ<strong><?= cas_money($totals['net_all']) ?></strong></div>
+<div class="cas-profit-metric">Số đơn hoàn tất / đã thanh toán<strong><?= (int)$totals['order_count'] ?></strong></div>
+<div class="cas-profit-metric"><?= cas_e(CAS_REVENUE_NET_LABEL) ?><strong><?= cas_money($totals['net_all']) ?></strong></div>
 <div class="cas-profit-metric">Số tiền đã hoàn<strong><?= cas_money($totals['refunded']) ?></strong></div>
 <div class="cas-profit-metric">Doanh thu có đủ giá vốn<strong><?= cas_money($totals['known_revenue']) ?></strong></div>
 <div class="cas-profit-metric">Giá vốn nguyên liệu<strong><?= cas_money($totals['material_cost']) ?></strong></div>
