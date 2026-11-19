@@ -26,7 +26,8 @@ for page in index don-hang giao-hang khach-hang san-pham them-san-pham quan-ly-n
  STATUS=$(curl -s -o /tmp/r2-admin-page -w '%{http_code}' -b /tmp/r2-admin-cookie "$BASE/admin/$page.php")
  [ "$STATUS" = "200" ] && grep -q 'admin-content' /tmp/r2-admin-page || { echo "Admin page $page failed: $STATUS"; tail -n 50 /tmp/cas-r2-admin-http.log; exit 1; }
 done
-curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/sua-san-pham.php?id=1" | grep -q 'Lưu sản phẩm'
+curl -fsS -b /tmp/r2-admin-cookie -o /tmp/r2-admin-edit-product.html "$BASE/admin/sua-san-pham.php?id=1"
+grep -Fq 'Lưu sản phẩm' /tmp/r2-admin-edit-product.html
 TOKEN=$(curl -fsS -b /tmp/r2-admin-cookie "$BASE/admin/them-san-pham.php" | get_token)
 STATUS=$(curl -s -o /dev/null -w '%{http_code}' -b /tmp/r2-admin-cookie --data-urlencode "csrf=$TOKEN" --data-urlencode "action=product_save" --data-urlencode "name=San pham kiem thu" --data-urlencode "sku=TEST-NEW-123" --data-urlencode "slug=san-pham-test-123" --data-urlencode "price=125000" --data-urlencode "product_type=bouquet" --data-urlencode "category_id=1" --data-urlencode "tone_id=1" --data-urlencode "occasion_id=2" --data-urlencode "image=lam-tinh.png" --data-urlencode "status=active" "$BASE/admin/them-san-pham.php")
 [ "$STATUS" = "303" ] || { echo "Product save failed: $STATUS";exit 1; }
