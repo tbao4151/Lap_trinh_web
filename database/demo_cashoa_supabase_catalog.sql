@@ -11,21 +11,21 @@ USE cas_hoa;
 START TRANSACTION;
 
 -- Enrich categories. INSERT IGNORE protects existing slug values.
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Đồng tiền','dong-tien','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Hồng','hong','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Hồng đỏ Ecu','hong-do-ecu','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Hồng Julibee','julibee','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Hồng kem dâu','hong-kem-dau','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Hồng ohara','hong-ohara','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Hồng Sophia','hong-sophia','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Hướng dương','huong-duong','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Lam tinh','lam-tinh','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Ly kép','lily','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Phăng, cẩm chướng','phang-cam-chuong','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Phi yến','phi-yen','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Pingpong','ping-pong','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Tú cầu','tu-cau','active');
-INSERT IGNORE INTO categories(name,slug,status) VALUES ('Tulip','tulip','active');
+INSERT INTO categories(name,slug,status) SELECT 'Đồng tiền',CONCAT('cashoa-','dong-tien'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Đồng tiền');
+INSERT INTO categories(name,slug,status) SELECT 'Hồng',CONCAT('cashoa-','hong'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hồng');
+INSERT INTO categories(name,slug,status) SELECT 'Hồng đỏ Ecu',CONCAT('cashoa-','hong-do-ecu'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hồng đỏ Ecu');
+INSERT INTO categories(name,slug,status) SELECT 'Hồng Julibee',CONCAT('cashoa-','julibee'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hồng Julibee');
+INSERT INTO categories(name,slug,status) SELECT 'Hồng kem dâu',CONCAT('cashoa-','hong-kem-dau'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hồng kem dâu');
+INSERT INTO categories(name,slug,status) SELECT 'Hồng ohara',CONCAT('cashoa-','hong-ohara'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hồng ohara');
+INSERT INTO categories(name,slug,status) SELECT 'Hồng Sophia',CONCAT('cashoa-','hong-sophia'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hồng Sophia');
+INSERT INTO categories(name,slug,status) SELECT 'Hướng dương',CONCAT('cashoa-','huong-duong'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hướng dương');
+INSERT INTO categories(name,slug,status) SELECT 'Lam tinh',CONCAT('cashoa-','lam-tinh'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Lam tinh');
+INSERT INTO categories(name,slug,status) SELECT 'Ly kép',CONCAT('cashoa-','lily'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Ly kép');
+INSERT INTO categories(name,slug,status) SELECT 'Phăng, cẩm chướng',CONCAT('cashoa-','phang-cam-chuong'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Phăng, cẩm chướng');
+INSERT INTO categories(name,slug,status) SELECT 'Phi yến',CONCAT('cashoa-','phi-yen'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Phi yến');
+INSERT INTO categories(name,slug,status) SELECT 'Pingpong',CONCAT('cashoa-','ping-pong'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Pingpong');
+INSERT INTO categories(name,slug,status) SELECT 'Tú cầu',CONCAT('cashoa-','tu-cau'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Tú cầu');
+INSERT INTO categories(name,slug,status) SELECT 'Tulip',CONCAT('cashoa-','tulip'),'active' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Tulip');
 
 -- Enrich available tones and occasions only when missing.
 INSERT INTO tones(name,status) SELECT 'Cam','active' WHERE NOT EXISTS (SELECT 1 FROM tones WHERE name='Cam');
