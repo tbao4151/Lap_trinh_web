@@ -13,6 +13,10 @@ async function html(c,url){let r=await c.get(base+'/'+url);return r.text();}
 function csrf(s){const m=s.match(/name="csrf" value="([a-f0-9]+)"/)||s.match(/window.CAS_CSRF\s*=\s*"([a-f0-9]+)"/);assert(m,'CSRF available');return m[1];}
 async function post(c,url,form){return c.post(base+'/'+url,{form,maxRedirects:0});}
 async function main(){
+ assert.match(base,/^http:\/\/127\.0\.0\.1:\d+$/,'Local HTTP test server required');
+ assert.equal(process.env.DB_HOST||'127.0.0.1','127.0.0.1');
+ assert.equal(process.env.DB_PORT||'3307','3307');
+ assert.match(process.env.DB_NAME||'cas_hoa_customer_preview',/^cas_hoa_customer_(preview|test_[a-z0-9]+)$/);
  const guest=await request.newContext(),a=await request.newContext(),b=await request.newContext();
  const suffix=Date.now().toString().slice(-8),email='customer-'+suffix+'@example.test',phone='09'+suffix,password='Aa1!'+crypto.randomBytes(18).toString('hex');
  let token=csrf(await html(guest,'thanh-toan.php')),code,key;
@@ -30,6 +34,44 @@ async function main(){
  await test('Checkout rejects invalid date, phone and missing address',async()=>{
    for(const fields of [{receiveDate:'2030-02-30'},{customerPhone:'abc0900000000'},{address:''},{receiveTime:'00:00 - 01:00'}])assert.equal((await post(guest,'actions/checkout.php',{...checkout,...fields})).status(),422);
  });
+ const productPrice=Number(sql('SELECT price FROM products WHERE product_id=1')[0].price);
+ const deliveryFee=Number(sql("SELECT setting_value FROM shop_settings WHERE setting_key='default_shipping_fee'")[0].setting_value);
+ const expectedDelivery=productPrice*2+deliveryFee;
+ const isolated=await request.newContext();
+ const isolatedToken=csrf(await html(isolated,'thanh-toan.php'));
+ const isolatedCheckout=(fields={})=>post(isolated,'actions/checkout.php',{...checkout,csrf:isolatedToken,...fields});
+ const cartItem={productId:'p001',quantity:1};
+ const saveCart=items=>post(isolated,'actions/cart.php',{csrf:isolatedToken,cart:JSON.stringify(items)});
+ await test('Other session starts with empty cart',async()=>{
+   assert.equal((await isolatedCheckout()).status(),422);
+ });
+ await test('Duplicate aliases rejected before checkout',async()=>{
+   assert.equal((await saveCart([cartItem,{...cartItem,productId:'p0001'}])).status(),422);
+ });
+ await test('Past date rejected',async()=>{
+   assert.equal((await saveCart([cartItem])).status(),200);
+   assert.equal((await isolatedCheckout({receiveDate:'2000-01-01'})).status(),422);
+ });
+ await test('Product withdrawn after cart save prevents order writes',async()=>{
+   const before=sql('SELECT COUNT(*) n FROM orders')[0].n;
+   try {
+     sql("UPDATE products SET status='hidden' WHERE product_id=1");
+     assert.equal((await isolatedCheckout()).status(),422);
+     assert.equal(sql('SELECT COUNT(*) n FROM orders')[0].n,before);
+   } finally {sql("UPDATE products SET status='active' WHERE product_id=1");}
+ });
+ await test('Legacy pickup replay writes one order and no delivery',async()=>{
+   const before=Number(sql('SELECT COUNT(*) n FROM orders')[0].n);
+   const legacy={fulfillment:'pickup',address:'',cart:JSON.stringify([cartItem])};
+   const replies=await Promise.all([isolatedCheckout(legacy),isolatedCheckout(legacy)]);
+   assert.deepEqual(replies.map(r=>r.status()).sort(),[201,422]);
+   const placed=await replies.find(r=>r.status()===201).json();
+   const order=sql('SELECT order_id,shipping_fee FROM orders WHERE order_code=?',[placed.orderCode])[0];
+   assert.equal(Number(order.shipping_fee),0);
+   assert.equal(Number(sql('SELECT COUNT(*) n FROM deliveries WHERE order_id=?',[order.order_id])[0].n),0);
+   assert.equal(Number(sql('SELECT COUNT(*) n FROM orders')[0].n),before+1);
+ });
+ await isolated.dispose();
  await test('Server prices, transaction and replay protection',async()=>{
    const page=await html(guest,'thanh-toan.php');key=page.match(/name="checkoutKey" value="([a-f0-9]+)"/)[1];
    const count=Number(sql('SELECT COUNT(*) n FROM orders')[0].n);
@@ -37,11 +79,12 @@ async function main(){
    const responses=await Promise.all([post(guest,'actions/checkout.php',forms),post(guest,'actions/checkout.php',forms)]);
    const payloads=await Promise.all(responses.map(r=>r.json()));assert(payloads.every(p=>p.ok));code=payloads[0].orderCode;assert.equal(payloads[1].orderCode,code);
    assert.equal(Number(sql('SELECT COUNT(*) n FROM orders')[0].n),count+1);
-   const order=sql('SELECT * FROM orders WHERE order_code=?',[code])[0];assert.equal(Number(order.total_amount),800000);assert.equal(order.card_message,'Gửi bạn 🌷');
+   const order=sql('SELECT * FROM orders WHERE order_code=?',[code])[0];assert.equal(Number(order.total_amount),expectedDelivery);assert.equal(order.card_message,'Gửi bạn 🌷');
+   assert.equal(Number(sql('SELECT fee FROM deliveries WHERE order_id=?',[order.order_id])[0].fee),deliveryFee);
    assert.equal(Number(sql('SELECT COUNT(*) n FROM order_items WHERE order_id=?',[order.order_id])[0].n),1);
  });
  await test('Guest lookup correct phone, wrong phone and limited fields',async()=>{
-   let r=await post(guest,'actions/lookup.php',{csrf:token,code,phone:'0911111111'});let data=await r.json();assert(data.ok);assert.equal(data.order.total,800000);assert(!('recipientPhone' in data.order));assert(!('address' in data.order));
+   let r=await post(guest,'actions/lookup.php',{csrf:token,code,phone:'0911111111'});let data=await r.json();assert(data.ok);assert.equal(data.order.total,expectedDelivery);assert(!('recipientPhone' in data.order));assert(!('address' in data.order));
    assert.equal((await post(guest,'actions/lookup.php',{csrf:token,code,phone:'0922222222'})).status(),404);
  });
  await test('Success page reflects current database order status',async()=>{
@@ -80,10 +123,10 @@ async function main(){
      await c.dispose();
    }
  });
- await test('Wrapping snapshot survives later rename and has no surcharge',async()=>{
+ await test('Wrapping and unit price snapshots survive catalog edits',async()=>{
    const c=await request.newContext(),name='Giấy snapshot HTTP '+suffix;let wrapId;
    try {
-     sql("INSERT INTO wrapping_colors(name,hex_code,status) VALUES(?,'#FFFFFF','active')",[name]);
+     sql("INSERT INTO wrapping_colors(name,hex_code,status,surcharge) VALUES(?,'#FFFFFF','active',7000)",[name]);
      wrapId=sql('SELECT color_id FROM wrapping_colors WHERE name=?',[name])[0].color_id;
      sql('INSERT INTO product_wrapping(product_id,color_id) VALUES(1,?)',[wrapId]);
      const t=csrf(await html(c,'thanh-toan.php'));
@@ -91,7 +134,13 @@ async function main(){
      const page=await html(c,'thanh-toan.php'),k=page.match(/name="checkoutKey" value="([a-f0-9]+)"/)[1];
      const response=await post(c,'actions/checkout.php',{...checkout,csrf:t,checkoutKey:k});assert.equal(response.status(),201);
      const placed=await response.json();const order=sql('SELECT order_note,total_amount FROM orders WHERE order_code=?',[placed.orderCode])[0];
-     assert(order.order_note.includes('Mẫu p001: '+name));assert.equal(Number(order.total_amount),400000);
+     assert(order.order_note.includes('Mẫu p001: '+name));assert.equal(Number(order.total_amount),productPrice+7000+deliveryFee);
+     try {
+       sql('UPDATE products SET price=price+1000 WHERE product_id=1');
+       const saved=sql('SELECT i.unit_price,o.total_amount FROM order_items i JOIN orders o ON o.order_id=i.order_id WHERE o.order_code=?',[placed.orderCode])[0];
+       assert.equal(Number(saved.unit_price),productPrice+7000);
+       assert.equal(Number(saved.total_amount),productPrice+7000+deliveryFee);
+     } finally {sql('UPDATE products SET price=? WHERE product_id=1',[productPrice]);}
      sql('UPDATE wrapping_colors SET name=? WHERE color_id=?',['Tên đổi sau khi đặt',wrapId]);
      assert.equal(sql('SELECT order_note FROM orders WHERE order_code=?',[placed.orderCode])[0].order_note,order.order_note);
    } finally {
@@ -116,6 +165,41 @@ async function main(){
    const page=await html(a,'thanh-toan.php'),k=page.match(/name="checkoutKey" value="([a-f0-9]+)"/)[1];
    const result=await (await post(a,'actions/checkout.php',{...checkout,csrf:t,checkoutKey:k,fulfillment:'pickup',address:''})).json();assert(result.ok);code=result.orderCode;
    assert((await html(a,'lich-su-don-hang.php')).includes(code));
+ });
+ await test('Stored password is hashed and login rotates session',async()=>{
+   const hash=sql('SELECT password_hash FROM users WHERE email=?',[email])[0].password_hash;
+   assert.notEqual(hash,password);assert.match(hash,/^\$/);
+   const c=await request.newContext();
+   try {
+     const t=csrf(await html(c,'dang-nhap.php'));
+     const sid=async()=>(await c.storageState()).cookies.find(cookie=>cookie.name==='PHPSESSID')?.value;
+     const anonymous=await sid();assert(anonymous);
+     assert.equal((await post(c,'dang-nhap.php',{csrf:t,identifier:email,password})).status(),303);
+     assert(await sid());assert.notEqual(await sid(),anonymous);
+     const signedIn=await c.storageState();
+     assert.equal((await post(c,'dang-xuat.php',{csrf:csrf(await html(c,'tai-khoan.php'))})).status(),303);
+     const previous=await request.newContext({storageState:signedIn});
+     try {assert.equal((await previous.get(base+'/tai-khoan.php',{maxRedirects:0})).status(),303);}
+     finally {await previous.dispose();}
+   } finally {await c.dispose();}
+ });
+ await test('Registration validation rejects invalid email, phone and arrays',async()=>{
+   const t=csrf(await html(b,'dang-ky.php'));
+   for(const fields of [{email:'bad'},{phone:'abc'}]){
+     const r=await post(b,'dang-ky.php',{csrf:t,email,phone,full_name:'Demo',password,confirm_password:password,...fields});
+     assert.match(await r.text(),/class="auth-message error/);
+   }
+   assert.equal((await post(b,'dang-ky.php',{csrf:t,'email[]':'bad'})).status(),422);
+ });
+ await test('Unknown reset email returns generic response and rate limit',async()=>{
+   const c=await request.newContext();
+   try {
+     const t=csrf(await html(c,'quen-mat-khau.php'));
+     for(let i=0;i<6;i++){
+       const r=await post(c,'quen-mat-khau.php',{csrf:t,action:'request',email:'missing-'+email});
+       assert.match(await r.text(),i<5?/Nếu email tồn tại/:/Quá nhiều yêu cầu/);
+     }
+   } finally {await c.dispose();}
  });
  await test('Signed-in checkout preserves submitted buyer name and phone snapshot',async()=>{
    const order=sql('SELECT o.order_note,c.full_name,c.phone,u.email FROM orders o JOIN customers c ON c.customer_id=o.customer_id JOIN users u ON u.user_id=c.user_id WHERE o.order_code=?',[code])[0];
@@ -143,12 +227,20 @@ async function main(){
    const mails=fs.readdirSync(path.join(root,'.local/mailbox')).map(f=>fs.readFileSync(path.join(root,'.local/mailbox',f),'utf8'));
    const mail=mails.find(m=>m.includes(email));assert(mail,'Email received by local SMTP');
    const match=mail.match(/#uid=(\d+)&token=([a-f0-9]{64})/);assert(match,'Private fragment reset link');
+   const version=()=>Number(sql('SELECT session_version FROM users WHERE user_id=?',[match[1]])[0].session_version);
+   const before=version();
+   const ttl=Number(sql('SELECT TIMESTAMPDIFF(SECOND,NOW(),expires_at) seconds_left FROM password_resets WHERE token_hash=?',[crypto.createHash('sha256').update(match[2]).digest('hex')])[0].seconds_left);
+   assert(ttl>1740 && ttl<=1800);
    const newPassword='Aa1!'+crypto.randomBytes(18).toString('hex');
    r=await post(c,'quen-mat-khau.php',{csrf:t,action:'reset',uid:match[1],token:match[2],password:newPassword,confirm:newPassword});assert.match(await r.text(),/Mật khẩu đã được thay đổi/);
    r=await post(c,'quen-mat-khau.php',{csrf:t,action:'reset',uid:match[1],token:match[2],password:newPassword,confirm:newPassword});assert.match(await r.text(),/không hợp lệ hoặc đã hết hạn/);
    const expired=crypto.randomBytes(32).toString('hex');sql("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES(?,?,DATE_SUB(NOW(),INTERVAL 1 MINUTE))",[match[1],crypto.createHash('sha256').update(expired).digest('hex')]);
    r=await post(c,'quen-mat-khau.php',{csrf:t,action:'reset',uid:match[1],token:expired,password:newPassword,confirm:newPassword});assert.match(await r.text(),/không hợp lệ hoặc đã hết hạn/);
    t=csrf(await html(c,'dang-nhap.php'));r=await post(c,'dang-nhap.php',{csrf:t,identifier:email,password:newPassword});assert.equal(r.status(),303);
+   assert.equal(version(),before+1);
+   assert.equal((await a.get(base+'/tai-khoan.php',{maxRedirects:0})).status(),303);
+   t=csrf(await html(a,'dang-nhap.php'));
+   assert.equal((await post(a,'dang-nhap.php',{csrf:t,identifier:email,password:newPassword})).status(),303);
    await c.dispose();
  });
  await test('Contact persisted and rate limited',async()=>{
@@ -172,7 +264,8 @@ async function main(){
  });
  const routes=['index.php','san-pham.php','chi-tiet-san-pham.php?slug=lam-tinh','gio-hang.php','thanh-toan.php','dat-hang-thanh-cong.php','dang-nhap.php','dang-ky.php','quen-mat-khau.php','tai-khoan.php','lich-su-don-hang.php','tra-cuu-don-hang.php','tin-tuc.php','chi-tiet-tin-tuc.php?slug=chon-hoa-theo-mau','lien-he.php','gioi-thieu.php','chinh-sach-giao-hang.php','chinh-sach-doi-tra.php'];
  for(const route of routes)await test('HTTP page '+route,async()=>{const c=['tai-khoan.php','lich-su-don-hang.php'].includes(route)?a:guest;const r=await c.get(base+'/'+route);assert.equal(r.status(),200);assert.equal(new URL(r.url()).pathname,new URL(base+'/'+route).pathname,'Expected page, without redirect to login');assert(!/Fatal error|Warning:|Stack trace:/.test(await r.text()));});
- fs.mkdirSync(path.join(root,'docs/evidence/customer'),{recursive:true});fs.writeFileSync(path.join(root,'docs/evidence/customer/http-results.json'),JSON.stringify({date:new Date().toISOString(),base,results},null,2));
+ const output=process.env.CAS_HTTP_RESULTS||path.join(root,'docs/evidence/customer/http-results.json');
+ fs.mkdirSync(path.dirname(output),{recursive:true});fs.writeFileSync(output,JSON.stringify({date:new Date().toISOString(),base,results},null,2));
  await Promise.all([guest.dispose(),a.dispose(),b.dispose()]);if(results.some(r=>r.status==='FAIL'))process.exitCode=1;
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
