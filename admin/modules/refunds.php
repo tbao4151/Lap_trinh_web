@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /**
  * ADM-04 — Hoàn tiền: yêu cầu → duyệt / từ chối → ghi nhận đã hoàn thủ công, có lịch sử từng bước.
  * Không chuyển tiền thật. Khi admin ghi nhận chứng từ hoàn tiền, trạng thái thanh toán cập nhật trong cùng transaction.

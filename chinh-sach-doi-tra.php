@@ -1,19 +1,7 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Hoa tươi là sản phẩm có đặc tính tự nhiên nên màu sắc, độ nở và một số chi tiết có thể thay đổi nhẹ theo từng đợt hoa.">
-  <title>Chính sách đổi trả | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="policy" class="d-flex flex-column">
-  <div id="siteHeader"></div>
+<?php
+require_once __DIR__ . '/includes/bootstrap.php';
+cas_page_start("Chính sách đổi trả | CÁ'S HOA", 'policy', "Hoa tươi là sản phẩm có đặc tính tự nhiên nên màu sắc, độ nở và một số chi tiết có thể thay đổi nhẹ theo từng đợt hoa.");
+?>
 
   <main class="cas-page content-page">
     <div class="cas-container" style="max-width: 920px">
@@ -89,14 +77,4 @@
       </section>
     </div>
   </main>
-
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

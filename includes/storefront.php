@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /**
  * Dữ liệu cửa hàng do Admin cấu hình (migration 003): cài đặt shop, danh mục khám phá, giấy gói, ảnh sản phẩm.
  * Chỉ đọc. Nếu CSDL chưa chạy migration 003, các hàm trả về giá trị mặc định để trang khách vẫn hoạt động.

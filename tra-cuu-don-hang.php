@@ -1,19 +1,7 @@
-<?php require_once __DIR__.'/includes/bootstrap.php'; ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Tra cứu trạng thái đơn hàng CÁ'S HOA bằng mã đơn và số điện thoại người nhận.">
-  <title>Tra cứu đơn hàng | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="lookup" class="d-flex flex-column">
-  <div id="siteHeader"></div>
+<?php
+require_once __DIR__ . '/includes/bootstrap.php';
+cas_page_start("Tra cứu đơn hàng | CÁ'S HOA", 'lookup', "Tra cứu trạng thái đơn hàng CÁ'S HOA bằng mã đơn và số điện thoại người nhận.");
+?>
   <main class="cas-page lookup-page">
     <div class="cas-container">
       <section class="lookup-card mx-auto" style="max-width:860px">
@@ -35,13 +23,4 @@
       </section>
     </div>
   </main>
-  <div id="siteFooter"></div>
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/r2-lookup.js" defer></script>
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF=<?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(['assets/js/r2-lookup.js']); ?>

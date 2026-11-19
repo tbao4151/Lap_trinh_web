@@ -1,19 +1,15 @@
-<?php require_once __DIR__.'/includes/customer.php'; $checkoutKey=cas_checkout_key(); $current=cas_user(); $profile=[]; if($current && $current['role']==='customer'){$q=cas_db()->prepare('SELECT full_name,phone,address FROM customers WHERE user_id=?');$q->execute([$current['user_id']]);$profile=$q->fetch()?:[];} ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Thanh toán đơn hoa tại CÁ'S HOA.">
-  <title>Thanh toán | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="checkout" class="d-flex flex-column">
-  <div id="siteHeader"></div>
+<?php
+require_once __DIR__ . '/includes/customer.php';
+$checkoutKey = cas_checkout_key();
+$current = cas_user();
+$profile = [];
+if ($current && $current['role'] === 'customer') {
+    $q = cas_db()->prepare('SELECT full_name,phone,address FROM customers WHERE user_id=?');
+    $q->execute([$current['user_id']]);
+    $profile = $q->fetch() ?: [];
+}
+cas_page_start("Thanh toán | CÁ'S HOA", 'checkout', "Thanh toán đơn hoa tại CÁ'S HOA.");
+?>
 
   <main class="cas-page checkout-page">
     <div class="cas-container">
@@ -85,14 +81,4 @@
       </div>
     </div>
   </main>
-
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF=<?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

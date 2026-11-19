@@ -1,19 +1,8 @@
-<?php require_once __DIR__.'/includes/storefront.php'; $discovery = cas_discovery_groups(); ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="CÁ'S HOA - Hoa tươi cho những ngày đáng nhớ và cả những ngày bình thường.">
-  <title>CÁ'S HOA — Hoa cho những điều khó nói</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="home" class="d-flex flex-column">
-  <div id="siteHeader"></div>
+<?php
+require_once __DIR__ . '/includes/storefront.php';
+$discovery = cas_discovery_groups();
+cas_page_start("CÁ'S HOA — Hoa cho những điều khó nói", 'home', "CÁ'S HOA - Hoa tươi cho những ngày đáng nhớ và cả những ngày bình thường.");
+?>
 
   <main class="cas-page">
     <section class="hero-section" aria-labelledby="featured-title">
@@ -87,13 +76,4 @@
   </main>
 
   <div class="cas-container"><?php require __DIR__.'/includes/customer-recommendations.php'; ?></div>
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

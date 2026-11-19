@@ -1,4 +1,8 @@
 <?php
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 require_once __DIR__.'/customer.php';
 $recommendations=cas_catalog_options();
 ?>

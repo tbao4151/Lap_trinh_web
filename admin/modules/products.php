@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /**
  * ADM-02 — Sản phẩm, hình ảnh, giấy gói theo sản phẩm, quản lý nhanh và phân loại.
  * Giữ nguyên tên action / field cũ (product_save, quick_save, taxonomy_save) để kiểm thử CI của nhóm vẫn chạy.

@@ -5,23 +5,9 @@ if(preg_match('/^[a-z0-9-]{1,220}$/',$slug)){
  $stmt=cas_db()->prepare("SELECT title,thumbnail,content,published_at FROM news WHERE slug=? AND status='published' LIMIT 1");
  $stmt->execute([$slug]);$article=$stmt->fetch() ?: null;
 }
-if(!$article) http_response_code(404);
+if (!$article) http_response_code(404);
+cas_page_start("Chi tiết tin tức | CÁ'S HOA", 'article', "Bài viết về hoa và quà tặng.");
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Bài viết về hoa và quà tặng.">
-  <title>Chi tiết tin tức | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="article" class="d-flex flex-column">
-  <div id="siteHeader"></div>
 
   <main class="cas-page content-page">
     <div class="cas-container">
@@ -44,15 +30,4 @@ if(!$article) http_response_code(404);
 </article>
     </div>
   </main>
-
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

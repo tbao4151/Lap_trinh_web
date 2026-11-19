@@ -25,22 +25,8 @@ if(cas_post()){
 }
 $q=cas_db()->prepare("SELECT u.full_name,u.email,u.phone,c.address FROM users u LEFT JOIN customers c ON c.user_id=u.user_id WHERE u.user_id=?");
 $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
+cas_page_start("Tài khoản | CÁ'S HOA", 'account', "Quản lý thông tin khách hàng.");
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Quản lý thông tin khách hàng.">
-  <title>Tài khoản | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="account" class="d-flex flex-column">
-  <div id="siteHeader"></div>
 
   <main class="cas-page content-page">
     <div class="cas-container">
@@ -55,12 +41,7 @@ $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
         </div>
       </div>
 
-      <nav class="account-nav" aria-label="Điều hướng tài khoản">
-        <a class="active" href="tai-khoan.php"><i class="bi bi-person-lines-fill"></i> Thông tin cá nhân</a>
-        <a href="lich-su-don-hang.php"><i class="bi bi-receipt"></i> Lịch sử đơn hàng</a>
-        <a href="tra-cuu-don-hang.php"><i class="bi bi-search"></i> Tra cứu đơn</a>
-        <form action="dang-xuat.php" method="post"><?= cas_csrf_form() ?><button class="btn-cas-outline w-100 mt-2" type="submit">Đăng xuất</button></form>
-      </nav>
+<?php cas_account_nav('account', true); ?>
     </aside>
         </div>
 
@@ -109,16 +90,4 @@ $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
       </div>
     </div>
   </main>
-
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  
-  
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

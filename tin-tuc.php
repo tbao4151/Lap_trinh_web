@@ -1,22 +1,8 @@
 <?php
-require_once __DIR__.'/includes/bootstrap.php';
-$articles=cas_db()->query("SELECT slug,title,summary,thumbnail,published_at FROM news WHERE status='published' ORDER BY published_at DESC")->fetchAll();
+require_once __DIR__ . '/includes/bootstrap.php';
+$articles = cas_db()->query("SELECT slug,title,summary,thumbnail,published_at FROM news WHERE status='published' ORDER BY published_at DESC")->fetchAll();
+cas_page_start("Tin tức | CÁ'S HOA", 'news', "Tin tức, mẹo chăm hoa và gợi ý quà tặng.");
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Tin tức, mẹo chăm hoa và gợi ý quà tặng.">
-  <title>Tin tức | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="news" class="d-flex flex-column">
-  <div id="siteHeader"></div>
 
   <main class="cas-page content-page">
     <div class="cas-container">
@@ -54,14 +40,4 @@ $articles=cas_db()->query("SELECT slug,title,summary,thumbnail,published_at FROM
       </section>
     </div>
   </main>
-
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

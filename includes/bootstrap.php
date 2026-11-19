@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 if (session_status() === PHP_SESSION_NONE) {
     $secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
@@ -55,3 +59,4 @@ function cas_phone(string $value): string
     elseif (preg_match('/^84[0-9]{9}$/D', $value)) $value = '0'.substr($value, 2);
     return $value;
 }
+require_once __DIR__ . '/layout.php';

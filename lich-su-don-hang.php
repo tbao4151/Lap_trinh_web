@@ -12,25 +12,8 @@ if($orders){
  $q=cas_db()->prepare("SELECT i.order_id,i.quantity,i.unit_price,p.name FROM order_items i JOIN products p ON p.product_id=i.product_id WHERE i.order_id IN ($marks)");
  $q->execute($ids);foreach($q as $item)$items[$item['order_id']][]=$item;
 }
-function cas_order_status(string $status): string{
- return ['pending_confirmation'=>'Chờ xác nhận','confirmed'=>'Đã xác nhận','preparing'=>'Đang chuẩn bị','ready'=>'Sẵn sàng','delivering'=>'Đang giao','completed'=>'Hoàn tất','cancelled'=>'Đã huỷ'][$status]??$status;
-}
+cas_page_start("Lịch sử đơn hàng | CÁ'S HOA", 'orders', "Xem các đơn hàng đã đặt.");
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Xem các đơn hàng đã đặt.">
-  <title>Lịch sử đơn hàng | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="orders" class="d-flex flex-column">
-  <div id="siteHeader"></div>
 
   <main class="cas-page content-page">
     <div class="cas-container">
@@ -48,7 +31,7 @@ function cas_order_status(string $status): string{
 <?php if(!$orders): ?><div class="customer-empty"><i class="bi bi-receipt"></i><h2 class="font-display fs-4">Chưa có đơn hàng nào</h2><p class="cas-muted mb-3">Chưa có đơn hàng được liên kết với tài khoản này.</p><a class="btn-cas-primary" href="san-pham.php">Chọn một bó hoa</a></div><?php endif; ?>
 <?php foreach($orders as $o): ?>
 <article class="order-history-card mb-3">
-  <div class="d-flex justify-content-between flex-wrap gap-2"><strong><?= cas_e($o['order_code']) ?></strong><span class="stat-chip"><?= cas_e(cas_order_status($o['order_status'])) ?></span></div>
+  <div class="d-flex justify-content-between flex-wrap gap-2"><strong><?= cas_e($o['order_code']) ?></strong><span class="stat-chip"><?= cas_e(cas_order_status_label($o['order_status'])) ?></span></div>
   <div class="cas-muted small mt-2"><?= cas_e($o['created_at']) ?> · <?= cas_e($o['recipient_name']) ?></div>
   <div class="fw-bold mt-2"><?= number_format((float)$o['total_amount'],0,',','.') ?> ₫</div>
   <p class="small mt-2 mb-0"><?= $o['delivery_method']==='pickup'?'Nhận tại cửa hàng':'Giao tận nơi' ?> · <?= cas_e($o['receive_date']) ?> · <?= cas_e($o['receive_time']) ?></p>
@@ -64,11 +47,7 @@ function cas_order_status(string $status): string{
 </div></div>
         <div class="col-lg-3">
           <aside class="content-card mb-3">
-            <nav class="account-nav" aria-label="Điều hướng tài khoản">
-              <a href="tai-khoan.php"><i class="bi bi-person-lines-fill"></i> Thông tin cá nhân</a>
-              <a class="active" href="lich-su-don-hang.php" aria-current="page"><i class="bi bi-receipt"></i> Lịch sử đơn hàng</a>
-              <a href="tra-cuu-don-hang.php"><i class="bi bi-search"></i> Tra cứu đơn</a>
-            </nav>
+<?php cas_account_nav('orders', false); ?>
           </aside>
           <aside class="content-card">
             <h2 class="font-display fs-5">Cần hỗ trợ đơn hàng?</h2>
@@ -80,16 +59,4 @@ function cas_order_status(string $status): string{
       </div>
     </div>
   </main>
-
-  <div id="siteFooter"></div>
-
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <script src="assets/js/products.php" defer></script>
-  <script src="assets/js/cart-r2.php" defer></script>
-  
-  
-  <script src="assets/js/main-r2.js" defer></script>
-<script>window.CAS_CSRF = <?= json_encode(cas_csrf()) ?>;</script>
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_page_end(); ?>

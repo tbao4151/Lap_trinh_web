@@ -51,31 +51,8 @@ if(cas_post()){
     }else throw new RuntimeException('Thao tác không hợp lệ.');
   }catch(Throwable $e){$error=cas_customer_error($e);}
 }
+cas_auth_start("Quên mật khẩu | CÁ'S HOA", 'forgot', "Khôi phục mật khẩu tài khoản CÁ'S HOA.");
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Khôi phục mật khẩu tài khoản CÁ'S HOA.">
-  <title>Quên mật khẩu | CÁ'S HOA</title>
-  <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="forgot" class="auth-page">
-  <main class="auth-main">
-    <div class="auth-shell"><div class="auth-grid">
-      <aside class="auth-story">
-  <p class="cas-eyebrow">CÁ'S HOA · FLOWERS & FEELINGS</p>
-  <h2>Những điều khó nói, gửi cùng một nhành hoa.</h2>
-  <p>Tài khoản giúp bạn lưu thông tin, theo dõi đơn và giữ lại những lựa chọn hoa dành cho người thương.</p>
-  <div class="d-flex align-items-center gap-3 mt-4 fw-semibold" style="color:var(--primary)"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span>Tiệm hoa tươi online</span></div>
-</aside>
-      <div><a href="index.php" class="auth-brand" aria-label="Về trang chủ CÁ'S HOA"><span class="cas-brand-mark"><i class="bi bi-flower1"></i></span><span class="cas-brand-name">CÁ'S HOA</span></a>
-        <section class="auth-card">
           <p class="cas-eyebrow">Khôi phục tài khoản</p>
           <h1>Quên mật khẩu</h1>
           <p class="auth-description">Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu có thời hạn 30 phút.</p>
@@ -98,11 +75,4 @@ if(cas_post()){
           </form>
           <?php endif; ?>
           <p class="auth-foot">Nhớ mật khẩu rồi? <a href="dang-nhap.php">Đăng nhập</a></p>
-        </section>
-      </div>
-    </div></div>
-  </main>
-  
-  <script src="assets/js/customer-forms.js" defer></script>
-</body>
-</html>
+<?php cas_auth_end(); ?>

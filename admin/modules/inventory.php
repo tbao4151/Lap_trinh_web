@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /** ADM-03 — Kho hoa, kho phụ kiện, kho tổng và lịch sử giao dịch kho. Dùng sau khi đã require admin/_ops.php. */
 
 const CAS_INV_CATEGORIES = [

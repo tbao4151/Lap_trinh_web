@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /**
  * Menu quản trị đủ 24 route, nhóm theo nghiệp vụ và chỉ hiển thị mục vai trò hiện tại được dùng.
  * Dùng chung cho _app.php và _ops.php.

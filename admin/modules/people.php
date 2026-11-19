@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /**
  * ADM-06 — Tài khoản nội bộ: nhân viên, hồ sơ cá nhân, chủ sở hữu và nhật ký quản trị.
  * Vai trò vẫn là roles.name của includes/auth.php (staff/admin/owner); không tạo vai trò mới, không xoá tài khoản (chỉ khoá).

@@ -1,20 +1,9 @@
 <?php
-require_once __DIR__.'/includes/customer.php';
-$aiReady=trim((string)(getenv('OPENAI_API_KEY')?:''))!==''&&function_exists('curl_init');
-$options=cas_catalog_options();
+require_once __DIR__ . '/includes/customer.php';
+$aiReady = trim((string)(getenv('OPENAI_API_KEY') ?: '')) !== '' && function_exists('curl_init');
+$options = cas_catalog_options();
+cas_page_start("Tư vấn chọn hoa | CÁ'S HOA", 'advisor', "Tư vấn chọn hoa theo dịp, tone màu và ngân sách tại CÁ'S HOA.");
 ?>
-<!doctype html><html lang="vi"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Tư vấn chọn hoa theo dịp, tone màu và ngân sách tại CÁ'S HOA.">
-<title>Tư vấn chọn hoa | CÁ'S HOA</title>
-<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
-<link rel="stylesheet" href="assets/css/responsive.css">
-<link rel="stylesheet" href="assets/css/customer.css">
-</head>
-<body data-page="advisor" class="d-flex flex-column">
-<div id="siteHeader"></div>
 <main class="cas-page"><section class="cas-container" style="padding-top:44px;padding-bottom:65px">
 <div class="cas-advisor-intro">
 <p class="cas-eyebrow">Gợi ý dành riêng cho bạn</p>
@@ -40,11 +29,4 @@ $options=cas_catalog_options();
 <p id="advisorAnswer" class="mt-2" style="white-space:pre-line"></p>
 <div id="advisorItems" class="row g-3"></div>
 </div></div></div></section></main>
-<div id="siteFooter"></div>
-<script>window.CAS_CSRF=<?= json_encode(cas_csrf()) ?>;</script>
-<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-<script src="assets/js/products.php" defer></script>
-<script src="assets/js/cart-r2.php" defer></script>
-<script src="assets/js/main-r2.js" defer></script>
-<script src="assets/js/flower-advisor.js" defer></script>
-</body></html>
+<?php cas_page_end(['assets/js/flower-advisor.js'], false); ?>

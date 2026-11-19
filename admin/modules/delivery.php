@@ -1,5 +1,9 @@
 <?php
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_SERVER['SCRIPT_FILENAME'] ?? ''))) === str_replace('\\', '/', strtolower((string)realpath(__FILE__)))) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 /** ADM-04 — Giao hàng: lịch theo ngày / khung giờ, luật chuyển trạng thái và lịch sử thay đổi. */
 
 const CAS_DELIVERY_LABELS = ['not_delivered' => 'Chưa giao', 'out_for_delivery' => 'Đang giao', 'pickup_ready' => 'Chờ khách lấy', 'delivered' => 'Đã giao'];
