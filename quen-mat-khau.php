@@ -86,8 +86,8 @@ if(cas_post()){
           <form id="recoveryVerifyForm" class="auth-form" method="post" action="quen-mat-khau.php">
             <input type="hidden" name="uid" value="<?= (int)$uid ?>"><input type="hidden" name="token" value="<?= cas_e($token) ?>">
             <?= cas_csrf_form() ?><input type="hidden" name="action" value="reset">
-            <div class="mb-3"><label for="newPassword" class="form-label">Mật khẩu mới</label><input type="password" id="newPassword" name="password" class="form-control cas-form-control" required></div>
-            <div class="mb-3"><label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label><input type="password" id="confirmPassword" name="confirm" class="form-control cas-form-control" required></div>
+            <div class="mb-3"><label for="newPassword" class="form-label">Mật khẩu mới <span class="form-required">*</span></label><div class="auth-password-wrap"><input type="password" id="newPassword" name="password" class="form-control cas-form-control" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="newPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye"></i></button></div><div class="password-policy">Từ 10 ký tự, tối đa 72 byte; có chữ hoa, chữ thường, số và ký tự đặc biệt.</div></div>
+            <div class="mb-3"><label for="confirmPassword" class="form-label">Xác nhận mật khẩu <span class="form-required">*</span></label><div class="auth-password-wrap"><input type="password" id="confirmPassword" name="confirm" class="form-control cas-form-control" autocomplete="new-password" required><button class="auth-password-toggle" type="button" data-toggle-password="confirmPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye"></i></button></div></div>
             <button class="btn-cas-primary w-100" type="submit">Đổi mật khẩu</button>
           </form>
           <?php else: ?>

@@ -45,7 +45,7 @@ function cas_order_status(string $status): string{
 
       <div class="row g-4">
         <div class="col-lg-9"><div id="orderHistory">
-<?php if(!$orders): ?><p class="cas-muted">Chưa có đơn hàng được liên kết với tài khoản này.</p><?php endif; ?>
+<?php if(!$orders): ?><div class="customer-empty"><i class="bi bi-receipt"></i><h2 class="font-display fs-4">Chưa có đơn hàng nào</h2><p class="cas-muted mb-3">Chưa có đơn hàng được liên kết với tài khoản này.</p><a class="btn-cas-primary" href="san-pham.php">Chọn một bó hoa</a></div><?php endif; ?>
 <?php foreach($orders as $o): ?>
 <article class="order-history-card mb-3">
   <div class="d-flex justify-content-between flex-wrap gap-2"><strong><?= cas_e($o['order_code']) ?></strong><span class="stat-chip"><?= cas_e(cas_order_status($o['order_status'])) ?></span></div>
@@ -63,6 +63,13 @@ function cas_order_status(string $status): string{
 </nav>
 </div></div>
         <div class="col-lg-3">
+          <aside class="content-card mb-3">
+            <nav class="account-nav" aria-label="Điều hướng tài khoản">
+              <a href="tai-khoan.php"><i class="bi bi-person-lines-fill"></i> Thông tin cá nhân</a>
+              <a class="active" href="lich-su-don-hang.php" aria-current="page"><i class="bi bi-receipt"></i> Lịch sử đơn hàng</a>
+              <a href="tra-cuu-don-hang.php"><i class="bi bi-search"></i> Tra cứu đơn</a>
+            </nav>
+          </aside>
           <aside class="content-card">
             <h2 class="font-display fs-5">Cần hỗ trợ đơn hàng?</h2>
             <p class="cas-muted small lh-lg">Chuẩn bị mã đơn và số điện thoại người nhận để shop kiểm tra nhanh hơn.</p>

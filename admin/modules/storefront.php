@@ -122,7 +122,7 @@ function cas_wrapping_page(): void
       <td><?= (float)$w['surcharge'] > 0 ? '+' . cas_money($w['surcharge']) : 'Miễn phí' ?></td><td><?= (int)$w['products'] ?></td>
       <td><?= cas_status_badge($w['status'] === 'active' ? 'Đang dùng' : 'Ngừng dùng', $w['status'] === 'active' ? 'success' : '') ?></td>
       <?php if ($canEdit): ?><td><div class="cas-admin-table-form"><a class="admin-btn-light" href="?edit=<?= (int)$w['color_id'] ?>">Sửa</a><a class="admin-btn-light" href="?assign=<?= (int)$w['color_id'] ?>#assign">Gán SP</a>
-        <form method="post" data-confirm="Xoá giấy gói này?"><?= cas_csrf_form() ?><input type="hidden" name="action" value="wrapping_delete"><input type="hidden" name="color_id" value="<?= (int)$w['color_id'] ?>"><button class="admin-btn-light text-danger" type="submit">Xoá</button></form></div></td><?php endif; ?></tr>
+        <form method="post" data-confirm="Xoá giấy gói này?"><?= cas_csrf_form() ?><input type="hidden" name="action" value="wrapping_delete"><input type="hidden" name="color_id" value="<?= (int)$w['color_id'] ?>"><button class="admin-btn-light admin-btn-danger" type="submit">Xoá</button></form></div></td><?php endif; ?></tr>
     <?php endforeach; ?>
     <?php if (!$rows): ?><tr><td colspan="6"><div class="admin-empty">Chưa có giấy gói.</div></td></tr><?php endif; ?>
     </tbody></table></div>
@@ -132,12 +132,12 @@ function cas_wrapping_page(): void
   <h2 class="admin-card-title"><?= $edit ? 'Sửa "' . cas_e($edit['name']) . '"' : 'Thêm giấy gói' ?></h2>
   <form method="post" enctype="multipart/form-data" class="admin-form-grid mt-3">
     <?= cas_csrf_form() ?><input type="hidden" name="action" value="wrapping_save"><?php if ($edit): ?><input type="hidden" name="color_id" value="<?= (int)$edit['color_id'] ?>"><?php endif; ?>
-    <div class="full"><label class="admin-label">Tên giấy gói</label><input class="admin-input" name="name" maxlength="80" required value="<?= cas_e($edit['name'] ?? '') ?>" placeholder="Ví dụ: Nâu sữa"></div>
-    <div><label class="admin-label">Mã màu</label><input class="admin-input" name="hex_code" type="color" value="<?= cas_e($edit['hex_code'] ?? '#D8C9B8') ?>"></div>
-    <div><label class="admin-label">Phụ thu (VND)</label><input class="admin-input" name="surcharge" type="number" min="0" max="500000" step="1000" value="<?= (int)($edit['surcharge'] ?? 0) ?>"></div>
-    <div><label class="admin-label">Thứ tự hiển thị</label><input class="admin-input" name="sort_order" type="number" min="0" max="999" value="<?= (int)($edit['sort_order'] ?? 0) ?>"></div>
-    <div><label class="admin-label">Trạng thái</label><?= cas_select('status', ['active' => 'Đang dùng', 'inactive' => 'Ngừng dùng'], (string)($edit['status'] ?? 'active')) ?></div>
-    <div class="full"><label class="admin-label">Ảnh mẫu giấy (PNG / JPG / WEBP ≤ 1 MB, tuỳ chọn)</label><input class="admin-input" type="file" name="image" accept="image/png,image/jpeg,image/webp">
+    <div class="full"><label class="admin-label" for="wName">Tên giấy gói</label><input id="wName" class="admin-input" name="name" maxlength="80" required value="<?= cas_e($edit['name'] ?? '') ?>" placeholder="Ví dụ: Nâu sữa"></div>
+    <div><label class="admin-label" for="wHex">Mã màu</label><input id="wHex" class="admin-input" name="hex_code" type="color" value="<?= cas_e($edit['hex_code'] ?? '#D8C9B8') ?>"></div>
+    <div><label class="admin-label" for="wSurcharge">Phụ thu (VND)</label><input id="wSurcharge" class="admin-input" name="surcharge" type="number" min="0" max="500000" step="1000" value="<?= (int)($edit['surcharge'] ?? 0) ?>"></div>
+    <div><label class="admin-label" for="wSort">Thứ tự hiển thị</label><input id="wSort" class="admin-input" name="sort_order" type="number" min="0" max="999" value="<?= (int)($edit['sort_order'] ?? 0) ?>"></div>
+    <div><label class="admin-label" for="wStatus">Trạng thái</label><?= cas_select('status', ['active' => 'Đang dùng', 'inactive' => 'Ngừng dùng'], (string)($edit['status'] ?? 'active'), 'id="wStatus"') ?></div>
+    <div class="full"><label class="admin-label" for="wImage">Ảnh mẫu giấy (PNG / JPG / WEBP ≤ 1 MB, tuỳ chọn)</label><input id="wImage" class="admin-input" type="file" name="image" accept="image/png,image/jpeg,image/webp">
       <?php if (!empty($edit['image'])): ?><label class="admin-check mt-2"><input type="checkbox" name="remove_image" value="1"> Bỏ ảnh hiện tại</label><?php endif; ?></div>
     <div class="full"><button class="admin-btn" type="submit"><?= $edit ? 'Lưu giấy gói' : 'Thêm giấy gói' ?></button><?php if ($edit): ?> <a class="admin-btn-light" href="giay-goi.php">Huỷ</a><?php endif; ?></div>
   </form>
@@ -279,7 +279,7 @@ function cas_discovery_page(): void
         <div class="cas-muted text-break">→ <?= cas_e(rawurldecode($g['href'])) ?></div>
         <div class="mt-1"><?= $g['status'] !== 'active' ? cas_status_badge('Đang ẩn') : (!$g['valid'] ? cas_status_badge('Phân loại ngừng dùng – tạm ẩn', 'danger') : cas_status_badge('Đang hiển thị', 'success')) ?></div>
         <?php if ($canEdit): ?><div class="cas-admin-table-form mt-2"><a class="admin-btn-light" href="?edit=<?= (int)$g['group_id'] ?>#groupForm">Sửa</a>
-          <form method="post" data-confirm="Xoá nhóm khám phá này?"><?= cas_csrf_form() ?><input type="hidden" name="action" value="discovery_delete"><input type="hidden" name="group_id" value="<?= (int)$g['group_id'] ?>"><button class="admin-btn-light text-danger" type="submit">Xoá</button></form></div><?php endif; ?>
+          <form method="post" data-confirm="Xoá nhóm khám phá này?"><?= cas_csrf_form() ?><input type="hidden" name="action" value="discovery_delete"><input type="hidden" name="group_id" value="<?= (int)$g['group_id'] ?>"><button class="admin-btn-light admin-btn-danger" type="submit">Xoá</button></form></div><?php endif; ?>
       </div>
     </article>
   <?php endforeach; ?>
@@ -291,17 +291,17 @@ function cas_discovery_page(): void
   <h2 class="admin-card-title"><?= $edit ? 'Sửa nhóm "' . cas_e($edit['title']) . '"' : 'Thêm nhóm khám phá' ?></h2>
   <form method="post" enctype="multipart/form-data" class="admin-form-grid mt-3">
     <?= cas_csrf_form() ?><input type="hidden" name="action" value="discovery_save"><?php if ($edit): ?><input type="hidden" name="group_id" value="<?= (int)$edit['group_id'] ?>"><?php endif; ?>
-    <div><label class="admin-label">Tiêu đề</label><input class="admin-input" name="title" maxlength="80" required value="<?= cas_e($edit['title'] ?? '') ?>" placeholder="Ví dụ: Cảm ơn thầy cô"></div>
-    <div><label class="admin-label">Nhãn phụ</label><input class="admin-input" name="subtitle" maxlength="60" value="<?= cas_e($edit['subtitle'] ?? '') ?>" placeholder="Theo dịp"></div>
-    <div><label class="admin-label">Điều kiện lọc</label><?= cas_select('filter_type', CAS_DISCOVERY_TYPES, (string)($edit['filter_type'] ?? 'occasion')) ?></div>
+    <div><label class="admin-label" for="dgTitle">Tiêu đề</label><input id="dgTitle" class="admin-input" name="title" maxlength="80" required value="<?= cas_e($edit['title'] ?? '') ?>" placeholder="Ví dụ: Cảm ơn thầy cô"></div>
+    <div><label class="admin-label" for="dgSub">Nhãn phụ</label><input id="dgSub" class="admin-input" name="subtitle" maxlength="60" value="<?= cas_e($edit['subtitle'] ?? '') ?>" placeholder="Theo dịp"></div>
+    <div><label class="admin-label" for="dgType">Điều kiện lọc</label><?= cas_select('filter_type', CAS_DISCOVERY_TYPES, (string)($edit['filter_type'] ?? 'occasion'), 'id="dgType"') ?></div>
     <?php foreach ($options as $type => $list): ?>
-    <div><label class="admin-label"><?= cas_e(CAS_DISCOVERY_TYPES[$type]) ?></label><select class="admin-select" name="filter_id_<?= $type ?>"><?php foreach ($list as $o): ?><option value="<?= (int)$o['id'] ?>" <?= ($edit['filter_type'] ?? '') === $type && (int)$edit['filter_id'] === (int)$o['id'] ? 'selected' : '' ?>><?= cas_e($o['name']) ?></option><?php endforeach; ?></select></div>
+    <div><label class="admin-label" for="dg_<?= $type ?>"><?= cas_e(CAS_DISCOVERY_TYPES[$type]) ?></label><select id="dg_<?= $type ?>" class="admin-select" name="filter_id_<?= $type ?>"><?php foreach ($list as $o): ?><option value="<?= (int)$o['id'] ?>" <?= ($edit['filter_type'] ?? '') === $type && (int)$edit['filter_id'] === (int)$o['id'] ? 'selected' : '' ?>><?= cas_e($o['name']) ?></option><?php endforeach; ?></select></div>
     <?php endforeach; ?>
-    <div><label class="admin-label">Kiểu sản phẩm (khi lọc theo kiểu)</label><?= cas_select('filter_value', ['bouquet' => 'Bó hoa', 'basket' => 'Giỏ hoa'], (string)($edit['filter_value'] ?? 'bouquet')) ?></div>
-    <div><label class="admin-label">Thứ tự</label><input class="admin-input" name="sort_order" type="number" min="0" max="999" value="<?= (int)($edit['sort_order'] ?? count($groups) + 1) ?>"></div>
-    <div><label class="admin-label">Trạng thái</label><?= cas_select('status', ['active' => 'Hiển thị', 'inactive' => 'Ẩn'], (string)($edit['status'] ?? 'active')) ?></div>
-    <div><label class="admin-label">Ảnh thư viện</label><select class="admin-select" name="library_image"><option value=""><?= $edit ? '— Giữ ảnh hiện tại —' : '— Chọn ảnh —' ?></option><?php foreach ($library as $file): ?><option value="<?= cas_e($file) ?>"><?= cas_e($file) ?></option><?php endforeach; ?></select></div>
-    <div><label class="admin-label">Hoặc tải ảnh (≤ 2 MB)</label><input class="admin-input" type="file" name="image_file" accept="image/png,image/jpeg,image/webp"></div>
+    <div><label class="admin-label" for="dgFilterVal">Kiểu sản phẩm (khi lọc theo kiểu)</label><?= cas_select('filter_value', ['bouquet' => 'Bó hoa', 'basket' => 'Giỏ hoa'], (string)($edit['filter_value'] ?? 'bouquet'), 'id="dgFilterVal"') ?></div>
+    <div><label class="admin-label" for="dgSort">Thứ tự</label><input id="dgSort" class="admin-input" name="sort_order" type="number" min="0" max="999" value="<?= (int)($edit['sort_order'] ?? count($groups) + 1) ?>"></div>
+    <div><label class="admin-label" for="dgStatus">Trạng thái</label><?= cas_select('status', ['active' => 'Hiển thị', 'inactive' => 'Ẩn'], (string)($edit['status'] ?? 'active'), 'id="dgStatus"') ?></div>
+    <div><label class="admin-label" for="dgLibImg">Ảnh thư viện</label><select id="dgLibImg" class="admin-select" name="library_image"><option value=""><?= $edit ? '— Giữ ảnh hiện tại —' : '— Chọn ảnh —' ?></option><?php foreach ($library as $file): ?><option value="<?= cas_e($file) ?>"><?= cas_e($file) ?></option><?php endforeach; ?></select></div>
+    <div><label class="admin-label" for="dgFileImg">Hoặc tải ảnh (≤ 2 MB)</label><input id="dgFileImg" class="admin-input" type="file" name="image_file" accept="image/png,image/jpeg,image/webp"></div>
     <div class="full"><button class="admin-btn" type="submit"><?= $edit ? 'Lưu nhóm' : 'Thêm nhóm' ?></button><?php if ($edit): ?> <a class="admin-btn-light" href="kham-pha.php">Huỷ</a><?php endif; ?>
       <p class="cas-muted mt-2 mb-0">Liên kết trên trang chủ dùng tên phân loại hiện có để lọc trang Sản phẩm; nếu phân loại bị chuyển "ngừng dùng", thẻ tự ẩn và sản phẩm vẫn giữ liên kết phân loại.</p></div>
   </form>

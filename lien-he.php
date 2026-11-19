@@ -38,10 +38,10 @@
             <h2 class="font-display fs-3 mt-2">Gửi lời nhắn cho shop</h2>
 
             <form id="contactForm" class="row g-3 mt-1" novalidate>
-              <div class="col-md-6"><label for="contact-name" class="form-label small fw-semibold">Họ và tên</label><input id="contact-name" name="name" class="form-control cas-form-control" placeholder="Nguyễn Văn A" required><div class="invalid-feedback">Vui lòng nhập họ tên.</div></div>
-              <div class="col-md-6"><label for="contact-phone" class="form-label small fw-semibold">Số điện thoại</label><input id="contact-phone" name="phone" class="form-control cas-form-control" inputmode="tel" placeholder="0123456789" required><div class="invalid-feedback">Vui lòng nhập số điện thoại.</div></div>
-              <div class="col-12"><label for="contact-subject" class="form-label small fw-semibold">Chủ đề</label><select id="contact-subject" name="subject" class="form-select cas-form-select" required><option value="">Chọn chủ đề</option><option>Tư vấn mẫu hoa</option><option>Hỗ trợ đơn hàng</option><option>Giao hàng</option><option>Góp ý dịch vụ</option></select><div class="invalid-feedback">Vui lòng chọn chủ đề.</div></div>
-              <div class="col-12"><label for="contact-message" class="form-label small fw-semibold">Nội dung</label><textarea id="contact-message" name="message" class="form-control cas-form-control" rows="5" placeholder="Nhập nội dung bạn muốn gửi..." required></textarea><div class="invalid-feedback">Vui lòng nhập nội dung.</div></div>
+              <div class="col-md-6"><label for="contact-name" class="form-label small fw-semibold">Họ và tên <span class="form-required">*</span></label><input id="contact-name" name="name" class="form-control cas-form-control" placeholder="Nguyễn Văn A" required><div class="invalid-feedback">Vui lòng nhập họ tên.</div></div>
+              <div class="col-md-6"><label for="contact-phone" class="form-label small fw-semibold">Số điện thoại <span class="form-required">*</span></label><input id="contact-phone" name="phone" class="form-control cas-form-control" inputmode="tel" placeholder="0123456789" required><div class="invalid-feedback">Vui lòng nhập số điện thoại.</div></div>
+              <div class="col-12"><label for="contact-subject" class="form-label small fw-semibold">Chủ đề <span class="form-required">*</span></label><select id="contact-subject" name="subject" class="form-select cas-form-select" required><option value="">Chọn chủ đề</option><option>Tư vấn mẫu hoa</option><option>Hỗ trợ đơn hàng</option><option>Giao hàng</option><option>Góp ý dịch vụ</option></select><div class="invalid-feedback">Vui lòng chọn chủ đề.</div></div>
+              <div class="col-12"><label for="contact-message" class="form-label small fw-semibold">Nội dung <span class="form-required">*</span></label><textarea id="contact-message" name="message" class="form-control cas-form-control" rows="5" placeholder="Nhập nội dung bạn muốn gửi..." required></textarea><div class="invalid-feedback">Vui lòng nhập nội dung.</div></div>
               <div class="col-12"><div id="contactMessage" class="auth-message d-none" role="status"></div><button class="btn-cas-primary mt-2" type="submit">Gửi nội dung</button></div>
             </form>
           </section>
@@ -51,7 +51,7 @@
       <section class="mt-5">
         <p class="cas-eyebrow">Câu hỏi thường gặp</p>
         <h2 class="font-display fs-2 mt-2">Bạn có thể cần biết</h2>
-        <div class="accordion mt-3" id="contactFaq">
+        <div class="accordion cas-faq mt-3" id="contactFaq">
           <div class="accordion-item">
             <h3 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne">Có thể đặt hoa trong ngày không?</button></h3>
             <div id="faqOne" class="accordion-collapse collapse show" data-bs-parent="#contactFaq"><div class="accordion-body">Có. Một số mẫu có thể chuẩn bị trong ngày tùy tồn hoa và khung giờ giao. Bạn nên kiểm tra mục “Mẫu hôm nay”.</div></div>

@@ -7,46 +7,51 @@ $titles=[
  'product_edit'=>'Sửa sản phẩm','product_quick'=>'Quản lý nhanh','taxonomy'=>'Phân loại & bộ lọc',
  'inventory'=>'Kho tổng','reports'=>'Báo cáo doanh thu'
 ];
+$icons=[
+ 'dashboard'=>'bi-grid','orders'=>'bi-clipboard2-check','delivery'=>'bi-truck',
+ 'customers'=>'bi-people','products'=>'bi-flower2','product_add'=>'bi-plus-square',
+ 'product_edit'=>'bi-pencil-square','product_quick'=>'bi-lightning-charge','taxonomy'=>'bi-tags',
+ 'inventory'=>'bi-building','reports'=>'bi-bar-chart'
+];
+$roleLabels=['staff'=>'Nhân viên','admin'=>'Quản trị viên','owner'=>'Chủ sở hữu'];
+$statusTones=['pending_confirmation'=>'warning','confirmed'=>'success','preparing'=>'warning','ready'=>'warning','delivering'=>'warning','completed'=>'success','cancelled'=>'danger'];
 $title=$titles[$cas_page]??'CÁ\'S HOA Admin';
+$icon=$icons[$cas_page]??'bi-flower2';
 ?>
 <!doctype html><html lang="vi"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= cas_e($title) ?> | CÁ'S HOA Admin</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="../assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
 <link href="../assets/css/admin.css" rel="stylesheet">
-<style>
-.cas-admin-nav a{display:block;color:inherit;text-decoration:none;padding:10px 13px;border-radius:8px}
-.cas-admin-nav a:hover,.cas-admin-nav a.active{background:rgba(120,170,130,.18);font-weight:700}
-.cas-admin-stack{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.cas-admin-stack .admin-input,.cas-admin-stack .admin-select{max-width:240px}
-.cas-admin-table-form{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.cas-admin-table-form .admin-select{min-width:110px;max-width:150px}
-.cas-admin-table-form .admin-input{width:125px}
-.cas-admin-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
-.cas-admin-metric{border:1px solid #e3e8e3;background:white;border-radius:12px;padding:18px}
-.cas-admin-metric strong{display:block;font-size:24px;margin-top:10px}
-.admin-sidebar{overflow-y:auto}
-@media(max-width:850px){.admin-app{display:block}.admin-sidebar{position:relative;width:100%;height:auto}.admin-workspace{margin-left:0;width:100%}}
-</style></head>
+</head>
 <body data-admin-page="<?= cas_e($cas_page) ?>">
 <div class="admin-app">
-<aside class="admin-sidebar">
-  <div class="p-3"><a class="admin-brand" href="index.php">CÁ'S HOA <small>Admin PHP/MySQL</small></a></div>
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="admin-sidebar-head">
+    <a class="admin-brand" href="index.php"><span class="admin-brand-mark"><i class="bi bi-flower1" aria-hidden="true"></i></span><span><strong>CÁ'S HOA</strong><small>Admin PHP/MySQL</small></span></a>
+    <button class="admin-sidebar-close" id="adminSidebarClose" type="button" aria-label="Đóng menu"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+  </div>
   <?php require __DIR__.'/_nav.php'; ?>
 </aside>
+<button class="admin-overlay" id="adminOverlay" type="button" aria-label="Đóng menu"></button>
 <div class="admin-workspace">
-<header class="admin-topbar d-flex justify-content-between align-items-center px-4">
- <strong><?= cas_e($title) ?></strong>
- <div class="d-flex gap-2 align-items-center">
- <span><?= cas_e($user['full_name']) ?> (<?= cas_e($user['role']) ?>)</span>
- <form action="../dang-xuat.php" method="post"><?= cas_csrf_form() ?><button class="admin-btn-light" type="submit">Đăng xuất</button></form>
+<header class="admin-topbar">
+ <div class="admin-topbar-left">
+   <button class="admin-menu-button" id="adminMenuOpen" type="button" aria-controls="adminSidebar" aria-expanded="false" aria-label="Mở menu"><i class="bi bi-list" aria-hidden="true"></i></button>
+   <div><div class="admin-topbar-title"><?= cas_e($title) ?></div><span class="admin-role"><?= cas_e($roleLabels[$user['role']]??$user['role']) ?></span></div>
+ </div>
+ <div class="admin-topbar-actions">
+   <a class="admin-store-link" href="../index.php" aria-label="Về cửa hàng" title="Về cửa hàng"><i class="bi bi-shop" aria-hidden="true"></i><span>Về cửa hàng</span></a>
+   <a class="admin-btn-light" href="tai-khoan.php" aria-label="Tài khoản của bạn" title="Tài khoản của bạn"><i class="bi bi-person-circle" aria-hidden="true"></i><span><?= cas_e($user['full_name']) ?></span></a>
+   <form action="../dang-xuat.php" method="post" class="m-0"><?= cas_csrf_form() ?><button class="admin-btn-light" type="submit" aria-label="Đăng xuất" title="Đăng xuất"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Đăng xuất</span></button></form>
  </div>
 </header>
 <main class="admin-content">
 <section class="admin-hero"><div><h1><?= cas_e($title) ?></h1>
-<p>Hệ thống quản trị CÁ'S HOA — dữ liệu PHP và MySQL.</p></div></section>
-<?php if($error!==''): ?><div class="alert alert-danger" role="alert"><?= cas_e($error) ?></div><?php endif; ?>
-<?php if($notice!==''): ?><div class="alert alert-success" role="status"><?= cas_e($notice) ?></div><?php endif; ?>
+<p>Hệ thống quản trị CÁ'S HOA — dữ liệu vận hành theo thời gian thực.</p></div><div class="admin-hero-icon"><i class="bi <?= cas_e($icon) ?>" aria-hidden="true"></i></div></section>
+<?php if($error!==''): ?><div class="alert alert-danger admin-section" role="alert"><?= cas_e($error) ?></div><?php endif; ?>
+<?php if($notice!==''): ?><div class="alert alert-success admin-section" role="status"><?= cas_e($notice) ?></div><?php endif; ?>
 <?php
 switch($cas_page):
 case 'dashboard':
@@ -64,9 +69,11 @@ $latest=cas_admin_rows($db,"SELECT o.order_code,o.total_amount,o.order_status,o.
 <div class="cas-admin-metrics admin-section">
 <?php foreach($kpis as $label=>$count): ?><article class="cas-admin-metric"><span><?= cas_e($label) ?></span><strong><?= number_format($count,0,',','.') ?><?= $label==='Doanh thu hoàn tất'?' ₫':'' ?></strong></article><?php endforeach; ?>
 </div>
-<section class="admin-card admin-section"><h2 class="admin-card-title mb-3">Đơn gần đây</h2>
+<section class="admin-card admin-section">
+<div class="cas-admin-stack justify-content-between mb-2"><h2 class="admin-card-title mb-0">Đơn gần đây</h2><a class="admin-btn-light" href="don-hang.php">Quản lý đơn hàng</a></div>
 <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Giá trị</th><th>Trạng thái</th></tr></thead><tbody>
-<?php foreach($latest as $o): ?><tr><td><?= cas_e($o['order_code']) ?></td><td><?= cas_e($o['full_name']) ?></td><td><?= cas_money($o['total_amount']) ?></td><td><?= cas_e($statuses[$o['order_status']]??$o['order_status']) ?></td></tr><?php endforeach; ?>
+<?php foreach($latest as $o): $tone=$statusTones[$o['order_status']]??''; ?><tr><td><strong><?= cas_e($o['order_code']) ?></strong><div class="cas-muted"><?= cas_e($o['created_at']) ?></div></td><td><?= cas_e($o['full_name']) ?></td><td class="admin-money"><?= cas_money($o['total_amount']) ?></td><td><span class="admin-status<?= $tone?' '.$tone:'' ?>"><?= cas_e($statuses[$o['order_status']]??$o['order_status']) ?></span></td></tr><?php endforeach; ?>
+<?php if(!$latest): ?><tr><td colspan="4"><div class="admin-empty">Chưa có đơn hàng nào.</div></td></tr><?php endif; ?>
 </tbody></table></div></section>
 <?php break;
 case 'orders':
@@ -77,19 +84,20 @@ $sql.=" ORDER BY o.created_at DESC,o.order_id DESC LIMIT 200";
 $rows=cas_admin_rows($db,$sql,$args);
 ?>
 <section class="admin-card admin-section">
-<form method="get" class="cas-admin-stack mb-3">Lọc: <?= cas_admin_select('status',['all'=>'Tất cả']+$statuses,$filter) ?><button class="admin-btn-light">Lọc đơn</button><span><?= count($rows) ?> đơn</span></form>
+<form method="get" class="cas-admin-stack mb-3"><label class="admin-label mb-0" for="orderStatusSelect">Trạng thái:</label><select id="orderStatusSelect" class="admin-select" name="status"><?php foreach(['all'=>'Tất cả']+$statuses as $k=>$lbl): ?><option value="<?= cas_e((string)$k) ?>"<?= (string)$k===$filter?' selected':'' ?>><?= cas_e((string)$lbl) ?></option><?php endforeach; ?></select><button class="admin-btn-light" type="submit">Lọc đơn</button><span class="admin-badge"><?= count($rows) ?> đơn</span></form>
 <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Mã đơn / khách</th><th>Người nhận</th><th>Giá trị</th><th>Cập nhật</th></tr></thead><tbody>
-<?php foreach($rows as $o): ?><tr>
-<td><strong><?= cas_e($o['order_code']) ?></strong><div><?= cas_e($o['customer_name']) ?> — <?= cas_e($o['customer_phone']) ?></div><small><?= cas_e($o['created_at']) ?></small></td>
-<td><?= cas_e($o['recipient_name']) ?><div><?= cas_e($o['receive_date']) ?> · <?= cas_e($o['receive_time']) ?></div></td>
-<td><?= cas_money($o['total_amount']) ?></td>
+<?php foreach($rows as $o): $tone=$statusTones[$o['order_status']]??''; ?><tr>
+<td><strong><?= cas_e($o['order_code']) ?></strong> <span class="admin-status<?= $tone?' '.$tone:'' ?>"><?= cas_e($statuses[$o['order_status']]??$o['order_status']) ?></span><div class="mt-1"><?= cas_e($o['customer_name']) ?> — <?= cas_e($o['customer_phone']) ?></div><div class="cas-muted"><?= cas_e($o['created_at']) ?></div></td>
+<td><?= cas_e($o['recipient_name']) ?><div class="cas-muted"><?= cas_e($o['receive_date']) ?> · <?= cas_e($o['receive_time']) ?></div></td>
+<td class="admin-money"><?= cas_money($o['total_amount']) ?></td>
 <td><form method="post" class="cas-admin-table-form"><?= cas_csrf_form() ?><input type="hidden" name="action" value="order_update"><input type="hidden" name="id" value="<?= (int)$o['order_id'] ?>">
-<?= cas_admin_select('status',cas_order_choices($o['order_status'],$o['delivery_method']),$o['order_status']) ?>
+<?= str_replace('<select class="admin-select"','<select class="admin-select" aria-label="Trạng thái đơn '.cas_e($o['order_code']).'"',cas_admin_select('status',cas_order_choices($o['order_status'],$o['delivery_method']),$o['order_status'])) ?>
 <?php if(in_array($user['role'],['admin','owner'],true)): ?>
-<?= cas_admin_select('payment_status',$payments,$o['payment_status']) ?>
-<?php else: ?><input type="hidden" name="payment_status" value="<?= cas_e($o['payment_status']) ?>"><span class="cas-muted small"><?= cas_e($payments[$o['payment_status']]??$o['payment_status']) ?></span><?php endif; ?>
+<?= str_replace('<select class="admin-select"','<select class="admin-select" aria-label="Thanh toán đơn '.cas_e($o['order_code']).'"',cas_admin_select('payment_status',$payments,$o['payment_status'])) ?>
+<?php else: ?><input type="hidden" name="payment_status" value="<?= cas_e($o['payment_status']) ?>"><span class="admin-badge"><?= cas_e($payments[$o['payment_status']]??$o['payment_status']) ?></span><?php endif; ?>
 <input class="admin-input" name="reason" maxlength="255" aria-label="Lý do thay đổi trạng thái" placeholder="Lý do nếu hủy/hoàn tác">
 <button class="admin-btn-light" type="submit">Lưu</button></form></td></tr><?php endforeach; ?>
+<?php if(!$rows): ?><tr><td colspan="4"><div class="admin-empty">Không có đơn hàng phù hợp bộ lọc.</div></td></tr><?php endif; ?>
 </tbody></table></div></section>
 <?php break;
 case 'delivery':
@@ -100,8 +108,10 @@ $rows=cas_admin_rows($db,"SELECT d.delivery_id,d.delivery_status,d.scheduled_at,
 <?php foreach($rows as $d): ?><tr><td><?= cas_e($d['order_code']) ?></td><td><?= cas_e($d['recipient_name']) ?><br><?= cas_e($d['recipient_phone']) ?></td>
 <td><?= cas_e($d['delivery_address']) ?><br><?= cas_e($d['scheduled_at']) ?></td>
 <td><form method="post" class="cas-admin-table-form"><?= cas_csrf_form() ?><input type="hidden" name="action" value="delivery_update"><input type="hidden" name="id" value="<?= (int)$d['delivery_id'] ?>">
-<?= cas_admin_select('status',$deliveries,$d['delivery_status']) ?><button class="admin-btn-light" type="submit">Lưu</button></form></td>
-</tr><?php endforeach; ?></tbody></table></div></section>
+<?= str_replace('<select class="admin-select"','<select class="admin-select" aria-label="Trạng thái giao"',cas_admin_select('status',$deliveries,$d['delivery_status'])) ?><button class="admin-btn-light" type="submit">Lưu</button></form></td>
+</tr><?php endforeach; ?>
+<?php if(!$rows): ?><tr><td colspan="4"><div class="admin-empty">Chưa có lịch giao hàng.</div></td></tr><?php endif; ?>
+</tbody></table></div></section>
 <?php break;
 case 'customers':
 $search=trim((string)($_GET['q']??''));$args=[];
@@ -110,9 +120,10 @@ if($search!==''){$sql.=" WHERE c.full_name LIKE ? OR c.phone LIKE ? OR c.email L
 $sql.=" GROUP BY c.customer_id ORDER BY c.customer_id DESC LIMIT 200";
 $rows=cas_admin_rows($db,$sql,$args);
 ?>
-<section class="admin-card admin-section"><form method="get" class="cas-admin-stack mb-3"><input name="q" class="admin-input" value="<?= cas_e($search) ?>" placeholder="Tên, SĐT, email"><button class="admin-btn-light">Tìm</button><span><?= count($rows) ?> khách</span></form>
+<section class="admin-card admin-section"><form method="get" class="cas-admin-stack mb-3"><input name="q" class="admin-input" aria-label="Tìm khách hàng theo tên, SĐT hoặc email" value="<?= cas_e($search) ?>" placeholder="Tên, SĐT, email"><button class="admin-btn-light" type="submit">Tìm</button><span class="admin-badge"><?= count($rows) ?> khách</span></form>
 <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Khách hàng</th><th>SĐT / email</th><th>Địa chỉ</th><th>Số đơn</th><th>Tổng đơn</th></tr></thead><tbody>
-<?php foreach($rows as $c): ?><tr><td><?= cas_e($c['full_name']) ?></td><td><?= cas_e($c['phone']) ?><br><?= cas_e($c['email']) ?></td><td><?= cas_e($c['address']) ?></td><td><?= (int)$c['orders_count'] ?></td><td><?= cas_money($c['amount']) ?></td></tr><?php endforeach; ?>
+<?php foreach($rows as $c): ?><tr><td><strong><?= cas_e($c['full_name']) ?></strong></td><td><?= cas_e($c['phone']) ?><div class="cas-muted"><?= cas_e($c['email']) ?></div></td><td><?= cas_e($c['address']?:'—') ?></td><td><?= (int)$c['orders_count'] ?></td><td><strong><?= cas_money($c['amount']) ?></strong></td></tr><?php endforeach; ?>
+<?php if(!$rows): ?><tr><td colspan="5"><div class="admin-empty">Không tìm thấy khách hàng phù hợp.</div></td></tr><?php endif; ?>
 </tbody></table></div></section>
 <?php break;
 case 'products':
@@ -123,11 +134,11 @@ $sql.=" ORDER BY p.product_id DESC LIMIT 300";
 $rows=cas_admin_rows($db,$sql,$args);
 ?>
 <section class="admin-card admin-section">
-<form method="get" class="cas-admin-stack mb-3"><input class="admin-input" name="q" value="<?= cas_e($search) ?>" placeholder="Tên hoặc SKU"><button class="admin-btn-light">Tìm kiếm</button><span><?= count($rows) ?> sản phẩm</span><a class="admin-btn" href="them-san-pham.php">Thêm sản phẩm</a></form>
+<form method="get" class="cas-admin-stack mb-3"><input class="admin-input" name="q" aria-label="Tìm sản phẩm theo tên hoặc SKU" value="<?= cas_e($search) ?>" placeholder="Tên hoặc SKU"><button class="admin-btn-light" type="submit">Tìm kiếm</button><span class="admin-badge"><?= count($rows) ?> sản phẩm</span><a class="admin-btn" href="them-san-pham.php">Thêm sản phẩm</a></form>
 <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Ảnh</th><th>Sản phẩm</th><th>Loại</th><th>Giá</th><th>Hiển thị</th><th>Thao tác</th></tr></thead><tbody>
 <?php foreach($rows as $p): ?><tr>
-<td><img src="../<?= cas_e($p['image']) ?>" width="65" height="65" style="object-fit:cover" alt=""></td>
-<td><strong><?= cas_e($p['name']) ?></strong><div><?= cas_e($p['sku']) ?></div></td>
+<td><img class="admin-thumb" src="../<?= cas_e($p['image']) ?>" width="65" height="65" alt=""></td>
+<td><strong><?= cas_e($p['name']) ?></strong><div class="cas-muted"><?= cas_e($p['sku']) ?></div></td>
 <td><?= cas_e($p['category_name']) ?> / <?= cas_e($p['product_type']) ?></td><td><?= cas_money($p['price']) ?></td><td><?= cas_e($p['status']) ?></td>
 <td><a class="admin-btn-light" href="sua-san-pham.php?id=<?= (int)$p['product_id'] ?>">Sửa</a></td></tr><?php endforeach; ?>
 </tbody></table></div></section>
@@ -150,24 +161,24 @@ $images=glob(__DIR__.'/../assets/images/*.png')?:[];
 <?= cas_csrf_form() ?><input type="hidden" name="action" value="product_save">
 <?php if($edit): ?><input type="hidden" name="id" value="<?= (int)$id ?>"><?php endif; ?>
 <?php foreach(['name'=>'Tên sản phẩm','sku'=>'SKU','slug'=>'Slug (để trống sẽ tự tạo)','price'=>'Giá bán (VND)'] as $field=>$label): ?>
-<div><label class="admin-label"><?= cas_e($label) ?></label><input class="admin-input" name="<?= cas_e($field) ?>" value="<?= cas_e((string)($product[$field]??'')) ?>" <?= $field==='price'?'type="number" min="0" max="100000000"':'maxlength="190"' ?> <?= in_array($field,['name','sku','price'],true)?'required':'' ?>></div>
+<div><label class="admin-label" for="f_<?= cas_e($field) ?>"><?= cas_e($label) ?></label><input id="f_<?= cas_e($field) ?>" class="admin-input" name="<?= cas_e($field) ?>" value="<?= cas_e((string)($product[$field]??'')) ?>" <?= $field==='price'?'type="number" min="0" max="100000000"':'maxlength="190"' ?> <?= in_array($field,['name','sku','price'],true)?'required':'' ?>></div>
 <?php endforeach; ?>
-<div><label class="admin-label">Loại sản phẩm</label><?= cas_admin_select('product_type',['bouquet'=>'Bó hoa','basket'=>'Giỏ hoa'],(string)($product['product_type']??'bouquet')) ?></div>
+<div><label class="admin-label" for="f_product_type">Loại sản phẩm</label><?= str_replace('<select class="admin-select"','<select id="f_product_type" class="admin-select"',cas_admin_select('product_type',['bouquet'=>'Bó hoa','basket'=>'Giỏ hoa'],(string)($product['product_type']??'bouquet'))) ?></div>
 <?php foreach([['category_id',$categories],['tone_id',$tones],['occasion_id',$occasions]] as [$field,$opts]): ?>
-<div><label class="admin-label"><?= cas_e($field) ?></label><select name="<?= cas_e($field) ?>" class="admin-select"><option value="">Không chọn</option>
+<div><label class="admin-label" for="f_<?= cas_e($field) ?>"><?= cas_e($field) ?></label><select id="f_<?= cas_e($field) ?>" name="<?= cas_e($field) ?>" class="admin-select"><option value="">Không chọn</option>
 <?php foreach($opts as $o): $pk=$field; ?><option value="<?= (int)$o[$pk] ?>" <?= (string)($product[$field]??'')===(string)$o[$pk]?'selected':'' ?>><?= cas_e($o['name']) ?></option><?php endforeach; ?>
 </select></div>
 <?php endforeach; ?>
-<div><label class="admin-label">Ảnh sản phẩm có sẵn</label><select name="image" class="admin-select">
+<div><label class="admin-label" for="f_image">Ảnh sản phẩm có sẵn</label><select id="f_image" name="image" class="admin-select">
 <?php foreach($images as $image): $filename=basename($image); ?>
 <option value="<?= cas_e($filename) ?>" <?= basename((string)($product['image']??'lam-tinh.png'))===$filename?'selected':'' ?>><?= cas_e($filename) ?></option>
 <?php endforeach; ?></select></div>
-<div><label class="admin-label">Trạng thái</label><?= cas_admin_select('status',['active'=>'Đang bán','hidden'=>'Ẩn'],(string)($product['status']??'active')) ?></div>
-<div class="full"><label class="admin-label">Mô tả</label><textarea class="admin-textarea" name="description" rows="3"><?= cas_e($product['description']??'') ?></textarea></div>
-<div class="full"><label class="admin-label">Thành phần</label><textarea class="admin-textarea" name="composition" rows="3"><?= cas_e($product['composition']??'') ?></textarea></div>
+<div><label class="admin-label" for="f_status">Trạng thái</label><?= str_replace('<select class="admin-select"','<select id="f_status" class="admin-select"',cas_admin_select('status',['active'=>'Đang bán','hidden'=>'Ẩn'],(string)($product['status']??'active'))) ?></div>
+<div class="full"><label class="admin-label" for="f_description">Mô tả</label><textarea id="f_description" class="admin-textarea" name="description" rows="3"><?= cas_e($product['description']??'') ?></textarea></div>
+<div class="full"><label class="admin-label" for="f_composition">Thành phần</label><textarea id="f_composition" class="admin-textarea" name="composition" rows="3"><?= cas_e($product['composition']??'') ?></textarea></div>
 <div class="full cas-admin-stack">
-<label><input type="checkbox" name="featured" <?= !empty($product['featured'])?'checked':'' ?>> Sản phẩm nổi bật</label>
-<label><input type="checkbox" name="today" <?= !empty($product['today'])?'checked':'' ?>> Mẫu hôm nay</label></div>
+<label class="admin-check"><input type="checkbox" name="featured" <?= !empty($product['featured'])?'checked':'' ?>> Sản phẩm nổi bật</label>
+<label class="admin-check"><input type="checkbox" name="today" <?= !empty($product['today'])?'checked':'' ?>> Mẫu hôm nay</label></div>
 <div class="full"><button class="admin-btn" type="submit">Lưu sản phẩm</button> <a class="admin-btn-light" href="san-pham.php">Hủy</a></div>
 </form></section>
 <?php break;
@@ -177,9 +188,9 @@ $rows=cas_admin_rows($db,'SELECT product_id,name,sku,price,status FROM products 
 <section class="admin-card admin-section"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Sản phẩm</th><th>Giá</th><th>Trạng thái / lưu</th></tr></thead><tbody>
 <?php foreach($rows as $p): ?><tr><td><?= cas_e($p['name']) ?> — <?= cas_e($p['sku']) ?></td><td><?= cas_money($p['price']) ?></td><td>
 <form class="cas-admin-table-form" method="post"><?= cas_csrf_form() ?><input type="hidden" name="action" value="quick_save"><input type="hidden" name="id" value="<?= (int)$p['product_id'] ?>">
-<input class="admin-input" type="number" name="price" min="0" value="<?= (int)$p['price'] ?>">
-<?= cas_admin_select('status',['active'=>'Đang bán','hidden'=>'Ẩn'],$p['status']) ?>
-<button class="admin-btn-light">Lưu</button></form></td></tr><?php endforeach; ?>
+<input class="admin-input" type="number" name="price" min="0" aria-label="Giá bán <?= cas_e($p['name']) ?>" value="<?= (int)$p['price'] ?>">
+<?= str_replace('<select class="admin-select"','<select class="admin-select" aria-label="Trạng thái '.cas_e($p['name']).'"',cas_admin_select('status',['active'=>'Đang bán','hidden'=>'Ẩn'],$p['status'])) ?>
+<button class="admin-btn-light" type="submit">Lưu</button></form></td></tr><?php endforeach; ?>
 </tbody></table></div></section>
 <?php break;
 case 'taxonomy':
@@ -188,7 +199,7 @@ foreach(['categories'=>'Loại hoa','tones'=>'Tông màu','occasions'=>'Dịp t�
 ?>
 <section class="admin-card admin-section"><h2 class="admin-card-title"><?= cas_e($label) ?></h2>
 <form method="post" class="cas-admin-stack my-3"><?= cas_csrf_form() ?><input type="hidden" name="action" value="taxonomy_save"><input type="hidden" name="table" value="<?= cas_e($table) ?>">
-<input class="admin-input" name="name" maxlength="100" required placeholder="Tên <?= cas_e($label) ?>"><button class="admin-btn">Thêm</button></form>
+<input class="admin-input" name="name" maxlength="100" aria-label="Tên <?= cas_e($label) ?>" required placeholder="Tên <?= cas_e($label) ?>"><button class="admin-btn" type="submit">Thêm</button></form>
 <div class="cas-admin-stack"><?php foreach($rows as $r): ?><span class="admin-badge"><?= cas_e($r['name']) ?></span><?php endforeach; ?></div></section>
 <?php endforeach;break;
 case 'inventory':
@@ -197,9 +208,9 @@ $qty=0;$low=0;$value=0;
 foreach($items as $i){$qty+=(float)$i['quantity'];if((float)$i['quantity']<=(float)$i['min_quantity'])$low++;$value+=(float)$i['quantity']*(float)$i['unit_cost'];}
 ?>
 <div class="cas-admin-metrics admin-section">
-<article class="cas-admin-metric">Mặt hàng<strong><?= count($items) ?></strong></article>
-<article class="cas-admin-metric">Cần nhập thêm<strong><?= $low ?></strong></article>
-<article class="cas-admin-metric">Giá trị tồn<strong><?= cas_money($value) ?></strong></article></div>
+<article class="cas-admin-metric"><span>Mặt hàng</span><strong><?= count($items) ?></strong></article>
+<article class="cas-admin-metric"><span>Cần nhập thêm</span><strong><?= $low ?></strong></article>
+<article class="cas-admin-metric"><span>Giá trị tồn</span><strong><?= cas_money($value) ?></strong></article></div>
 <section class="admin-card admin-section"><div class="admin-table-wrap"><table class="admin-table">
 <thead><tr><th>Mặt hàng</th><th>Nhóm</th><th>Tồn</th><th>Tối thiểu</th><th>Giá nhập</th></tr></thead><tbody>
 <?php foreach($items as $i): ?><tr><td><?= cas_e($i['name']) ?></td><td><?= cas_e($i['item_type']) ?></td><td><?= cas_e($i['quantity']) ?> <?= cas_e($i['unit']) ?></td><td><?= cas_e($i['min_quantity']) ?></td><td><?= cas_money($i['unit_cost']) ?></td></tr><?php endforeach; ?>
@@ -218,12 +229,28 @@ $q->execute([$start,$end]);$rows=$q->fetchAll();
 $totals=['orders'=>0,'gross'=>0,'revenue'=>0];
 foreach($rows as $r){$totals['orders']+=(int)$r['order_count'];$totals['gross']+=(float)$r['gross_sales'];$totals['revenue']+=(float)$r['confirmed_revenue'];}
 ?>
-<section class="admin-card admin-section"><p><a class="admin-btn-light" href="loi-nhuan.php">Xem biểu đồ lợi nhuận gộp và giá vốn nguyên liệu →</a></p><form method="get" class="cas-admin-stack mb-3">Từ <input name="start" type="date" class="admin-input" value="<?= cas_e($start) ?>"> đến <input name="end" type="date" class="admin-input" value="<?= cas_e($end) ?>"><button class="admin-btn-light">Xem báo cáo</button></form>
-<div class="cas-admin-metrics mb-4"><article class="cas-admin-metric">Tổng đơn<strong><?= $totals['orders'] ?></strong></article><article class="cas-admin-metric">Giá trị đơn<strong><?= cas_money($totals['gross']) ?></strong></article><article class="cas-admin-metric">Doanh thu đã hoàn tất và thanh toán<strong><?= cas_money($totals['revenue']) ?></strong></article></div>
+<section class="admin-card admin-section">
+<div class="cas-admin-stack justify-content-between mb-3">
+  <form method="get" class="cas-admin-stack"><label class="admin-label mb-0" for="reportStart">Từ</label><input id="reportStart" name="start" type="date" class="admin-input" value="<?= cas_e($start) ?>"><label class="admin-label mb-0" for="reportEnd">đến</label><input id="reportEnd" name="end" type="date" class="admin-input" value="<?= cas_e($end) ?>"><button class="admin-btn-light" type="submit">Xem báo cáo</button></form>
+  <?php if(in_array($user['role'],['admin','owner'],true)): ?><a class="admin-btn-light" href="loi-nhuan.php">Biểu đồ lợi nhuận gộp <i class="bi bi-arrow-right" aria-hidden="true"></i></a><?php endif; ?>
+</div>
+<div class="cas-admin-metrics mb-4"><article class="cas-admin-metric"><span>Tổng đơn</span><strong><?= $totals['orders'] ?></strong></article><article class="cas-admin-metric"><span>Giá trị đơn</span><strong><?= cas_money($totals['gross']) ?></strong></article><article class="cas-admin-metric"><span>Doanh thu đã hoàn tất và thanh toán</span><strong><?= cas_money($totals['revenue']) ?></strong></article></div>
 <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Ngày</th><th>Số đơn</th><th>Giá trị tạo đơn</th><th>Doanh thu hợp lệ</th></tr></thead><tbody>
-<?php foreach($rows as $r): ?><tr><td><?= cas_e($r['day']) ?></td><td><?= (int)$r['order_count'] ?></td><td><?= cas_money($r['gross_sales']) ?></td><td><?= cas_money($r['confirmed_revenue']) ?></td></tr><?php endforeach; ?>
+<?php foreach($rows as $r): ?><tr><td><?= cas_e($r['day']) ?></td><td><?= (int)$r['order_count'] ?></td><td><?= cas_money($r['gross_sales']) ?></td><td><strong><?= cas_money($r['confirmed_revenue']) ?></strong></td></tr><?php endforeach; ?>
+<?php if(!$rows): ?><tr><td colspan="4"><div class="admin-empty">Chưa có đơn hàng trong khoảng thời gian đã chọn.</div></td></tr><?php endif; ?>
 </tbody></table></div></section>
 <?php break;
 endswitch;
 ?>
-</main></div></div></body></html>
+</main></div></div>
+<script>
+(function(){
+  var sb=document.getElementById('adminSidebar'),ov=document.getElementById('adminOverlay'),open=document.getElementById('adminMenuOpen'),close=document.getElementById('adminSidebarClose');
+  function toggle(s){if(sb)sb.classList.toggle('open',s);if(ov)ov.classList.toggle('open',s);if(open)open.setAttribute('aria-expanded',String(s));}
+  if(open)open.addEventListener('click',function(){toggle(true);});
+  if(close)close.addEventListener('click',function(){toggle(false);});
+  if(ov)ov.addEventListener('click',function(){toggle(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sb&&sb.classList.contains('open'))toggle(false);});
+})();
+</script>
+</body></html>

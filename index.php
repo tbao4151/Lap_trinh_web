@@ -18,8 +18,14 @@
   <main class="cas-page">
     <section class="hero-section" aria-labelledby="featured-title">
       <div class="cas-container">
-        <p class="cas-eyebrow mb-3">Mẫu hoa nổi bật</p>
-        <h1 id="featured-title" class="visually-hidden">Mẫu hoa nổi bật của CÁ'S HOA</h1>
+        <div class="hero-header">
+          <div class="hero-header-copy">
+            <p class="cas-eyebrow">CÁ'S HOA · Flowers &amp; Feelings</p>
+            <h1 id="featured-title" class="cas-title">Hoa cho những điều khó nói.</h1>
+            <p class="cas-subtitle">Mỗi bó hoa được phối theo cảm xúc và dịp tặng, luôn kèm sẵn thiệp viết tay và túi giấy chỉn chu.</p>
+          </div>
+          <a href="tu-van-hoa.php" class="btn-cas-outline">Nhờ gợi ý mẫu hoa <i class="bi bi-stars" aria-hidden="true"></i></a>
+        </div>
 
         <div id="heroCarousel" class="carousel slide hero-slider" data-bs-ride="carousel" data-bs-interval="10000">
           <div class="carousel-inner" id="heroTrack"></div>

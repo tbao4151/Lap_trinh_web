@@ -49,7 +49,7 @@
           <div class="col-lg-3">
             <div class="collapse d-lg-block" id="filterPanel">
               <aside class="catalog-sidebar" aria-label="Bộ lọc sản phẩm">
-                <div class="d-flex justify-content-between align-items-center mb-3"><strong>Bộ lọc</strong><button type="button" class="btn btn-link p-0 text-decoration-none small" style="color:var(--primary)" data-reset-filters>Đặt lại</button></div>
+                <div class="d-flex justify-content-between align-items-center mb-3"><strong>Bộ lọc</strong><button type="button" class="btn-filter-reset" data-reset-filters>Đặt lại</button></div>
 
                 <div class="filter-group">
                   <div class="filter-title">Kiểu sản phẩm</div>
@@ -85,6 +85,7 @@
                   <p id="catalogPriceError" class="auth-message error" role="alert" hidden></p>
                   <label class="filter-check mt-3"><input id="todayFilter" type="checkbox"> Chỉ mẫu hôm nay</label>
                 </div>
+                <button class="btn-cas-primary w-100 mt-3 d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanel" aria-controls="filterPanel">Xem kết quả</button>
               </aside>
             </div>
           </div>

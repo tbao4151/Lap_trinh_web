@@ -29,8 +29,8 @@
             <section class="checkout-card">
               <h2>Thông tin liên hệ</h2>
               <div class="row g-3">
-                <div class="col-md-6"><label for="customerName" class="form-label small fw-semibold">Họ và tên</label><input id="customerName" name="customerName" maxlength="120" value="<?= cas_e($profile['full_name']??'') ?>" class="form-control cas-form-control" autocomplete="name" required><div class="invalid-feedback">Vui lòng nhập họ tên.</div></div>
-                <div class="col-md-6"><label for="customerPhone" class="form-label small fw-semibold">Số điện thoại</label><input id="customerPhone" name="customerPhone" value="<?= cas_e($profile['phone']??'') ?>" class="form-control cas-form-control" inputmode="tel" autocomplete="tel" pattern="[0-9 +]{9,15}" required><div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ.</div></div>
+                <div class="col-md-6"><label for="customerName" class="form-label small fw-semibold">Họ và tên <span class="form-required">*</span></label><input id="customerName" name="customerName" maxlength="120" value="<?= cas_e($profile['full_name']??'') ?>" class="form-control cas-form-control" autocomplete="name" required><div class="invalid-feedback">Vui lòng nhập họ tên.</div></div>
+                <div class="col-md-6"><label for="customerPhone" class="form-label small fw-semibold">Số điện thoại <span class="form-required">*</span></label><input id="customerPhone" name="customerPhone" value="<?= cas_e($profile['phone']??'') ?>" class="form-control cas-form-control" inputmode="tel" autocomplete="tel" pattern="[0-9 +]{9,15}" required><div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ.</div></div>
               </div>
             </section>
 
@@ -42,21 +42,22 @@
               </div>
 
               <div id="deliveryFields" class="mt-3">
-                <label for="address" class="form-label small fw-semibold">Địa chỉ nhận hoa</label>
+                <label for="address" class="form-label small fw-semibold">Địa chỉ nhận hoa <span class="form-required">*</span></label>
                 <input id="address" name="address" maxlength="255" value="<?= cas_e($profile['address']??'') ?>" class="form-control cas-form-control" placeholder="Số nhà, đường, phường/xã, quận/huyện" required>
+                <div class="invalid-feedback">Vui lòng nhập địa chỉ nhận hoa.</div>
               </div>
 
               <div class="row g-3 mt-0">
-                <div class="col-md-6"><label for="receiveDate" class="form-label small fw-semibold">Ngày nhận</label><input id="receiveDate" name="receiveDate" type="date" min="<?= date('Y-m-d',strtotime('tomorrow')) ?>" class="form-control cas-form-control" required><div class="invalid-feedback">Vui lòng chọn ngày nhận.</div></div>
-                <div class="col-md-6"><label for="receiveTime" class="form-label small fw-semibold">Khung giờ</label><select id="receiveTime" name="receiveTime" class="form-select cas-form-select" required><option value="">Chọn khung giờ</option><option>08:00 - 10:00</option><option>10:00 - 12:00</option><option>13:00 - 15:00</option><option>15:00 - 17:00</option><option>17:00 - 19:00</option></select><div class="invalid-feedback">Vui lòng chọn khung giờ.</div></div>
+                <div class="col-md-6"><label for="receiveDate" class="form-label small fw-semibold">Ngày nhận <span class="form-required">*</span></label><input id="receiveDate" name="receiveDate" type="date" min="<?= date('Y-m-d',strtotime('tomorrow')) ?>" class="form-control cas-form-control" required><div class="invalid-feedback">Vui lòng chọn ngày nhận.</div></div>
+                <div class="col-md-6"><label for="receiveTime" class="form-label small fw-semibold">Khung giờ <span class="form-required">*</span></label><select id="receiveTime" name="receiveTime" class="form-select cas-form-select" required><option value="">Chọn khung giờ</option><option>08:00 - 10:00</option><option>10:00 - 12:00</option><option>13:00 - 15:00</option><option>15:00 - 17:00</option><option>17:00 - 19:00</option></select><div class="form-text">Chọn ngày nhận hợp lệ trước khi chọn khung giờ.</div><div class="invalid-feedback">Vui lòng chọn khung giờ.</div></div>
               </div>
             </section>
 
             <section class="checkout-card">
               <h2>Người nhận và lời nhắn</h2>
               <div class="row g-3">
-                <div class="col-md-6"><label for="recipientName" class="form-label small fw-semibold">Tên người nhận</label><input id="recipientName" name="recipientName" class="form-control cas-form-control" required><div class="invalid-feedback">Vui lòng nhập tên người nhận.</div></div>
-                <div class="col-md-6"><label for="recipientPhone" class="form-label small fw-semibold">SĐT người nhận</label><input id="recipientPhone" name="recipientPhone" class="form-control cas-form-control" inputmode="tel" pattern="[0-9 +]{9,15}" required><div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ.</div></div>
+                <div class="col-md-6"><label for="recipientName" class="form-label small fw-semibold">Tên người nhận <span class="form-required">*</span></label><input id="recipientName" name="recipientName" class="form-control cas-form-control" required><div class="invalid-feedback">Vui lòng nhập tên người nhận.</div></div>
+                <div class="col-md-6"><label for="recipientPhone" class="form-label small fw-semibold">SĐT người nhận <span class="form-required">*</span></label><input id="recipientPhone" name="recipientPhone" class="form-control cas-form-control" inputmode="tel" pattern="[0-9 +]{9,15}" required><div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ.</div></div>
                 <div class="col-12"><label for="cardMessage" class="form-label small fw-semibold">Lời nhắn trên thiệp</label><textarea id="cardMessage" name="cardMessage" maxlength="3000" class="form-control cas-form-control" rows="3" placeholder="Nhập lời nhắn bạn muốn gửi..."></textarea></div>
                 <div class="col-12"><label for="orderNote" class="form-label small fw-semibold">Ghi chú cho shop</label><textarea id="orderNote" name="orderNote" maxlength="3000" class="form-control cas-form-control" rows="2" placeholder="Ví dụ: gọi trước khi giao, ưu tiên hoa tone nhạt..."></textarea></div>
               </div>

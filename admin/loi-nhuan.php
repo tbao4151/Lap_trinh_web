@@ -49,20 +49,11 @@ $series=['known_revenue'=>['name'=>'Doanh thu có giá vốn','color'=>'#52765b'
  'gross_profit'=>['name'=>'Lợi nhuận gộp','color'=>'#365b8c']];
 cas_ops_start('Biểu đồ lợi nhuận gộp','Phân tích kết quả các đơn đã hoàn tất và đã thanh toán bằng dữ liệu kế toán có thể kiểm chứng.','bi-graph-up-arrow');
 ?>
-<style>
-.cas-profit-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin:14px 0 22px}
-.cas-profit-metric{border:1px solid #e2e6dc;border-radius:12px;padding:14px;background:#fff}
-.cas-profit-metric strong{display:block;font-size:1.32rem;margin-top:8px}
-.cas-profit-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.85rem;margin:12px 0}
-.cas-profit-swatch{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px}
-.cas-profit-chart{width:100%;height:auto;min-height:240px}
-.cas-profit-note{color:#555e55;line-height:1.65;font-size:.9rem}
-</style>
 <section class="admin-card admin-section">
 <form method="get" class="cas-admin-stack mb-3">
-<label for="from">Từ ngày</label><input id="from" name="from" type="date" required class="admin-input" value="<?= cas_e($from) ?>">
-<label for="to">Đến ngày</label><input id="to" name="to" type="date" required class="admin-input" value="<?= cas_e($to) ?>">
-<label for="group">Nhóm theo</label><select id="group" class="admin-select" name="group">
+<label class="admin-label mb-0" for="from">Từ ngày</label><input id="from" name="from" type="date" required class="admin-input" value="<?= cas_e($from) ?>">
+<label class="admin-label mb-0" for="to">Đến ngày</label><input id="to" name="to" type="date" required class="admin-input" value="<?= cas_e($to) ?>">
+<label class="admin-label mb-0" for="group">Nhóm theo</label><select id="group" class="admin-select" name="group">
 <option value="day" <?= $group==='day'?'selected':'' ?>>Ngày</option><option value="month" <?= $group==='month'?'selected':'' ?>>Tháng</option>
 </select><button class="admin-btn" type="submit">Xem báo cáo</button></form>
 <p class="cas-profit-note">Chỉ tính đơn <strong>hoàn tất và đã thanh toán</strong>; số tiền hoàn đã ghi nhận được trừ khỏi doanh thu. Những đơn không có snapshot giá vốn nguyên liệu không được tính vào lợi nhuận.</p>
@@ -80,7 +71,7 @@ cas_ops_start('Biểu đồ lợi nhuận gộp','Phân tích kết quả các �
 <section class="admin-card admin-section">
 <h2 class="admin-card-title">Xu hướng doanh thu, giá vốn và lợi nhuận gộp</h2>
 <div class="cas-profit-legend"><?php foreach($series as $data): ?><span><i class="cas-profit-swatch" style="background:<?= $data['color'] ?>"></i><?= cas_e($data['name']) ?></span><?php endforeach; ?></div>
-<?php if(!$rows): ?><p>Chưa có đơn phù hợp trong khoảng thời gian này.</p><?php else: ?>
+<?php if(!$rows): ?><div class="admin-empty mt-3">Chưa có đơn phù hợp trong khoảng thời gian này.</div><?php else: ?>
 <div class="admin-table-wrap">
 <svg class="cas-profit-chart" role="img" aria-label="Biểu đồ đường thể hiện doanh thu, giá vốn nguyên liệu và lợi nhuận gộp theo <?= $group==='month'?'tháng':'ngày' ?>" viewBox="0 0 1000 335" xmlns="http://www.w3.org/2000/svg">
 <?php for($i=0;$i<=4;$i++):$val=$yBottom+($yTop-$yBottom)*$i/4;$y=$yFor($val); ?>

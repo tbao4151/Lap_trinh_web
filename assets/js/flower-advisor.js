@@ -19,7 +19,15 @@
       mode.textContent=data.mode==='ai'?'Tư vấn bằng AI':'Gợi ý dựa trên bộ lọc sản phẩm';
       answer.textContent=String(data.message||'');
       items.replaceChildren();
-      (data.products||[]).forEach(function(product){
+      var list=data.products||[];
+      if(!list.length){
+        const emptyCol=document.createElement('div');emptyCol.className='col-12';
+        const emptyBox=document.createElement('div');emptyBox.className='cas-advisor-note';
+        emptyBox.append('Chưa có mẫu hoa khớp hoàn toàn với tiêu chí này. Bạn có thể nới khoảng ngân sách hoặc ');
+        const browse=document.createElement('a');browse.href='san-pham.php';browse.className='fw-bold';browse.style.color='var(--primary)';browse.textContent='xem tất cả mẫu hoa';
+        emptyBox.append(browse,'.');emptyCol.appendChild(emptyBox);items.appendChild(emptyCol);
+      }
+      list.forEach(function(product){
         const cell=document.createElement('div');cell.className='col-md-6';
         const a=document.createElement('a');a.className='cas-advisor-card';
         a.href='chi-tiet-san-pham.php?slug='+encodeURIComponent(product.slug);

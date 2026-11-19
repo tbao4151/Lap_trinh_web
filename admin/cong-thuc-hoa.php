@@ -68,9 +68,9 @@ cas_ops_start('Định mức nguyên liệu','Công thức cho một bó / giỏ
 <td><?= cas_e((string)$r['quantity'].' '.$r['unit']) ?></td>
 <td><?= cas_e((string)$r['stock']) ?> <?= cas_e($r['unit']) ?></td>
 <td><form method="post" data-confirm="Xóa nguyên liệu khỏi công thức?" class="cas-admin-table-form">
-<?= cas_csrf_form() ?><input type="hidden" name="action" value="recipe_delete"><input type="hidden" name="product_id" value="<?= $selected ?>"><input type="hidden" name="item_id" value="<?= (int)$r['item_id'] ?>"><button class="admin-btn-light" type="submit">Xóa</button></form></td>
+<?= cas_csrf_form() ?><input type="hidden" name="action" value="recipe_delete"><input type="hidden" name="product_id" value="<?= $selected ?>"><input type="hidden" name="item_id" value="<?= (int)$r['item_id'] ?>"><button class="admin-btn-light admin-btn-danger" type="submit">Xóa</button></form></td>
 </tr><?php endforeach; ?>
-<?php if(!$recipe): ?><tr><td colspan="4">Chưa có định mức; chưa thể xuất kho tự động cho sản phẩm này.</td></tr><?php endif; ?>
+<?php if(!$recipe): ?><tr><td colspan="4"><div class="admin-empty">Chưa có định mức; chưa thể xuất kho tự động cho sản phẩm này.</div></td></tr><?php endif; ?>
 </tbody></table></div></article>
 </section>
 <?php endif; ?>

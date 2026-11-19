@@ -59,7 +59,7 @@ $q->execute([$user['user_id']]);$profile=$q->fetch()?:[];
         <a class="active" href="tai-khoan.php"><i class="bi bi-person-lines-fill"></i> Thông tin cá nhân</a>
         <a href="lich-su-don-hang.php"><i class="bi bi-receipt"></i> Lịch sử đơn hàng</a>
         <a href="tra-cuu-don-hang.php"><i class="bi bi-search"></i> Tra cứu đơn</a>
-        <form action="dang-xuat.php" method="post"><?= cas_csrf_form() ?><button class="btn-cas-outline mt-2" type="submit">Đăng xuất</button></form>
+        <form action="dang-xuat.php" method="post"><?= cas_csrf_form() ?><button class="btn-cas-outline w-100 mt-2" type="submit">Đăng xuất</button></form>
       </nav>
     </aside>
         </div>

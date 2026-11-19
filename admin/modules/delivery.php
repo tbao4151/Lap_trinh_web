@@ -142,10 +142,10 @@ function cas_delivery_page(): void
 </section>
 <section class="admin-card admin-section">
   <form method="get" class="cas-admin-stack mb-3">
-    <input class="admin-input" type="date" name="date" value="<?= cas_e($date) ?>">
-    <?= cas_select('slot', ['' => 'Mọi khung giờ'] + array_combine(CAS_DELIVERY_SLOTS, CAS_DELIVERY_SLOTS), $slot) ?>
-    <?= cas_select('status', ['' => 'Mọi trạng thái'] + CAS_DELIVERY_LABELS, $status) ?>
-    <input class="admin-input" name="q" value="<?= cas_e($search) ?>" placeholder="Mã đơn, người nhận, SĐT">
+    <input class="admin-input" type="date" name="date" aria-label="Lọc theo ngày giao" value="<?= cas_e($date) ?>">
+    <?= cas_select('slot', ['' => 'Mọi khung giờ'] + array_combine(CAS_DELIVERY_SLOTS, CAS_DELIVERY_SLOTS), $slot, 'aria-label="Lọc theo khung giờ"') ?>
+    <?= cas_select('status', ['' => 'Mọi trạng thái'] + CAS_DELIVERY_LABELS, $status, 'aria-label="Lọc theo trạng thái giao"') ?>
+    <input class="admin-input" name="q" value="<?= cas_e($search) ?>" aria-label="Tìm mã đơn, người nhận, SĐT" placeholder="Mã đơn, người nhận, SĐT">
     <button class="admin-btn-light" type="submit">Lọc lịch giao</button><a class="admin-btn-light" href="giao-hang.php">Bỏ lọc</a>
     <span class="admin-badge"><?= count($rows) ?> lịch</span>
   </form>
@@ -160,7 +160,7 @@ function cas_delivery_page(): void
         <?php if ($d['last_change']): ?><div class="cas-muted"><?= cas_e($d['last_change']) ?></div><?php endif; ?><?php if ($d['note']): ?><div class="cas-muted">Ghi chú: <?= cas_e($d['note']) ?></div><?php endif; ?></td>
       <td><?php if ($canUpdate && $next && $d['order_status'] !== 'cancelled'): ?>
         <form method="post" class="cas-admin-table-form"><?= cas_csrf_form() ?><input type="hidden" name="action" value="delivery_update"><input type="hidden" name="id" value="<?= (int)$d['delivery_id'] ?>">
-          <?= cas_select('status', array_intersect_key(CAS_DELIVERY_LABELS, array_flip($next)), $next[0]) ?><input class="admin-input" name="note" maxlength="255" placeholder="Ghi chú"><button class="admin-btn-light" type="submit">Lưu</button></form>
+          <?= cas_select('status', array_intersect_key(CAS_DELIVERY_LABELS, array_flip($next)), $next[0], 'aria-label="Trạng thái mới đơn ' . cas_e($d['order_code']) . '"') ?><input class="admin-input" name="note" maxlength="255" aria-label="Ghi chú giao hàng" placeholder="Ghi chú"><button class="admin-btn-light" type="submit">Lưu</button></form>
       <?php else: ?><span class="cas-muted"><?= $next ? 'Chỉ xem' : 'Hoàn tất' ?></span><?php endif; ?></td></tr>
     <?php endforeach; ?>
     <?php if (!$rows): ?><tr><td colspan="6"><div class="admin-empty">Không có lịch giao phù hợp.</div></td></tr><?php endif; ?>
