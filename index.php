@@ -1,4 +1,6 @@
 <?php
+// Customer helpers may emit HTTP headers; load them before rendering any HTML.
+require_once __DIR__ . '/includes/customer.php';
 require_once __DIR__ . '/includes/storefront.php';
 $discovery = cas_discovery_groups();
 cas_page_start("CÁ'S HOA — Hoa cho những điều khó nói", 'home', "CÁ'S HOA - Hoa tươi cho những ngày đáng nhớ và cả những ngày bình thường.");
