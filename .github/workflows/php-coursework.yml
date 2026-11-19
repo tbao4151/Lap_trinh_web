@@ -127,6 +127,21 @@ jobs:
           Xvfb :99 -screen 0 1440x960x24 >/tmp/cas-xvfb.log 2>&1 &
           sleep 2
           /tmp/cas-r2-env/bin/python scripts/capture-r2.py
+      - name: Validate exported real-world CÁ'S HOA demo catalog in MySQL
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_NAME: cas_hoa
+          DB_USER: root
+          DB_PASSWORD: localtestpass
+        run: |
+          export MYSQL_PWD="$DB_PASSWORD"
+          mysql --default-character-set=utf8mb4 -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" < database/demo_cashoa_supabase_catalog.sql
+          CATALOG_PRODUCTS=$(mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" "$DB_NAME" -N -e "SELECT COUNT(*) FROM products WHERE image LIKE 'assets/images/cashoa_catalog/%'")
+          GALLERY_IMAGES=$(mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" "$DB_NAME" -N -e "SELECT COUNT(*) FROM product_images WHERE path LIKE 'assets/images/cashoa_catalog/%'")
+          [ "$CATALOG_PRODUCTS" = "35" ] || { echo "Expected 35 imported products, got $CATALOG_PRODUCTS"; exit 1; }
+          [ "$GALLERY_IMAGES" = "55" ] || { echo "Expected 55 imported image rows, got $GALLERY_IMAGES"; exit 1; }
+          echo "PASS: 35 authentic CÁ'S HOA products, 55 real image paths."
       - uses: actions/upload-artifact@v4
         if: always()
         with:
