@@ -4,6 +4,16 @@ if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_S
     http_response_code(403);
     exit('Forbidden');
 }
+if (PHP_VERSION_ID < 80200) {
+    // Mã nguồn và CI chỉ kiểm thử trên PHP 8.2+; một số bản XAMPP cũ kèm PHP 8.0/8.1 sẽ chạy sai không rõ ràng.
+    if (PHP_SAPI !== 'cli') {
+        http_response_code(500);
+        header('Content-Type: text/plain; charset=UTF-8');
+    }
+    echo "CÁ'S HOA cần PHP 8.2 trở lên, máy đang dùng PHP " . PHP_VERSION . ". Cài XAMPP bản PHP 8.2.x rồi chạy lại.
+";
+    exit(1);
+}
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 if (session_status() === PHP_SESSION_NONE) {
     $secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';

@@ -29,6 +29,8 @@ Xem chi tiết kiến trúc, sơ đồ tách module và kết quả kiểm thử
 
 Yêu cầu **XAMPP với PHP 8.2+** (`pdo_mysql`, `mbstring`, `fileinfo`), **MySQL 8.0 hoặc MariaDB tương thích**, **Apache** và **Git**.
 
+> Kiểm tra trước bằng `<xampp>\php\php.exe -v`. Một số bộ cài XAMPP cũ đi kèm **PHP 8.0.x** — không đạt yêu cầu; khi đó trang web sẽ báo "CÁ'S HOA cần PHP 8.2 trở lên". Hãy cài bản XAMPP có PHP 8.2.x (ví dụ 8.2.12).
+
 ```powershell
 cd D:\xampp\htdocs   # hoặc C:\xampp\htdocs tùy nơi cài XAMPP
 git clone https://github.com/tbao4151/Lap_trinh_web.git
