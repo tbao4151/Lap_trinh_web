@@ -31,7 +31,7 @@ RESULTS = []
 ROUTES = ['dang-nhap', 'index', 'don-hang', 'giao-hang', 'khach-hang', 'san-pham', 'them-san-pham', 'sua-san-pham?id=1',
           'quan-ly-nhanh', 'phan-loai-bo-loc', 'kho-tong', 'bao-cao', 'loi-nhuan',
           'hoan-tien', 'giay-goi', 'kham-pha', 'cong-thuc-hoa', 'kho-hoa', 'kho-phu-kien', 'lich-su-kho', 'nhan-vien', 'cai-dat', 'tai-khoan', 'chu-so-huu']
-STAFF_FORBIDDEN = {'loi-nhuan', 'cong-thuc-hoa', 'them-san-pham', 'sua-san-pham?id=1', 'nhan-vien', 'cai-dat', 'chu-so-huu'}
+STAFF_FORBIDDEN = {'bao-cao', 'loi-nhuan', 'cong-thuc-hoa', 'them-san-pham', 'sua-san-pham?id=1', 'nhan-vien', 'cai-dat', 'chu-so-huu'}
 ADMIN_FORBIDDEN = {'chu-so-huu'}
 
 
@@ -342,11 +342,19 @@ def test_inventory(admin, staff):
     return item
 
 
+def profit_material_cost(html):
+    """Số "Giá vốn nguyên liệu" trên trang Lợi nhuận gộp (đồng), None nếu không tìm thấy."""
+    m = re.search(r'Giá vốn nguyên liệu<strong>([^<]+)</strong>', html)
+    return int(re.sub(r'\D', '', m.group(1)) or 0) if m else None
+
+
 def test_delivery(admin, staff, order_id):
     # Cross-module: configure recipe, reserve actual stock only on preparing,
     # let delivery move the order ready -> delivering -> completed.
     item = sql_int(f"SELECT item_id FROM inventory_items WHERE name={q('Hoa thử ' + RUN)}")
     product_id = 2  # make_paid_order builds an order for p002
+    # Lần chạy trước (hoặc dữ liệu demo) có thể đã để lại định mức cho p002: xóa để ca "thiếu công thức" có nghĩa.
+    sql('DELETE FROM product_recipes WHERE product_id=2')
     status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'preparing', 'payment_status': 'paid'})
     check('Thiếu công thức: chặn chuẩn bị và giữ trạng thái/stock', status == 422 and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}') == 'confirmed'
           and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}') == 8, status)
@@ -363,6 +371,9 @@ def test_delivery(admin, staff, order_id):
     status_report, html_report, _ = admin.get('admin/loi-nhuan.php?group=day')
     check('Báo cáo lợi nhuận có đồ thị và số liệu SQL', status_report == 200 and 'Biểu đồ lợi nhuận gộp' in html_report
           and 'Doanh thu có đủ giá vốn' in html_report, status_report)
+    # Đơn đang chuẩn bị chưa tính vào lợi nhuận; ghi lại giá vốn hiện có để so phần chênh sau khi đơn hoàn tất
+    # (không giả định cơ sở dữ liệu rỗng — trên DB đã có đơn demo, tổng giá vốn sẽ khác 24.000).
+    cost_before = profit_material_cost(html_report)
     status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'preparing', 'payment_status': 'paid'})
     check('Gửi lại preparing không trừ tồn lần hai',status==303 and sql_int(f'SELECT quantity FROM inventory_items WHERE item_id={item}')==6,status)
     status, _, _ = admin.post('admin/don-hang.php', {'action': 'order_update', 'id': order_id, 'status': 'ready', 'payment_status': 'paid'})
@@ -381,9 +392,11 @@ def test_delivery(admin, staff, order_id):
     check('Đã giao đồng bộ hoàn tất đơn', status == 303 and sql(f'SELECT delivery_status FROM deliveries WHERE delivery_id={did}') == 'delivered'
           and sql(f'SELECT order_status FROM orders WHERE order_id={order_id}')=='completed', status)
     status_profit, profit_html, _ = admin.get('admin/loi-nhuan.php?group=day')
-    check('Đơn hoàn tất lên đồ thị lợi nhuận, giá vốn snapshot 24.000 đ', status_profit==200
-          and '24.000' in profit_html and 'gross_profit' not in profit_html,
-          status_profit)
+    cost_after = profit_material_cost(profit_html)
+    check('Đơn hoàn tất lên đồ thị lợi nhuận, giá vốn snapshot tăng đúng 24.000 đ', status_profit==200
+          and cost_before is not None and cost_after is not None and cost_after - cost_before == 24000
+          and 'gross_profit' not in profit_html,
+          f'{status_profit} {cost_before} -> {cost_after}')
 
     status, _, _ = admin.post('admin/giao-hang.php', {'action': 'delivery_update', 'id': did, 'status': 'not_delivered', 'note': 'Thử quay lại'})
     check('Đã giao là trạng thái cuối -> 422', status == 422, status)
@@ -420,7 +433,8 @@ def test_inventory_cancellation(admin, order_id_for_reference):
 
 
 def test_refunds(admin, staff, order_code, order_id):
-    unpaid = sql("SELECT order_code FROM orders WHERE payment_status<>'paid' LIMIT 1")
+    # Chỉ đơn chưa thu/đang cọc mới là "chưa thanh toán"; đơn hoàn một phần vẫn được phép tạo hoàn tiền tiếp.
+    unpaid = sql("SELECT order_code FROM orders WHERE payment_status IN ('unpaid','partial') LIMIT 1")
     if unpaid:
         status, _, _ = staff.post('admin/hoan-tien.php', {'action': 'refund_create', 'order_code': unpaid, 'amount': 10000, 'reason': 'Khách đổi ý', 'request_token': secrets.token_hex(16)})
         check('Không tạo hoàn tiền cho đơn chưa thanh toán -> 422', status == 422, status)
@@ -444,6 +458,16 @@ def test_refunds(admin, staff, order_code, order_id):
     status, _, _ = admin.post('admin/hoan-tien.php', {'action': 'refund_transition', 'id': rid, 'status': 'recorded', 'reference': 'FT' + RUN})
     check('Ghi nhận đã hoàn có mã giao dịch -> 303', status == 303 and sql(f'SELECT reference FROM refunds WHERE refund_id={rid}') == 'FT' + RUN, status)
     check('Hoàn tiền đồng bộ trạng thái thanh toán một phần', sql(f'SELECT payment_status FROM orders WHERE order_id={order_id}') == 'partially_refunded')
+    note = sql(f"SELECT note FROM refund_events WHERE refund_id={rid} AND to_status='recorded'")
+    check('Lịch sử ghi nhận không ghi chú chỉ lưu "Mã GD: …", không thừa dấu "| "', note == 'Mã GD: FT' + RUN, note)
+    _, dash, _ = admin.get('admin/index.php')
+    m = re.search(r'<span>Đơn đã thanh toán</span><strong>([^<]+)</strong>', dash)
+    paid_ref = sql_int("SELECT COUNT(*) FROM orders WHERE payment_status IN ('paid','partially_refunded','refunded')")
+    check('Dashboard "Đơn đã thanh toán" vẫn tính đơn đã hoàn một phần', m is not None and int(re.sub(r'\D', '', m.group(1))) == paid_ref,
+          (m.group(1) if m else None, paid_ref))
+    _, dash_staff, _ = staff.get('admin/index.php')
+    check('Nhân viên không thấy số doanh thu trên Dashboard và menu Báo cáo doanh thu',
+          'Doanh thu thuần' not in dash_staff and 'bao-cao.php' not in dash_staff and 'Đơn đã thanh toán' in dash_staff)
     token2=secrets.token_hex(16)
     status, _, _ = staff.post('admin/hoan-tien.php',{'action':'refund_create','order_code':order_code,
         'amount':total-50000,'reason':'Hoàn phần tiền còn lại','request_token':token2})
