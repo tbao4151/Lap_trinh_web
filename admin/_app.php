@@ -9,6 +9,7 @@ if (PHP_SAPI !== 'cli' && str_replace('\\', '/', strtolower((string)realpath($_S
  * Dispatcher cho 4 route lõi Admin (dashboard, orders, customers, reports).
  */
 require_once __DIR__ . '/_actions.php';
+cas_admin_guard_core_page($db, $user, (string)($cas_page ?? ''));
 
 [$title, $icon] = cas_admin_core_meta((string)($cas_page ?? ''));
 cas_admin_layout_start(

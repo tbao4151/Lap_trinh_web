@@ -213,6 +213,36 @@ function cas_admin_core_meta(string $cas_page): array
     return [$titles[$cas_page] ?? "CÁ'S HOA Admin", $icons[$cas_page] ?? 'bi-flower2'];
 }
 
+/** Vai trò được xem từng trang lõi; trang không có trong danh sách mở cho mọi vai trò nội bộ. */
+function cas_admin_core_page_roles(string $cas_page): array
+{
+    $roles = [
+        // Doanh thu là số liệu tài chính: chỉ admin/owner, giống Biểu đồ lợi nhuận (đề xuất C7 trong docs/admin-ops-contracts.md).
+        'reports' => ['admin', 'owner'],
+    ];
+    return $roles[$cas_page] ?? ['staff', 'admin', 'owner'];
+}
+
+/** Chặn trang lõi khi vai trò không đủ quyền: ghi audit "denied", trả 403 và dừng. */
+function cas_admin_guard_core_page(PDO $db, array $user, string $cas_page): void
+{
+    if (in_array($user['role'] ?? '', cas_admin_core_page_roles($cas_page), true)) {
+        return;
+    }
+    try {
+        $db->prepare('INSERT INTO admin_audit_log(user_id,action,entity_type,entity_id,outcome,detail,ip) VALUES(?,?,?,?,?,?,?)')
+           ->execute([$user['user_id'] ?? null, 'page_view', 'permission', basename($_SERVER['SCRIPT_NAME'] ?? ''), 'denied',
+               json_encode(['role' => $user['role'] ?? ''], JSON_UNESCAPED_UNICODE), substr((string)($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45)]);
+    } catch (Throwable $e) {
+        error_log('CAS audit: ' . $e->getMessage());
+    }
+    http_response_code(403);
+    cas_admin_layout_start($user, 'Không có quyền truy cập', 'Bạn không có quyền truy cập khu vực này.', 'bi-shield-lock', $cas_page);
+    echo '<section class="admin-card admin-section"><p class="mb-0">Tài khoản của bạn không được phép xem trang này. Liên hệ quản trị viên nếu bạn cần được cấp quyền.</p></section>';
+    cas_admin_layout_end();
+    exit;
+}
+
 function cas_admin_render_core_page(PDO $db, array $user, string $cas_page): void
 {
     $statuses = cas_admin_order_statuses();
@@ -226,12 +256,18 @@ function cas_admin_render_core_page(PDO $db, array $user, string $cas_page): voi
                 'Chờ xác nhận' => (int)$db->query("SELECT COUNT(*) FROM orders WHERE order_status='pending_confirmation'")->fetchColumn(),
                 'Đang chuẩn bị' => (int)$db->query("SELECT COUNT(*) FROM orders WHERE order_status IN ('confirmed','preparing','ready')")->fetchColumn(),
                 'Giao hôm nay' => (int)$db->query('SELECT COUNT(*) FROM deliveries WHERE DATE(scheduled_at)=CURDATE()')->fetchColumn(),
-                'Đơn đã thanh toán' => (int)$db->query("SELECT COUNT(*) FROM orders WHERE payment_status='paid'")->fetchColumn(),
+                // Đơn đã thu tiền: tính cả đơn sau đó hoàn một phần/toàn bộ (cùng tập trạng thái với analytics.php),
+                // nếu chỉ đếm 'paid' thì một đơn vừa ghi nhận hoàn tiền sẽ biến mất khỏi ô này.
+                'Đơn đã thanh toán' => (int)$db->query("SELECT COUNT(*) FROM orders WHERE payment_status IN ('paid','partially_refunded','refunded')")->fetchColumn(),
                 'Nguyên liệu sắp hết' => (int)$db->query("SELECT COUNT(*) FROM inventory_items WHERE quantity<=min_quantity AND status='active'")->fetchColumn(),
                 // Trước đây: SUM(total_amount) chỉ với payment_status='paid' => bỏ sót phần còn lại của đơn hoàn một phần,
                 // lệch với Báo cáo doanh thu và Lợi nhuận gộp. Nay dùng chung định nghĩa doanh thu thuần (toàn thời gian).
                 CAS_REVENUE_NET_LABEL => (int)round(cas_revenue_net_total($db)),
             ];
+            if (!in_array($user['role'] ?? '', cas_admin_core_page_roles('reports'), true)) {
+                // Nhân viên không xem số liệu doanh thu (cùng quyền với trang Báo cáo doanh thu).
+                unset($kpis[CAS_REVENUE_NET_LABEL]);
+            }
             $latest = cas_admin_rows($db, "SELECT o.order_code,o.total_amount,o.order_status,o.created_at,c.full_name FROM orders o JOIN customers c ON c.customer_id=o.customer_id ORDER BY o.order_id DESC LIMIT 10");
             ?>
 <div class="cas-admin-metrics admin-section">

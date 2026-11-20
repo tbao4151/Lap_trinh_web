@@ -50,3 +50,5 @@ Chưa làm vì nằm trong `includes/auth.php`: các phiên **khác** của cùn
 ## C7. Quyền xem báo cáo doanh thu
 
 `bao-cao.php` hiện mở cho staff. Nếu nhóm muốn giới hạn, chỉ cần thêm `cas_page_roles(['admin','owner'], 'Báo cáo')` (hàm có sẵn trong `admin/_ops.php`) hoặc kiểm tra tương đương trong `_app.php`.
+
+**Cập nhật 20/11/2026 — đã áp dụng:** `_app.php` gọi `cas_admin_guard_core_page()` (trong `admin/modules/orders.php`); trang `reports` chỉ cho `admin`/`owner`, staff nhận 403 kèm audit `page_view` = `denied`. Menu `_nav.php` và ô "Doanh thu thuần" trên Dashboard cũng ẩn với staff để không lộ cùng số liệu qua đường khác.
