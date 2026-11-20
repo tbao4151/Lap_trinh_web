@@ -1,0 +1,126 @@
+{
+  "results": [
+    {
+      "id": "TC01",
+      "status": "PASS",
+      "actual": "Ba trang HTTP 200, ảnh giải mã được."
+    },
+    {
+      "id": "TC02",
+      "status": "FAIL",
+      "actual": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'Ly xanh',\n+   'Lam tinh'\n  ]\n"
+    },
+    {
+      "id": "TC03",
+      "status": "PASS",
+      "actual": "400000 → 800000 đ, xóa còn 0 sản phẩm."
+    },
+    {
+      "id": "TC06a",
+      "status": "PASS",
+      "actual": "Đăng ký, đăng xuất và đăng nhập lại thành công."
+    },
+    {
+      "id": "TC04",
+      "status": "PASS",
+      "actual": "Chặn thiếu tên; tạo đơn CSH-2026-9808DC04"
+    },
+    {
+      "id": "TC05",
+      "status": "PASS",
+      "actual": "CSH-2026-9808DC04 · Chờ xác nhận"
+    },
+    {
+      "id": "TC06b",
+      "status": "PASS",
+      "actual": "Đơn hiển thị tại A, tài khoản B không thấy đơn."
+    },
+    {
+      "id": "TC11-375",
+      "status": "PASS",
+      "actual": "7 trang, không tràn ngang hoặc ảnh vỡ."
+    },
+    {
+      "id": "TC11-768",
+      "status": "PASS",
+      "actual": "7 trang, không tràn ngang hoặc ảnh vỡ."
+    },
+    {
+      "id": "TC11-1440",
+      "status": "PASS",
+      "actual": "7 trang, không tràn ngang hoặc ảnh vỡ."
+    }
+  ],
+  "shots": [
+    {
+      "name": "TC01_trang_chu",
+      "url": "http://localhost/Lap_trinh_web/index.php",
+      "time": "2026-11-20T08:38:05.869Z"
+    },
+    {
+      "name": "TC01_danh_muc",
+      "url": "http://localhost/Lap_trinh_web/san-pham.php",
+      "time": "2026-11-20T08:38:07.479Z"
+    },
+    {
+      "name": "TC01_chi_tiet",
+      "url": "http://localhost/Lap_trinh_web/chi-tiet-san-pham.php?slug=lam-tinh",
+      "time": "2026-11-20T08:38:08.466Z"
+    },
+    {
+      "name": "TC03_so_luong",
+      "url": "http://localhost/Lap_trinh_web/gio-hang.php",
+      "time": "2026-11-20T08:38:12.804Z"
+    },
+    {
+      "name": "TC03_gio_rong",
+      "url": "http://localhost/Lap_trinh_web/gio-hang.php",
+      "time": "2026-11-20T08:38:13.050Z"
+    },
+    {
+      "name": "TC06_tai_khoan",
+      "url": "http://localhost/Lap_trinh_web/tai-khoan.php",
+      "time": "2026-11-20T08:38:16.194Z"
+    },
+    {
+      "name": "TC04_thieu_du_lieu",
+      "url": "http://localhost/Lap_trinh_web/thanh-toan.php",
+      "time": "2026-11-20T08:38:19.166Z"
+    },
+    {
+      "name": "TC04_dat_thanh_cong",
+      "url": "http://localhost/Lap_trinh_web/dat-hang-thanh-cong.php?code=CSH-2026-9808DC04",
+      "time": "2026-11-20T08:38:20.556Z"
+    },
+    {
+      "name": "TC05_tra_cuu",
+      "url": "http://localhost/Lap_trinh_web/tra-cuu-don-hang.php?code=CSH-2026-9808DC04",
+      "time": "2026-11-20T08:38:21.905Z"
+    },
+    {
+      "name": "TC06_lich_su",
+      "url": "http://localhost/Lap_trinh_web/lich-su-don-hang.php",
+      "time": "2026-11-20T08:38:22.981Z"
+    },
+    {
+      "name": "TC06_lich_su_B",
+      "url": "http://localhost/Lap_trinh_web/lich-su-don-hang.php",
+      "time": "2026-11-20T08:38:25.720Z"
+    },
+    {
+      "name": "TC11_375",
+      "url": "http://localhost/Lap_trinh_web/san-pham.php",
+      "time": "2026-11-20T08:38:27.719Z"
+    },
+    {
+      "name": "TC11_768",
+      "url": "http://localhost/Lap_trinh_web/san-pham.php",
+      "time": "2026-11-20T08:38:33.668Z"
+    },
+    {
+      "name": "TC11_1440",
+      "url": "http://localhost/Lap_trinh_web/san-pham.php",
+      "time": "2026-11-20T08:38:39.780Z"
+    }
+  ]
+}
