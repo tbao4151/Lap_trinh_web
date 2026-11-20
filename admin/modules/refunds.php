@@ -102,7 +102,7 @@ function cas_refund_transition(PDO $db, array $user): string
     $db->prepare('UPDATE refunds SET status=?, reviewed_by=?, reviewed_at=NOW(), reference=COALESCE(?,reference) WHERE refund_id=?')
        ->execute([$to, $user['user_id'], $reference, $id]);
     $db->prepare('INSERT INTO refund_events(refund_id,from_status,to_status,actor_id,note) VALUES(?,?,?,?,?)')
-       ->execute([$id, $r['status'], $to, $user['user_id'], trim($note . ($reference ? ' | Mã GD: ' . $reference : '')) ?: null]);
+       ->execute([$id, $r['status'], $to, $user['user_id'], cas_refund_event_note($note, $reference)]);
     if($to==='recorded'){
         $q=$db->prepare("SELECT COALESCE(SUM(amount),0) FROM refunds WHERE order_id=? AND status='recorded'");
         $q->execute([$orderId]);$refunded=(int)round((float)$q->fetchColumn());
@@ -114,6 +114,15 @@ function cas_refund_transition(PDO $db, array $user): string
     $db->commit();
     cas_audit('refund_' . $to, 'refund', $id, ['order' => $r['order_code'], 'amount' => (float)$r['amount'], 'from' => $r['status'], 'reference' => $reference]);
     return 'RF-' . str_pad((string)$id, 4, '0', STR_PAD_LEFT) . ': ' . CAS_REFUND_LABELS[$r['status']] . ' → ' . CAS_REFUND_LABELS[$to] . '.';
+}
+
+/** Ghi chú lịch sử hoàn tiền: ghép lý do và mã giao dịch, bỏ phần rỗng để không sinh "| Mã GD: …" thừa dấu. */
+function cas_refund_event_note(string $note, ?string $reference): ?string
+{
+    $parts = [];
+    if (trim($note) !== '') $parts[] = trim($note);
+    if ($reference !== null && trim($reference) !== '') $parts[] = 'Mã GD: ' . trim($reference);
+    return $parts ? implode(' | ', $parts) : null;
 }
 
 function cas_refunds_page(): void

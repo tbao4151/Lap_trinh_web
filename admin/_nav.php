@@ -17,7 +17,7 @@ $casNavGroups = [
         ['hoan-tien.php', 'Hoàn tiền', $casNavAll, 'bi-arrow-counterclockwise'],
         ['giao-hang.php', 'Giao hàng', $casNavAll, 'bi-truck'],
         ['khach-hang.php', 'Khách hàng', $casNavAll, 'bi-people'],
-        ['bao-cao.php', 'Báo cáo doanh thu', $casNavAll, 'bi-bar-chart'],
+        ['bao-cao.php', 'Báo cáo doanh thu', ['admin', 'owner'], 'bi-bar-chart'],
         ['loi-nhuan.php', 'Biểu đồ lợi nhuận', ['admin', 'owner'], 'bi-graph-up-arrow'],
     ],
     'Sản phẩm' => [

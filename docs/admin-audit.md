@@ -50,7 +50,7 @@ Sau khi sửa: 22/22 route có file `.php` thật, menu (`admin/_nav.php`) trỏ
 | F10 | Không có upload ảnh sản phẩm, chỉ chọn ảnh có sẵn | Form sửa sản phẩm | Trung bình | Tải nhiều ảnh, kiểm MIME thật bằng `finfo`, ≤ 2 MB, tên ngẫu nhiên, thư mục chặn chạy script |
 | F11 | Thông tin cửa hàng (địa chỉ, hotline, thông báo) viết cứng trong `main-r2.js` và `lien-he.php` | Xem mã nguồn | Thấp | Bảng `shop_settings` + trang Cài đặt; trang khách đọc qua `includes/storefront.php` |
 | F12 | Staff đổi được trạng thái đơn sang `cancelled` và thanh toán sang `refunded`; admin lùi đơn `completed` → `pending_confirmation/unpaid` | POST `order_update` (`_actions.php`) | Cao | **Chưa sửa** — thuộc contract đơn hàng/thanh toán của trưởng nhóm. Đề xuất ở `docs/admin-ops-contracts.md` |
-| F13 | Báo cáo doanh thu mở cho cả staff | GET `bao-cao.php` bằng staff → 200 | Thấp | **Giữ nguyên** (trang của trưởng nhóm), ghi vào đề xuất |
+| F13 | Báo cáo doanh thu mở cho cả staff | GET `bao-cao.php` bằng staff → 200 | Thấp | **Đã sửa 20/11/2026** — staff nhận 403 + audit `denied`, menu và ô doanh thu trên Dashboard ẩn với staff (xem `docs/TV3_NGHIEM_THU_FIXES_2026-11-20.md`) |
 | F14 | (Đạt) CSRF: POST thiếu token → 403 | POST không `csrf` | — | Giữ nguyên, có test |
 | F15 | (Đạt) Đăng xuất: cookie cũ POST lại bị chuyển về đăng nhập | POST sau `dang-xuat.php` | — | Giữ nguyên, có test; thêm: khoá tài khoản làm phiên đang mở mất quyền ngay |
 
